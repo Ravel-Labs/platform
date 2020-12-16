@@ -1,9 +1,11 @@
-import PageWrapper from '../PageWrapper.js';
+import PageWrapper from '../PageWrapper';
+import AudioPlayer from '../AudioPlayer';
 
 function TrackPage() {
   return (
     <PageWrapper>
       <h1>Track</h1>
+      <AudioPlayer />
     </PageWrapper>
   )
 }

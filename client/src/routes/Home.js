@@ -1,4 +1,4 @@
-import PageWrapper from '../PageWrapper.js';
+import PageWrapper from '../PageWrapper';
 
 function HomePage() {
   return (

@@ -15,6 +15,12 @@
 
 .Header li {
   margin: 20px;
+  border-bottom: 2px solid transparent;
+  transition: border-bottom-color .36s ease-in;
+}
+
+.Header li:hover {
+  border-bottom: 2px solid #7D7D7D;
 }
 
 .Header li a {
