@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-function TestAPI() {
+import PageWrapper from '../PageWrapper.js';
+
+function APITest() {
   const [message, setMessage] = useState(null)
   useEffect(() => {
     async function callAPI() {
@@ -12,12 +14,10 @@ function TestAPI() {
   }, [])
 
   return (
-    <div>
-      {message && (
-        <div>{message}</div>
-      )}
-    </div>
+    <PageWrapper>
+      <h1>{message ? message : ""}</h1>
+    </PageWrapper>
   )
 }
 
-export default TestAPI;
+export default APITest;
