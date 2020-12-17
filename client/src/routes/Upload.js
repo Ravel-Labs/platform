@@ -1,11 +1,11 @@
 import PageWrapper from '../PageWrapper';
 
-function Home() {
+function Upload() {
   return (
     <PageWrapper>
-      <h1>Home</h1>
+      <h1>Upload</h1>
     </PageWrapper>
   )
 }
 
-export default Home;
+export default Upload;

@@ -1,11 +1,11 @@
 import PageWrapper from '../PageWrapper';
 
-function Home() {
+function Login() {
   return (
     <PageWrapper>
-      <h1>Home</h1>
+      <h1>Login</h1>
     </PageWrapper>
   )
 }
 
-export default Home;
+export default Login;

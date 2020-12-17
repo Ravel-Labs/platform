@@ -8,7 +8,12 @@ import Header from './Header';
 import './App.css';
 
 const Home = lazy(() => import('./routes/Home'));
+const Login = lazy(() => import('./routes/Login'));
+const Signup = lazy(() => import('./routes/Signup'));
+const Profile = lazy(() => import('./routes/Profile'));
 const Track = lazy(() => import('./routes/Track'));
+const TrackFeedback = lazy(() => import('./routes/TrackFeedback'));
+const Upload = lazy(() => import('./routes/Upload'));
 const APITest = lazy(() => import('./routes/APITest'));
 
 export default function App() {
@@ -19,11 +24,26 @@ export default function App() {
           <Header />
           <Suspense fallback={<div>Loading...</div>}>
             <Switch>
-              <Route path="/track">
+              <Route path="/login">
+                <Login />
+              </Route>
+              <Route path="/signup">
+                <Signup />
+              </Route>
+              <Route path="/track/:trackSlug/feedback">
+                <TrackFeedback />
+              </Route>
+              <Route path="/track/:trackSlug">
                 <Track />
+              </Route>
+              <Route path="/upload">
+                <Upload />
               </Route>
               <Route path="/api-test">
                 <APITest />
+              </Route>
+              <Route path="/:username">
+                <Profile />
               </Route>
               <Route path="/">
                 <Home />
