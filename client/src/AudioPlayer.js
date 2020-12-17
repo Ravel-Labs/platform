@@ -1,9 +1,7 @@
-const audioSource = "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3";
-
-export default function AudioPlayer() {
+export default function AudioPlayer({ url }) {
   return (
     <div>
-      <audio src={audioSource} controls preload="metadata" />
+      <audio src={url} controls preload="metadata" />
     </div>
   )
 }
