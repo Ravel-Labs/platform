@@ -7,8 +7,12 @@ function APITest() {
   const [message, setMessage] = useState("Waiting...")
   useEffect(() => {
     async function callAPI() {
-      const res = await axios.get('/testAPI')
-      setMessage(res.data)
+      try {
+        const res = await axios.get('/testAPI')
+        setMessage(res.data)
+      } catch(err) {
+        setMessage(err.message)
+      }
     }
     callAPI();
   }, [])
