@@ -6,7 +6,7 @@ var logger = require('morgan');
 
 var cors = require("cors");
 var indexRouter = require('./routes/index');
-var testAPIRouter = require('./routes/testAPI');
+var testRouter = require('./routes/test');
 var tracksRouter = require('./routes/tracks');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use("/auth", authRouter);
-app.use("/testAPI", testAPIRouter);
+app.use("/test", testRouter);
 app.use("/tracks", tracksRouter);
 app.use("/users", usersRouter);
 
