@@ -1,39 +1,57 @@
 var express = require('express');
+var AuthService = require('../services/auth');
+var config = require('../config');
 var router = express.Router();
 
-// Signup route -- create a new user, return token.
-router.post('/signup', function(req, res) {
-  // TODO: validate uniqueness & proper values.
-  // TODO: create user in DB.
-  // TODO: create jwt to include in response.
+const dayMs = 24 * 60 * 60 * 1000
+// TODO: Update before deploying
+// const tokenLengthMs = 30 * dayMs
+const testTokenLengthMs = 60 * 1000
 
-  res.status(201).send({
-    user: {
-      username: req.body.username,
-      email: req.body.email,
-      id: 12,
-      displayName: "Display Name",
-    },
-    token: "TODO",
+function setAuthCookie(res, token) {
+  res.cookie(AuthService.AUTH_TOKEN_COOKIE, token, {
+    expires: new Date(Date.now() + testTokenLengthMs),
+    secure: config.nodeEnv === 'production', // set to true if your using https
+    httpOnly: true,
   });
+}
+
+// Signup route -- create a new user, return token.
+router.post('/signup', async function(req, res) {
+  const { email, username, password } = req.body;
+
+  try {
+    const { token, user } = await AuthService.Signup(email, username, password)
+    setAuthCookie(res, token);
+    return res.status(201).send({
+      user,
+      token,
+    });
+  } catch(e) {
+    console.log("/signup err", e)
+    res.status(400).send({
+      error: e,
+    });
+  }
 });
 
 // Login route -- validate credentials, return token + user info.
-router.post('/login', function(req, res) {
-  const { email } = req.body;
-  // TODO: lookup user in DB by email.
-  // TODO: validate password
-  // TODO: create jwt to include in response.
+router.post('/login', async function(req, res) {
+  const { email, password } = req.body;
 
-  res.status(200).send({
-    user: {
-      email,
-      username: "todo_username",
-      id: 12,
-      displayName: "Display Name",
-    },
-    token: "TODO",
-  });
+  try {
+    const { token, user } = await AuthService.Login(email, password)
+    setAuthCookie(res, token);
+    return res.status(200).send({
+      user,
+      token,
+    });
+  } catch(e) {
+    console.log("/login err", e)
+    res.status(401).send({
+      error: e,
+    });
+  }
 });
 
 module.exports = router;
