@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var testAPIRouter = require('./routes/testAPI');
 var tracksRouter = require('./routes/tracks');
 var usersRouter = require('./routes/users');
+var authRouter = require('./routes/auth');
 
 var app = express();
 
@@ -24,6 +25,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use("/auth", authRouter);
 app.use("/testAPI", testAPIRouter);
 app.use("/tracks", tracksRouter);
 app.use("/users", usersRouter);
