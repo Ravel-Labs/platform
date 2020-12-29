@@ -3,7 +3,7 @@ import { Link, useRouteMatch } from 'react-router-dom';
 import axios from 'axios';
 
 import PageWrapper from '../PageWrapper';
-import AudioPlayer from '../AudioPlayer';
+import TrackDisplay from '../TrackDisplay';
 
 function Track() {
   let match = useRouteMatch();
@@ -23,10 +23,7 @@ function Track() {
   }, [trackSlug])
   return (
     <PageWrapper>
-      <h1>{track ? track.title : `Fetching ${trackSlug}...`}</h1>
-      <div>slug: {trackSlug}</div>
-      <AudioPlayer url={track?.url}/>
-
+      <TrackDisplay track={track} />
       {/* TODO: Restrict to only uploader of this track. */}
       <Link to={`${match.url}/feedback`}>View track feedback</Link>
     </PageWrapper>
