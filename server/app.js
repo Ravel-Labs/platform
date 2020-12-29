@@ -6,11 +6,16 @@ var logger = require('morgan');
 
 var cors = require("cors");
 var config = require('./config')
+
+// API routes
 var indexRouter = require('./routes/index');
 var testRouter = require('./routes/test');
+var feedbackRouter = require('./routes/feedback');
 var tracksRouter = require('./routes/tracks');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
+
+// Middleware
 var tokenMiddleware = require('./middleware/token')
 
 var app = express();
@@ -36,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use("/auth", authRouter);
+app.use("/feedback", tokenMiddleware.withUser, feedbackRouter);
 app.use("/test", tokenMiddleware.withUser, testRouter);
 app.use("/tracks", tokenMiddleware.withUser, tracksRouter);
 app.use("/users", usersRouter);
