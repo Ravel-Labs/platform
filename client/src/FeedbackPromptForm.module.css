@@ -1,0 +1,27 @@
+.PromptText {
+  font-weight: 600;
+  font-size: 32px;
+}
+
+.PromptOption {
+  border: solid 1px #303030;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 13pt;
+  padding: 24px;
+  display: inline-block;
+}
+
+.PromptOption:nth-child(n+2) {
+  margin-left: -1px;
+}
+
+.PromptOption:hover {
+  background-color: lightgrey;
+}
+
+.PromptOption_Selected {
+  background-color: #0500FF;
+  color: #ffffff;
+}

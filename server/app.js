@@ -5,9 +5,18 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var cors = require("cors");
+var config = require('./config')
+
+// API routes
 var indexRouter = require('./routes/index');
-var testAPIRouter = require('./routes/testAPI');
+var testRouter = require('./routes/test');
+var feedbackRouter = require('./routes/feedback');
 var tracksRouter = require('./routes/tracks');
+var usersRouter = require('./routes/users');
+var authRouter = require('./routes/auth');
+
+// Middleware
+var tokenMiddleware = require('./middleware/token')
 
 var app = express();
 
@@ -15,7 +24,15 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(cors());
+app.use(cors(
+  {
+    origin: [
+      config.frontendUrl,
+      'http://localhost:3000',
+    ],
+    credentials: true
+  }
+));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -23,8 +40,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use("/testAPI", testAPIRouter);
-app.use("/tracks", tracksRouter);
+app.use("/auth", authRouter);
+app.use("/feedback", tokenMiddleware.withUser, feedbackRouter);
+app.use("/test", tokenMiddleware.withUser, testRouter);
+app.use("/tracks", tokenMiddleware.withUser, tracksRouter);
+app.use("/users", usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

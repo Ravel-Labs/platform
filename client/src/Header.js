@@ -20,7 +20,7 @@ function DevToolToggle({ isEnabled, onClick }) {
 }
 
 export default function Header() {
-  const [isDevEnabled, setIsDevEnabled] = useState(false)
+  const [isDevEnabled, setIsDevEnabled] = useState(true)
   const onClickDevtools = (e) => {
     e.preventDefault()
     setIsDevEnabled((prevIsEnabled) => {
