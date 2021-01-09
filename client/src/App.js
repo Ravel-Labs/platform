@@ -2,8 +2,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Header from './Header';
-// import Track from './routes/Track';
-// import APITest from './routes/APITest';
+import RouteAnalytics from './RouteAnalytics';
 
 import './App.css';
 
@@ -50,6 +49,7 @@ export default function App() {
               </Route>
             </Switch>
           </Suspense>
+          <RouteAnalytics />
         </div>
       </Router>
     </div>
