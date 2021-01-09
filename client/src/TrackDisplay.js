@@ -9,7 +9,7 @@ function TrackDisplay({ track }) {
       {track && (
         <div>
           <div>slug: {track.slug}</div>
-          <AudioPlayer url={track?.url}/>
+          <AudioPlayer track={track}/>
           {track.prompts.map((prompt) => (
             <FeedbackPromptForm key={prompt.id} prompt={prompt} />
           ))}
