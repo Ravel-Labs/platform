@@ -7,13 +7,14 @@ var logger = require('morgan');
 var cors = require("cors");
 var config = require('./config')
 
-// API routes
+// API router handlers
+var analyticsRouter = require('./routes/analytics');
+var authRouter = require('./routes/auth');
+var feedbackRouter = require('./routes/feedback');
 var indexRouter = require('./routes/index');
 var testRouter = require('./routes/test');
-var feedbackRouter = require('./routes/feedback');
 var tracksRouter = require('./routes/tracks');
 var usersRouter = require('./routes/users');
-var authRouter = require('./routes/auth');
 
 // Middleware
 var tokenMiddleware = require('./middleware/token')
@@ -39,7 +40,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// API routes
 app.use('/', indexRouter);
+app.use("/analytics", analyticsRouter);
 app.use("/auth", authRouter);
 app.use("/feedback", tokenMiddleware.withUser, feedbackRouter);
 app.use("/test", tokenMiddleware.withUser, testRouter);
