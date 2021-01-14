@@ -1,22 +1,21 @@
-
 exports.up = function(knex) {
   return knex.schema
   	.createTable('users', t => {
   		t.increments('id').primary();
-  		t.string('name', 255).notNullable();
-  		t.string('username', 255).unique().notNullable();
-  		t.string('email', 255).unique().notNullable();
+  		t.string('name').notNullable().defaultTo('');
+  		t.string('username').unique().notNullable();
+  		t.string('email').unique().notNullable();
   		t.string('passwordHash').notNullable();
-  		t.string('displayName').unique().notNullable();
-  		t.timestamp('createdAt').defaultTo(knex.fn.now())
+  		t.string('displayName').unique().notNullable().defaultTo('');
+  		t.timestamp('createdAt').defaultTo(knex.fn.now());
 
   	})
   	.createTable('tracks', t => {
   		t.increments('id').primary();
-  		t.string('trackName', 255).notNullable();
+  		t.string('trackName').notNullable();
   		t.timestamp('createdAt').defaultTo(knex.fn.now());
-  		t.string('genre', 255).notNullable();
-  		t.string('path', 255).unique().notNullable()
+  		t.string('genre').notNullable();
+  		t.string('path').unique().notNullable();
   	})
   	.createTable('trackCredits', t => {
   		t.increments('id').primary();
@@ -25,14 +24,27 @@ exports.up = function(knex) {
   	})
   	.createTable('eventTypes', t => {
   		t.increments('id').primary();
-  		t.string('type', 255).unique().notNullable();
+  		t.string('type').unique().notNullable();
   	})
-  	.createTable('events', t=> {
+  	.createTable('events', t => {
   		t.increments('id').primary();
   		t.integer('trackId').references('id').inTable('tracks');
   		t.integer('eventType').references('id').inTable('eventTypes');
-  		t.integer('listenerUserId').references('id').inTable('users');
+  		t.integer('listenerUserId').references('id').inTable('users').nullable();
   		t.jsonb('eventData').notNullable();
+  	})
+  	.createTable('feedbackPrompts', t => {
+  		t.increments('id').primary();
+  		t.string('type').notNullable();
+  		t.string('prompt').notNullable();
+  		t.integer('scale').notNullable();
+  	})
+  	.createTable('feedback', t => {
+  		t.increments('id').primary();
+  		t.integer('trackId').references('id').inTable('tracks');
+  		t.integer('listenerUserId').references('id').inTable('users').nullable();
+  		t.integer('value').notNullable();
+  		t.timestamp('createdAt').defaultTo(knex.fn.now());
   	})
 };
 
@@ -43,4 +55,6 @@ exports.down = function(knex) {
   	.dropTable('trackCredits')
   	.dropTable('eventTypes')
   	.dropTable('events')
+  	.dropTable('feedbackPrompts')
+  	.dropTable('feedback')
 };

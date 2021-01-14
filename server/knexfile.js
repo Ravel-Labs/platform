@@ -1,36 +1,25 @@
-module.exports = {
-
-  test: {
-    client: 'pg',
-    connection: 'postgres://localhost/ravel_test',
-    migrations: {
-      directory: __dirname + '/db/migrations'
-    },
-    seeds: {
-      directory: __dirname + 'db/seeds/test'
-    }
+const defaultConfig = {
+  client: 'pg',
+  migrations : {
+    directory: __dirname + '/db/migrations',
+    tableName: 'migrations'
   },
-
-  development: {
-    client: 'pg',
-    connection: 'postgres://localhost/ravel',
-    migrations: {
-      directory: __dirname + '/db/migrations'
-    },
-    seeds: {
-      directory: __dirname + 'db/seeds/development'
-    }
-  },
-
-  production: {
-    client: 'pg',
-    connection: process.env.DATABASE_URI,
-    migrations: {
-      directory: __dirname + '/db/migrations'
-    },
-    seeds: {
-      directory: __dirname + 'db/seeds/production'
-    }
+  seeds: {
+    directory: __dirname + 'db/seeds',
   }
+}
 
-};
+module.exports = {
+  test: {
+    ...defaultConfig,
+    connection: 'postgres://localhost/ravel_test',
+  },
+  development: {
+    ...defaultConfig,
+    connection: 'postgres://localhost/ravel',
+  },
+  production: {
+    ...defaultConfig,
+    connection: process.env.DATABASE_URI,
+  }
+}
