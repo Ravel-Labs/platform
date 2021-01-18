@@ -1,9 +1,10 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 
 import PageWrapper from '../PageWrapper';
 import SimpleForm from '../lib/SimpleForm';
+import { UserContext } from '../Context';
 
 const loginFields = [
   {
@@ -20,8 +21,8 @@ const loginFields = [
 
 function Login() {
   const [shouldDisableForm, setShouldDisableForm] = useState(true);
-  const [user, setUser] = useState(null);
   const [formError, setFormError] = useState(null);
+  const { user, onUpdateUser } = useContext(UserContext)
 
   const onLoginSubmit = async (values) => {
     setShouldDisableForm(true)
@@ -29,8 +30,8 @@ function Login() {
       const res = await axios.post("/auth/login", values);
       setShouldDisableForm(false)
       if (res.status === 200) {
-        setUser(res.data.user)
         setFormError(null)
+        onUpdateUser(res.data.user)
       }
     } catch(e) {
       setShouldDisableForm(false)
