@@ -1,5 +1,7 @@
 var jwt = require('jsonwebtoken');
-var config = require('../config')
+
+var config = require('../config');
+var User = require('../db/models').User;
 
 const AUTH_TOKEN_COOKIE = 'ravelPlatform';
 
@@ -12,32 +14,23 @@ function createToken(email) {
 }
 
 async function Login(email, password) {
-  // TODO: lookup user in DB by email.
-  // TODO: validate password
+  const { isValid, user } = await User.validateCredentials(email, password);
+  if (!isValid) {
+    throw Error('Invalid login credentials')
+  }
   const token = createToken(email)
   return {
     token,
-    user: {
-      email,
-      username: "todo_username",
-      id: 12,
-      displayName: "Display Name",
-    },
+    user,
   }
 }
 
 async function Signup(email, username, password) {
-  // TODO: validate uniqueness & proper values.
-  // TODO: create user in DB.
+  const user = await User.create(email, password, { username });
   const token = createToken(email)
   return {
     token,
-    user: {
-      email,
-      username,
-      id: 12,
-      displayName: "Display Name",
-    },
+    user,
   }
 }
 
