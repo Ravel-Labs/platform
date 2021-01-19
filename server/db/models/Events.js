@@ -24,8 +24,6 @@ async function getEventId(event) {
 
 async function create(trackId, eventType, listenerUserId, eventData, fields={}) {
   try {
-    // const eventType = await getEventId(event);
-    
     const newEvent = await db(tableName).insert({
       trackId,
       eventType,

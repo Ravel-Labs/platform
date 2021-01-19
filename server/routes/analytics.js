@@ -15,14 +15,10 @@ router.post('/', async function(req, res, next) {
       const eventData = {'duration': req.body.duration};
       // TODO: trackId is not currently tied to PAGE_VIEW event
       eventRec = await Events.create(req.body.trackId, eventId, req.body.userId, eventData);
-      // res.status(201).send(event);
     } else {
       eventRec = await Events.create(req.body.trackId, eventId, req.body.userId, req.body.eventData);
-      // res.status(201).send(event);
     }
 
-
-    // const event = Events.create(req.body.trackId, req.body.eventType, req.body.userId, req.body.eventData);
   	console.log("body ", req.body);
     res.status(201).send(eventRec);
   } catch(e) {
