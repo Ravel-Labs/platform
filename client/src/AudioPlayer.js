@@ -12,6 +12,8 @@ const playbackEventTypes = {
 export default function AudioPlayer({ track }) {
   const sendAnalytics = async (payload) => {
     payload.trackSlug = track.slug;
+    payload.trackId = 1;
+    // TODO: Make payload id tie to an actual trackId
     await axios.post("/analytics", payload)
   }
 
