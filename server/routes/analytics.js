@@ -6,16 +6,30 @@ var router = express.Router();
 /**
  * POST resource for creating analytics records.
  */
-router.post('/', function(req, res, next) {
+router.post('/', async function(req, res, next) {
   try {
-  	const event = Events.create(req.body.trackId, req.body.eventType, req.body.userId, req.body.eventData);
+  	// TODO: Check if there's a user logged in or not
+    const eventId = await Events.getEventId(req.body.eventType);
+    let eventRec;
+    if (eventId == 5) {
+      const eventData = {'duration': req.body.duration};
+      // TODO: trackId is not currently tied to PAGE_VIEW event
+      eventRec = await Events.create(req.body.trackId, eventId, req.body.userId, eventData);
+      // res.status(201).send(event);
+    } else {
+      eventRec = await Events.create(req.body.trackId, eventId, req.body.userId, req.body.eventData);
+      // res.status(201).send(event);
+    }
+
+
+    // const event = Events.create(req.body.trackId, req.body.eventType, req.body.userId, req.body.eventData);
   	console.log("body ", req.body);
-    res.status(201).send(event);
+    res.status(201).send(eventRec);
   } catch(e) {
   	console.log('/analytics err', e);
-  	res.status(400).send{
+  	res.status(400).send({
   		error: e,
-  	}
+  	});
   }
 });
 

@@ -1,6 +1,7 @@
 var db = require('../knex');
 
 const tableName = 'events';
+const typeTableName = 'eventTypes';
 
 const defaultReturnColumns = [
   'id',
@@ -13,7 +14,7 @@ const defaultReturnColumns = [
 
 async function getEventId(event) {
   try {
-    const eventId = await db(tableName).where(type: event).select('id');
+    const eventId = await db(typeTableName).where({type: event}).select('id').first().then((row) => row['id']);
     console.log(eventId);
     return eventId
   } catch(e) {
@@ -23,10 +24,11 @@ async function getEventId(event) {
 
 async function create(trackId, eventType, listenerUserId, eventData, fields={}) {
   try {
-    const eventId = await getEventId(eventType);
+    // const eventType = await getEventId(event);
+    
     const newEvent = await db(tableName).insert({
       trackId,
-      eventId,
+      eventType,
       eventData,
       ...fields,
     }, defaultReturnColumns);
@@ -38,5 +40,6 @@ async function create(trackId, eventType, listenerUserId, eventData, fields={}) 
 }
 
 module.exports = {
-  create
+  create,
+  getEventId,
 }
