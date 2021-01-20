@@ -18,7 +18,8 @@ async function Login(email, password) {
   if (!isValid) {
     throw Error('Invalid login credentials')
   }
-  const token = createToken(email, user.id)
+  const userId = user.id;
+  const token = createToken(email, userId)
   return {
     token,
     user,
@@ -27,7 +28,8 @@ async function Login(email, password) {
 
 async function Signup(email, username, password) {
   const user = await User.create(email, password, { username });
-  const token = createToken(email, user.id)
+  const userId = user.id;
+  const token = createToken(email, userId)
   return {
     token,
     user,

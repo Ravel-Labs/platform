@@ -7,7 +7,7 @@ function requireUser(req, res, next) {
     res.status(401).send('Access denied: invalid token');
   }
   req.userEmail = userEmail;
-  req.userId = userId;
+  req.body.userId = userId;
   next()
 }
 
@@ -15,7 +15,7 @@ function withUser(req, res, next) {
   const authToken = req.cookies[AuthService.AUTH_TOKEN_COOKIE]
   const { userEmail, userId } = AuthService.Validate(authToken);
   req.userEmail = userEmail;
-  req.userId = userId;
+  req.body.userId = userId;
   next()
 }
 
