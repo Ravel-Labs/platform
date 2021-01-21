@@ -23,25 +23,27 @@ const trackLocation = async (location) => {
       location: lastLocationData.location,
       eventType: pageViewType, 
       duration: timeOnRoute,
+      trackSlug: lastLocationData.trackSlug,
     }
 
     await axios.post("/analytics", analyticsPayload)
   }
 
   // If we care about tracking the new location, set the starttime in localStorage.
-  const shouldTrackLocation = trackedRoutes.reduce((accum, routePath) => {
+  const match = trackedRoutes.reduce((accum, routePath) => {
     const routeMatch = matchPath(location.pathname, {
       path: routePath,
       exact: true,
       strict: false,
     });
     
-    return accum || Boolean(routeMatch);
-  }, false);
+    return accum || routeMatch;
+  }, null);
 
-  if (shouldTrackLocation) {
+  if (Boolean(match)) {
     localStorage.setItem(ravelRouteKey, JSON.stringify({
       location,
+      trackSlug: match.params?.trackSlug,
       startTimeMs: nowMs,
     }));
   } else {

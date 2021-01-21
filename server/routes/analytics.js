@@ -1,5 +1,6 @@
 var express = require('express');
 var Events = require('../db/models').Events;
+var Tracks = require('../db/models').Tracks;
 
 var router = express.Router();
 
@@ -8,13 +9,12 @@ var router = express.Router();
  */
 router.post('/', async function(req, res, next) {
   try {
-  	// TODO: Check if there's a user logged in or not
     const eventId = await Events.getEventId(req.body.eventType);
     let eventRec;
     if (eventId == 5) {
       const eventData = {'duration': req.body.duration};
-      // TODO: trackId is not currently tied to PAGE_VIEW event
-      eventRec = await Events.create(req.body.trackId, eventId, req.body.userId, eventData);
+      const trackId = await Tracks.getIdBySlug(req.body.trackSlug);
+      eventRec = await Events.create(trackId, eventId, req.body.userId, eventData);
     } else {
       eventRec = await Events.create(req.body.trackId, eventId, req.body.userId, req.body.eventData);
     }
