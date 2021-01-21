@@ -21,5 +21,5 @@ async function getIdBySlug(trackSlug) {
 }
 
 module.exports = {
-	getEventIdBySlug,
+	getIdBySlug,
 }
