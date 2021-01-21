@@ -12,6 +12,7 @@ const playbackEventTypes = {
 export default function AudioPlayer({ track }) {
   const sendAnalytics = async (payload) => {
     payload.trackSlug = track.slug;
+    payload.trackId = track.id;
     await axios.post("/analytics", payload)
   }
 
@@ -36,6 +37,9 @@ export default function AudioPlayer({ track }) {
   const onPlayEnded = (e) => {
     sendAnalytics({
       eventType: playbackEventTypes.playEnded,
+      eventData: {
+        currentTime: e.target.currentTime,
+      }
     })
   }
 

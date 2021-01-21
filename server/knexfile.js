@@ -5,7 +5,7 @@ const defaultConfig = {
     tableName: 'migrations'
   },
   seeds: {
-    directory: __dirname + 'db/seeds',
+    directory: __dirname + '/db/seeds',
   }
 }
 

@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API routes
 app.use('/', indexRouter);
-app.use("/analytics", analyticsRouter);
+app.use("/analytics", tokenMiddleware.withUser, analyticsRouter);
 app.use("/auth", authRouter);
 app.use("/feedback", tokenMiddleware.withUser, feedbackRouter);
 app.use("/test", tokenMiddleware.withUser, testRouter);

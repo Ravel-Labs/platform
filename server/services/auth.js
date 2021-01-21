@@ -5,9 +5,9 @@ var User = require('../db/models').User;
 
 const AUTH_TOKEN_COOKIE = 'ravelPlatform';
 
-function createToken(email) {
+function createToken(email, userId) {
   try {
-    return jwt.sign({ email }, config.jwtSecret, { expiresIn: '30d' });
+    return jwt.sign({ email, userId }, config.jwtSecret, { expiresIn: '30d' });
   } catch(e) {
     console.error(e)
   }
@@ -18,7 +18,8 @@ async function Login(email, password) {
   if (!isValid) {
     throw Error('Invalid login credentials')
   }
-  const token = createToken(email)
+  const userId = user.id;
+  const token = createToken(email, userId)
   return {
     token,
     user,
@@ -27,7 +28,8 @@ async function Login(email, password) {
 
 async function Signup(email, username, password) {
   const user = await User.create(email, password, { username });
-  const token = createToken(email)
+  const userId = user.id;
+  const token = createToken(email, userId)
   return {
     token,
     user,
@@ -37,7 +39,7 @@ async function Signup(email, username, password) {
 function Validate(token) {
   try {
     var decoded = jwt.verify(token, config.jwtSecret);
-    return { isValid: true, error: null, userEmail: decoded.email }
+    return { isValid: true, error: null, userEmail: decoded.email, userId: decoded.userId }
   } catch(err) {
     return { isValid: false, error: err }
   }
