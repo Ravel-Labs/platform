@@ -11,6 +11,22 @@ const defaultReturnColumns = [
   'slug'	
 ]
 
+async function create(trackName, genre, path, slug, fields={}) {
+  try {
+    track = await db(tableName).insert({
+      trackName,
+      genre,
+      path,
+      slug,
+      ...fields,
+    }, defaultReturnColumns);
+    console.log(track);
+    return track;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 async function getIdBySlug(trackSlug) {
   try {
     const id = await db(tableName).where({slug:trackSlug}).select('id').first().then((row) => row['id']);
@@ -22,4 +38,5 @@ async function getIdBySlug(trackSlug) {
 
 module.exports = {
 	getIdBySlug,
+  create,
 }

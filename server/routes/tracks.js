@@ -48,14 +48,14 @@ var processFile = multer()
 // POST resource for track upload.
 router.post('/', processFile.single("audio"), async function(req, res, next) {
   try {
-    await UploadService.Upload(req.body.name, req.file);
+    const track = await UploadService.Upload(req.body.name, req.file, req.body.genre);
   } catch(e) {
     console.log("error", e)
     res.status(400).send(e);
   }
   
   // TODO: send back uploaded track info
-  res.status(201).send();
+  res.status(201).send(track);
 });
 
 module.exports = router;
