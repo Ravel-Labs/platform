@@ -57,7 +57,7 @@ export default function AudioPlayer({ track }) {
   return (
     <div>
       <audio
-        src={track?.url}
+        src={track?.path}
         controls
         preload="metadata"
         onEnded={onPlayEnded}

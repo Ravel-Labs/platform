@@ -35,7 +35,7 @@ function FeedbackPromptForm({ prompt }) {
 
   return (
     <div>
-      <p className={styles.PromptText}>{prompt.text}</p>
+      <p className={styles.PromptText}>{prompt.prompt}</p>
       <div>
         {values.map((val) => {
           const classname = classNames({
