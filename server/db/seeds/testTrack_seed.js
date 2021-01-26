@@ -5,7 +5,7 @@ exports.seed = function(knex) {
     .then(() => {
       // Inserts seed entries
       return knex('tracks').insert([
-        {trackName: 'My Amazing Track', genre: 'RnB', path: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3', slug: 'testSlug'},
+        {trackName: 'My Amazing Track', genre: 'RnB', path: 'https://ravel-platform-dev.s3.us-west-1.amazonaws.com/track-uploads/test_track-1611689045558.mpga', slug: 'testSlug'},
       ]);
     });
 };

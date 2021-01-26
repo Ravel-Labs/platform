@@ -2,6 +2,9 @@ var S3 = require('aws-sdk/clients/s3');
 
 var config = require('../config')
 
+var Tracks = require('../db/models').Tracks;
+var util = require('../util/utils.js');
+
 // TODO: Move these constants.
 const trackUploadFolder = "track-uploads";
 const mimetypeToExtension = {
@@ -59,7 +62,7 @@ const createBucket = async (s3, bucketName) => {
   }
 }
 
-async function Upload(trackName, fileContent) {
+async function Upload(trackName, fileContent, genre) {
   const s3 = new S3({
     accessKeyId: config.awsAccessKeyId,
     secretAccessKey: config.awsAccessKeySecret,
@@ -98,12 +101,14 @@ async function Upload(trackName, fileContent) {
     var hrend = process.hrtime(hrstart)
 
     // TODO: This upload is taking quite a long time (40-80s) every so often. Why?
-    console.info('END Upload time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+    console.info('END Upload time (hr): %ds %dms', hrend[0], hrend[1] / 1000000);
 
     // TODO: create track DB record w/ path to file
+    const slug = util.slugify(trackName);
+    const track = await Tracks.create(trackName, "genre", res.Location, slug);
 
     // TODO: return new track DB record instead
-    return res
+    return track;
   } catch(e) {
     console.error("error upload", e)
     throw e
