@@ -1,0 +1,43 @@
+version: "2"
+
+services:
+  db:
+    build:
+      context: ./server/db
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./server/db/data:/var/lib/postgresql/data
+  
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./client:/client
+      - /client/node_modules
+    ports:
+      - "3000:3000"
+    links:
+      - server
+  
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./server:/server
+      - /server/node_modules
+    env_file:
+      - server/.env
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/ravel
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    restart: always
