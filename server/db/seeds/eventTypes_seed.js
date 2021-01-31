@@ -1,15 +1,19 @@
 
 exports.seed = function(knex) {
-  // Deletes ALL existing entries
-  return knex('eventTypes').del()
-    .then(function () {
-      // Inserts seed entries
-      return knex('eventTypes').insert([
-        {type: 'PLAY'},
-        {type: 'PAUSE'},
-        {type: 'PLAY_ENDED'},
-        {type: 'SEEK'},
-        {type: 'PAGE_VIEW'}
-      ]);
-    });
+  const records = [
+    {type: 'PLAY'},
+    {type: 'PAUSE'},
+    {type: 'PLAY_ENDED'},
+    {type: 'SEEK'},
+    {type: 'PAGE_VIEW'}
+  ]
+
+  records.forEach((record) => {
+    return knex('eventTypes').select().where(record)
+      .then((res) => {
+        if (res.length === 0) {
+          return knex('eventTypes').insert(record)
+        }
+      });
+  })
 };
