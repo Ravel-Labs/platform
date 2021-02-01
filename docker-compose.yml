@@ -12,6 +12,12 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - ./server/db/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      start_period: 10s
+      timeout: 4s
+      retries: 3
   
   client:
     build:
@@ -39,5 +45,5 @@ services:
     ports:
       - "9000:9000"
     depends_on:
-      - db
-    restart: always
+      db:
+        condition: service_healthy
