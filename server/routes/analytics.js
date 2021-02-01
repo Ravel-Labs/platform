@@ -11,11 +11,15 @@ router.post('/', async function(req, res, next) {
   try {
     const eventTypeId = await Events.getEventId(req.body.eventType);
     const eventData = req.body.eventData || {};
-    let trackId = req.body.trackSlug;
+    // let trackId = req.body.trackSlug;
+    let trackId = req.body.trackId || null;
+    // const trackId = await Tracks.getIdBySlug(req.body.trackSlug);
 
     if (req.body.eventType === Events.EVENT_TYPES.pageView) {
       eventData.duration = req.body.duration;
-      trackId = await Tracks.getIdBySlug(req.body.trackSlug); 
+      trackId = await Tracks.getIdBySlug(req.body.trackSlug);
+    } else {
+
     }
     
     const event = await Events.create(trackId, eventTypeId, req.body.userId, eventData);

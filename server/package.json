@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "db": "knex migrate:latest && knex seed:run"
+    "db": "npx knex migrate:latest && npx knex seed:run"
   },
   "dependencies": {
     "aws-sdk": "^2.821.0",
