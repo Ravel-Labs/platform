@@ -2,6 +2,13 @@ var db = require('../knex');
 
 const tableName = 'events';
 const typeTableName = 'eventTypes';
+const EVENT_TYPES = {
+  pageView: "PAGE_VIEW",
+  play: "PLAY",
+  pause: "PAUSE",
+  playEnded: "PLAY_ENDED",
+  seek: "SEEK",
+}
 
 const defaultReturnColumns = [
   'id',
@@ -40,4 +47,5 @@ async function create(trackId, eventType, listenerUserId, eventData, fields={}) 
 module.exports = {
   create,
   getEventId,
+  EVENT_TYPES,
 }

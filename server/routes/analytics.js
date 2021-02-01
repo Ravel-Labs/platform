@@ -9,18 +9,17 @@ var router = express.Router();
  */
 router.post('/', async function(req, res, next) {
   try {
-    const eventId = await Events.getEventId(req.body.eventType);
-    let eventRec;
-    if (eventId == 5) {
-      const eventData = {'duration': req.body.duration};
-      const trackId = await Tracks.getIdBySlug(req.body.trackSlug);
-      eventRec = await Events.create(trackId, eventId, req.body.userId, eventData);
-    } else {
-      eventRec = await Events.create(req.body.trackId, eventId, req.body.userId, req.body.eventData);
-    }
+    const eventTypeId = await Events.getEventId(req.body.eventType);
+    const eventData = req.body.eventData || {};
+    let trackId = req.body.trackSlug;
 
-  	console.log("body ", req.body);
-    res.status(201).send(eventRec);
+    if (req.body.eventType === Events.EVENT_TYPES.pageView) {
+      eventData.duration = req.body.duration;
+      trackId = await Tracks.getIdBySlug(req.body.trackSlug); 
+    }
+    
+    const event = await Events.create(trackId, eventTypeId, req.body.userId, eventData);
+    res.status(201).send(event);
   } catch(e) {
   	console.log('/analytics err', e);
   	res.status(400).send({
