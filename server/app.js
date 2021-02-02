@@ -15,6 +15,7 @@ var indexRouter = require('./routes/index');
 var testRouter = require('./routes/test');
 var tracksRouter = require('./routes/tracks');
 var usersRouter = require('./routes/users');
+var statsRouter = require('./routes/stats');
 
 // Middleware
 var tokenMiddleware = require('./middleware/token')
@@ -48,6 +49,7 @@ app.use("/feedback", tokenMiddleware.withUser, feedbackRouter);
 app.use("/test", tokenMiddleware.withUser, testRouter);
 app.use("/tracks", tokenMiddleware.withUser, tracksRouter);
 app.use("/users", usersRouter);
+app.use("/stats", tokenMiddleware.requireUser, usersRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

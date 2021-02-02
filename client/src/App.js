@@ -13,6 +13,7 @@ const Signup = lazy(() => import('./routes/Signup'));
 const Profile = lazy(() => import('./routes/Profile'));
 const Track = lazy(() => import('./routes/Track'));
 const TrackFeedback = lazy(() => import('./routes/TrackFeedback'));
+const TrackStats = lazy(() => import('./routes/TrackStats'));
 const Upload = lazy(() => import('./routes/Upload'));
 const APITest = lazy(() => import('./routes/APITest'));
 
@@ -35,6 +36,9 @@ export default function App() {
                 </Route>
                 <Route path="/track/:trackSlug/feedback">
                   <TrackFeedback />
+                </Route>
+                <Route path="/track/:trackSlug/stats">
+                  <TrackStats />
                 </Route>
                 <Route path="/track/:trackSlug">
                   <Track />
