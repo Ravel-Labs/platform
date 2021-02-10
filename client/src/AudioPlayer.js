@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
 
@@ -9,11 +10,36 @@ const playbackEventTypes = {
   seek: "SEEK",
 }
 
+const sessionExpirationTime = 15*60*1000
+
 export default function AudioPlayer({ track }) {
+  let eventTimeDiff;
+  const nowMs = Date.now()  
+  const [sessionId, setSessionId] = useState(null)
+  const [newSession, setNewSession] = useState(true)
+  const [lastEventTime, setLastEventTime] = useState(null)
+
+
   const sendAnalytics = async (payload) => {
+    if (sessionId === null) {
+      setLastEventTime(nowMs)
+      setNewSession(!newSession)
+    } else {
+      eventTimeDiff = nowMs - lastEventTime
+      setLastEventTime(nowMs)
+      if(eventTimeDiff > sessionExpirationTime) {
+        setNewSession(!newSession)
+        setLastEventTime(nowMs)
+        console.log(newSession)
+      }
+    }
+
     payload.trackSlug = track.slug;
     payload.trackId = track.id;
-    await axios.post("/api/analytics", payload)
+    payload.newSession = newSession;
+    payload.sessionId = sessionId
+    const res = await axios.post("/api/analytics", payload)
+    setSessionId(res.data.sessionId)
   }
 
   const onClickPlay = (e) => {

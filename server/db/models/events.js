@@ -14,7 +14,7 @@ const defaultReturnColumns = [
   'id',
   'trackId',
   'eventType',
-  'listenerUserId',
+  'sessionId',
   'eventData',
   'createdAt'	
 ]
@@ -28,12 +28,12 @@ async function getEventId(event) {
   } 
 }
 
-async function create(trackId, eventType, listenerUserId, eventData, fields={}) {
+async function create(trackId, eventType, sessionId, eventData, fields={}) {
   try {
     const newEvent = await db(tableName).insert({
       trackId,
       eventType,
-      listenerUserId,
+      sessionId,
       eventData,
       ...fields,
     }, defaultReturnColumns);
