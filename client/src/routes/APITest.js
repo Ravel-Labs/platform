@@ -8,7 +8,7 @@ function APITest() {
   useEffect(() => {
     async function callAPI() {
       try {
-        const res = await axios.get('/test')
+        const res = await axios.get('/api/test')
         setMessage(res.data)
       } catch(err) {
         setMessage(err.message)

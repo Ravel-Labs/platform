@@ -15,7 +15,7 @@ export default function TrackUploadForm() {
     const formData = new FormData();
     formData.append("name", "test track");
     formData.append("audio", file);
-    await axios.post("/tracks", formData)
+    await axios.post("/api/tracks", formData)
   }
 
   return (

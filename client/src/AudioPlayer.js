@@ -13,7 +13,7 @@ export default function AudioPlayer({ track }) {
   const sendAnalytics = async (payload) => {
     payload.trackSlug = track.slug;
     payload.trackId = track.id;
-    await axios.post("/analytics", payload)
+    await axios.post("/api/analytics", payload)
   }
 
   const onClickPlay = (e) => {

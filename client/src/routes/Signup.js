@@ -31,7 +31,7 @@ function Signup() {
   const onSignupSubmit = async (values) => {
     setShouldDisableForm(true)
     try {
-      const res = await axios.post("/auth/signup", values);
+      const res = await axios.post("/api/auth/signup", values);
       setShouldDisableForm(false)
       if (res.status === 201) {
         setUser(res.data.user)

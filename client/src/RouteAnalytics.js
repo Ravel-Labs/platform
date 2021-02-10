@@ -26,7 +26,7 @@ const trackLocation = async (location) => {
       trackSlug: lastLocationData.trackSlug,
     }
 
-    await axios.post("/analytics", analyticsPayload)
+    await axios.post("/api/analytics", analyticsPayload)
   }
 
   // If we care about tracking the new location, set the starttime in localStorage.

@@ -20,7 +20,7 @@ function FeedbackPromptForm({ prompt }) {
   const onSubmitRating = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/feedback", {
+      const res = await axios.post("/api/feedback", {
         trackId: prompt.trackId,
         promptId: prompt.id,
         value: selectedVal,
