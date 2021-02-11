@@ -7,8 +7,11 @@ var router = express.Router();
 router.post('/:slug', async function(req, res, next) {
 	try {
     const trackId = await Tracks.getIdBySlug(req.body.trackSlug);
-    const feedbackStats = await Stats.getFeedbackStatsbyTrackId(trackId);
-    res.status(201).send(feedbackStats);
+    const playbackStats = await Stats.getPlaybackStatsByTrackId(trackId);
+    const feedbackStats = await Stats.getFeedbackStatsByTrackId(trackId); 
+    const stats = {...playbackStats, ...feedbackStats};
+    console.log(stats); 
+    res.status(201).send(stats);
 	} catch(e) {
 		console.log("error", e);
 		res.status(400).send(e);

@@ -12,8 +12,10 @@ function TrackStats() {
 	useEffect(() => {
 		async function fetchStats() {
 			try {
-				const res = await axios.post(`stats/${trackSlug}`)
-        setStats(res.data)
+				const payload = {}
+        payload.trackSlug = trackSlug
+        const res = await axios.post(`/stats/${trackSlug}`, payload)
+        setStats([res.data])
 			} catch(err) {
 				console.log("failed fetching stats: ", err);
 			}
@@ -23,7 +25,7 @@ function TrackStats() {
   return (
     <PageWrapper>
       <div>
-        <p>{stats}</p>
+        {stats.map((stat) => <div key={stat}> {stat} </div>)}
       </div>
     </PageWrapper>
   )

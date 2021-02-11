@@ -1,30 +1,7 @@
 var db = require('../knex');
 
-const tracksTable = 'tracks';
-const eventsTable = 'events';
-const eventTypesTable = 'eventTypes';
-const feedbackTable = 'feedback';
-const feedbackPromptsTable = 'feedbackPrompts';
-const trackFeedbackPromptsTable = 'trackFeedbackPrompts';
-
-// async function getEventStatsbyTrackId(trackId) {
-// 	try {
-// 		return eventStats;
-// 	} catch(e) {
-// 		console.error(e);
-// 	}
-
-// }
-
-async function getFeedbackStatsbyTrackId(trackId) {
+async function getFeedbackStatsByTrackId(trackId) {
 	try {
-		// const feedbackStats = await db(feedbackTable)
-  //                                 .join(feedbackPromptsTable, feedbackTable.promptId, feedbackPromptsTable.id)
-  //                                 .select(feedbackPromptsTable.prompt, knex.raw('SUM(*)'), knex.raw('AVG(feedback.value)'))
-  //                                 .groupby('promptId')
-  //                                 .where({trackId: trackId})
-
-
     const feedbackStats = await db.raw('SELECT f."promptId", \
                                         fp.prompt,\
                                         COUNT(*) as "numberOfResponses", \
@@ -34,21 +11,59 @@ async function getFeedbackStatsbyTrackId(trackId) {
                                         LEFT JOIN feedback as f \
                                         ON fp.id = f."promptId" \
                                         WHERE f."trackId" = ? \
-                                        GROUP BY f."promptId", fp.prompt;', trackId);
+                                        GROUP BY f."promptId", fp.prompt;', trackId)
+                                        .then((res) => res.rows);
+    console.log(feedbackStats);
     return feedbackStats;
 	} catch(e) {
 		console.error(e);
 	}
+}
 
+async function getPlaybackStatsByTrackId(trackId) {
+  try {
+    const playbackStats = await db.raw('WITH cte AS (SELECT \
+                                        "trackId", \
+                                        "eventType", \
+                                        "sessionId", \
+                                        type, \
+                                        CASE \
+                                          WHEN "eventType" = 5 THEN ("eventData"::jsonb -> \'duration\')::float / 1000.00 \
+                                          ELSE ("eventData"::jsonb -> \'currentTime\')::float \
+                                        END as "trackTime", \
+                                        "createdAt" \
+                                        FROM events \
+                                        JOIN "eventTypes" \
+                                        ON events."eventType" = "eventTypes".id \
+                                        WHERE "sessionId" IS NOT NULL AND "trackId" IS NOT NULL)  \
+                                        SELECT \
+                                          COUNT(*) FILTER (WHERE t1.sum > 30) as plays, \
+                                          AVG(t1.sum)::numeric(10,2) as "averageListeningTime" \
+                                        FROM \
+                                          (SELECT \
+                                            t."sessionId", \
+                                            t."lastEventType", \
+                                            SUM(ABS(t."timeDiff")) \
+                                          FROM \
+                                            (SELECT \
+                                              "trackId", \
+                                              "sessionId", \
+                                              LAG(type, 1) OVER(PARTITION BY "sessionId" ORDER BY "createdAt") as "lastEventType", \
+                                              "trackTime", \
+                                              "trackTime" - LAG("trackTime", 1) OVER (PARTITION BY "sessionId" ORDER BY "createdAt") as "timeDiff" \
+                                            FROM cte) as t \
+                                          WHERE "lastEventType" = \'PLAY\' AND "trackId" = ? \
+                                          GROUP BY "sessionId", "lastEventType") as t1 \
+                                        GROUP BY "lastEventType";', trackId)
+                                        .then((res) => res.rows);
+    console.log(playbackStats);
+    return playbackStats;
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 module.exports = {
-  getFeedbackStatsbyTrackId,
+  getFeedbackStatsByTrackId,
+  getPlaybackStatsByTrackId,
 }
-
-// trackId, feedback, feedbackPrompts
-// feedback where trackId = feedback.trackId
-// group by feedbackPromptId
-// get the average value after each grouping
-// join feedbackPromptId on prompt.FeedbackPrompts
-// return object with feedbackPrompt, number of responses, and average response for each prompt
