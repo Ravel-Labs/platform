@@ -4,7 +4,8 @@ services:
   nginx:
     build:
       context: ./nginx
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+    restart: always
     ports:
       - "80:80"
     depends_on:
@@ -15,7 +16,7 @@ services:
     container_name: db
     build:
       context: ./server/db
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - "5432:5432"
     environment:
@@ -34,7 +35,7 @@ services:
     container_name: client
     build:
       context: ./client
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     volumes:
       - ./client:/client
       - /client/node_modules
@@ -47,7 +48,7 @@ services:
     container_name: server
     build:
       context: ./server
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     volumes:
       - ./server:/server
       - /server/node_modules
