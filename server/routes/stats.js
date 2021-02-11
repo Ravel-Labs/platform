@@ -9,7 +9,10 @@ router.post('/:slug', async function(req, res, next) {
     const trackId = await Tracks.getIdBySlug(req.body.trackSlug);
     const playbackStats = await Stats.getPlaybackStatsByTrackId(trackId);
     const feedbackStats = await Stats.getFeedbackStatsByTrackId(trackId); 
-    const stats = {...playbackStats, ...feedbackStats};
+    const stats = {
+        playbackStats,
+        feedbackStats,
+    };
     console.log(stats); 
     res.status(201).send(stats);
 	} catch(e) {
