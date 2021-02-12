@@ -6,8 +6,8 @@ services:
 
   server:
     image: markwbennett/ravel-platform_server:latest
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@ravel-platform-1.cgbsb1l0kytg.us-west-1.rds.amazonaws.com:5432/ravel
+    env_file:
+      - .env
 
   nginx:
     image: markwbennett/ravel-platform_nginx:latest

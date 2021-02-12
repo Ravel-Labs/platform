@@ -8,6 +8,7 @@ var router = express.Router();
  * POST resource for creating analytics records.
  */
 router.post('/', async function(req, res, next) {
+  console.log(" => analytics! ")
   try {
     const eventTypeId = await Events.getEventId(req.body.eventType);
     const eventData = req.body.eventData || {};
