@@ -1,63 +1,16 @@
 version: "2"
 
 services:
+  client:
+    image: markwbennett/ravel-platform_client:latest
+
+  server:
+    image: markwbennett/ravel-platform_server:latest
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@ravel-platform-1.cgbsb1l0kytg.us-west-1.rds.amazonaws.com:5432/ravel
+
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+    image: markwbennett/ravel-platform_nginx:latest
     restart: always
     ports:
       - "80:80"
-    depends_on:
-      - server
-      - client
-
-  db:
-    container_name: db
-    build:
-      context: ./server/db
-      dockerfile: Dockerfile
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - ./server/db/data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      start_period: 10s
-      timeout: 4s
-      retries: 3
-  
-  client:
-    container_name: client
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    volumes:
-      - ./client:/client
-      - /client/node_modules
-    # ports:
-    #   - "3000:3000"
-    links:
-      - server
-  
-  server:
-    container_name: server
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    volumes:
-      - ./server:/server
-      - /server/node_modules
-    env_file:
-      - server/.env
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/ravel
-    # ports:
-    #   - "9000:9000"
-    depends_on:
-      db:
-        condition: service_healthy
