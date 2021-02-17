@@ -1,4 +1,4 @@
-var User = require('./user');
+var User = require('./users');
 var Events = require('./events');
 var Tracks = require('./tracks');
 var Feedback = require('./feedback');
