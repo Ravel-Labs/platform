@@ -3,6 +3,11 @@ phases:
   install:
     runtime-versions:
       docker: 18
+  pre_build:
+    commands:
+      # Log in to the Docker CLI
+      - echo Logging into docker...
+      - echo "$DOCKER_PW" | docker login -u "$DOCKER_UN" --password-stdin
   build:
     commands:
       - echo Build started on `date`
@@ -11,8 +16,6 @@ phases:
       - docker build -t markwbennett/ravel-platform_client ./client
       - docker build -t markwbennett/ravel-platform_server ./server
       - docker build -t markwbennett/ravel-platform_nginx ./nginx
-      # Log in to the Docker CLI
-      - echo "$DOCKER_PW" | docker login -u "$DOCKER_UN" --password-stdin
   post_build:
     commands:
       # Take these images and push them to Docker hub
