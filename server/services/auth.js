@@ -28,9 +28,6 @@ async function Login(email, password) {
 
 async function Signup(email, username, password) {
   const user = await User.create(email, password, { username });
-  if (!user?.id) {
-    throw Error("Failed to create new user.")
-  }
   const userId = user.id;
   const token = createToken(email, userId)
   return {
