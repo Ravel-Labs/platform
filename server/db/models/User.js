@@ -45,10 +45,13 @@ async function validateCredentials(email, password) {
  */
 async function create(email, password, fields={}) {
   const passwordHash = bcrypt.hashSync(password, 10);
+  const { username } = fields;
   try {
     const newUser = await db(tableName).insert({
       email,
       passwordHash,
+      username,
+      displayName: username,
       ...fields,
     }, defaultReturnColumns);
     console.log(newUser)
