@@ -12,7 +12,7 @@ const links = [
   {label: 'Signup', path: '/signup', anonymousOnly: true},
   {label: 'Profile', path: '/username123', loggedInOnly: true},
   {label: 'Upload', path: '/upload', loggedInOnly: true},
-  {label: 'API Test', path: '/api-test', devOnly: true},
+  {label: 'API Test', path: '/debug', devOnly: true},
 ]
 
 function DevToolToggle({ isEnabled, onClick }) {
