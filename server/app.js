@@ -44,13 +44,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 // API routes
-app.use("/analytics", tokenMiddleware.withUser, analyticsRouter);
-app.use("/auth", authRouter);
-app.use("/feedback", tokenMiddleware.withUser, feedbackRouter);
-app.use("/test", tokenMiddleware.withUser, testRouter);
-app.use("/tracks", tokenMiddleware.withUser, tracksRouter);
-app.use("/users", usersRouter);
-app.use("/stats", tokenMiddleware.withUser, statsRouter)
+const apiPrefix = "/api"
+app.use(`${apiPrefix}/analytics`, tokenMiddleware.withUser, analyticsRouter);
+app.use(`${apiPrefix}/auth`, authRouter);
+app.use(`${apiPrefix}/feedback`, tokenMiddleware.withUser, feedbackRouter);
+app.use(`${apiPrefix}/test`, tokenMiddleware.withUser, testRouter);
+app.use(`${apiPrefix}/tracks`, tokenMiddleware.withUser, tracksRouter);
+app.use(`${apiPrefix}/users`, usersRouter);
+app.use(`${apiPrefix}/stats`, tokenMiddleware.withUser, statsRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
