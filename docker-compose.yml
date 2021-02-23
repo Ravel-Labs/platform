@@ -1,16 +1,13 @@
-version: "2"
+version: "3.8"
 
 services:
   client:
     image: markwbennett/ravel-platform_client:latest
+    restart: always
+    ports:
+      - "80:80"
 
   server:
     image: markwbennett/ravel-platform_server:latest
     env_file:
       - .env
-
-  nginx:
-    image: markwbennett/ravel-platform_nginx:latest
-    restart: always
-    ports:
-      - "80:80"
