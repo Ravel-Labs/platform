@@ -27,7 +27,7 @@ function Login() {
   const onLoginSubmit = async (values) => {
     setShouldDisableForm(true)
     try {
-      const res = await axios.post("/auth/login", values);
+      const res = await axios.post("/api/auth/login", values);
       setShouldDisableForm(false)
       if (res.status === 200) {
         setFormError(null)

@@ -42,7 +42,7 @@ export default function App() {
                 <Route path="/upload">
                   <Upload />
                 </Route>
-                <Route path="/api-test">
+                <Route path="/debug">
                   <APITest />
                 </Route>
                 <Route path="/:username">

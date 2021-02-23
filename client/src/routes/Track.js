@@ -13,7 +13,7 @@ function Track() {
   useEffect(() => {
     async function fetchTrack() {
       try {
-        const res = await axios.get(`/tracks/${trackSlug}`)
+        const res = await axios.get(`/api/tracks/${trackSlug}`)
         setTrack(res.data)
       } catch(err) {
         console.error("failed fetching track", err)

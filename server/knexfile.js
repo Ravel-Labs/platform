@@ -12,14 +12,16 @@ const defaultConfig = {
 module.exports = {
   test: {
     ...defaultConfig,
-    connection: 'postgres://localhost/ravel_test',
+    // connection: 'postgres://localhost/ravel_test',
+    connection: process.env.DATABASE_URL_TEST
   },
   development: {
     ...defaultConfig,
-    connection: 'postgres://localhost/ravel',
+    // connection: 'postgres://localhost/ravel',
+    connection: process.env.DATABASE_URL
   },
   production: {
     ...defaultConfig,
-    connection: process.env.DATABASE_URI,
+    connection: process.env.DATABASE_URL,
   }
 }
