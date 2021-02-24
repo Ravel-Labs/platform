@@ -40,7 +40,7 @@ function TrackStats() {
 		async function fetchStats() {
 			try {
 				const payload = { trackSlug };
-        const res = await axios.post(`/stats/${trackSlug}`, payload)
+        const res = await axios.post(`/api/stats/${trackSlug}`, payload)
         setStats(res.data)
 			} catch(err) {
 				console.log("failed fetching stats: ", err);

@@ -41,8 +41,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API routes
 app.use('/', indexRouter);
+
+// API routes
 app.use("/analytics", tokenMiddleware.withUser, analyticsRouter);
 app.use("/auth", authRouter);
 app.use("/feedback", tokenMiddleware.withUser, feedbackRouter);

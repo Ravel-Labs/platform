@@ -9,20 +9,19 @@ var router = express.Router();
  * POST resource for creating analytics records.
  */
 router.post('/', async function(req, res, next) {
-  console.log(" => analytics! ")
   try {
     const eventTypeId = await Events.getEventId(req.body.eventType);
+    const { shouldCreateSession, eventType } = req.body;
     const eventData = req.body.eventData || {};
     let trackId = req.body.trackId || null;
     let sessionId = req.body.sessionId || null;
-    const newSession = req.body.newSession;
 
-    if (req.body.eventType === Events.EVENT_TYPES.pageView) {
+    if (eventType === Events.EVENT_TYPES.pageView) {
       eventData.duration = req.body.duration;
       trackId = await Tracks.getIdBySlug(req.body.trackSlug);
     }
         
-    if (newSession) {
+    if (shouldCreateSession) {
       const session = await Sessions.create(trackId, req.body.userId);
       sessionId = session[0].id;
       console.log(sessionId);
