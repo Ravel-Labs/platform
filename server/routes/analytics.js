@@ -11,7 +11,7 @@ var router = express.Router();
 router.post('/', async function(req, res, next) {
   try {
     const eventTypeId = await Events.getEventId(req.body.eventType);
-    const { shouldCreateSession, eventType } = req.body;
+    const { shouldCreateNewSession, eventType } = req.body;
     const eventData = req.body.eventData || {};
     let trackId = req.body.trackId || null;
     let sessionId = req.body.sessionId || null;
@@ -21,7 +21,7 @@ router.post('/', async function(req, res, next) {
       trackId = await Tracks.getIdBySlug(req.body.trackSlug);
     }
         
-    if (shouldCreateSession) {
+    if (shouldCreateNewSession) {
       const session = await Sessions.create(trackId, req.body.userId);
       sessionId = session[0].id;
       console.log(sessionId);
