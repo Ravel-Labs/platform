@@ -26,6 +26,7 @@ function Track() {
       <TrackDisplay track={track} />
       {/* TODO: Restrict to only uploader of this track. */}
       <Link to={`${match.url}/feedback`}>View track feedback</Link>
+      <Link to={`${match.url}/stats`}>View track stats</Link>
     </PageWrapper>
   )
 }
