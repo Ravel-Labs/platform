@@ -10,6 +10,9 @@ const defaultReturnColumns = [
   'username',
   'displayName',
   'createdAt',
+  'roleId',
+  'referrerId',
+  'invitesRemaining'
 ];
 
 /**
@@ -43,7 +46,7 @@ async function validateCredentials(email, password) {
  * @param  {object} fields={} Additional fields to write when creating the model record. 
  * @return {db/User}
  */
-async function create(email, password, fields={}) {
+async function create(email, password, roleId, referrerId, invitesRemaining, fields={}) {
   const passwordHash = bcrypt.hashSync(password, 10);
   const { username } = fields;
   try {
@@ -52,6 +55,9 @@ async function create(email, password, fields={}) {
       passwordHash,
       username,
       displayName: username,
+      roleId,
+      referrerId,
+      invitesRemaining,
       ...fields,
     }, defaultReturnColumns);
     console.log(newUser)

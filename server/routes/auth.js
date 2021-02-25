@@ -16,12 +16,22 @@ function setAuthCookie(res, token) {
   });
 }
 
+router.post('/create-invite', async function(req, res, next) {
+  try {
+    const inviteCode = await Invites.create(req.body.userId, roleId=2)
+  } catch(e) {
+    console.log("error", e);
+    res.status(400).send(e);
+  }
+  res.status(200).send(inviteCode);
+})
+
 // Signup route -- create a new user, return token.
 router.post('/signup', async function(req, res) {
-  const { email, username, password } = req.body;
+  const { email, username, password, code } = req.body;
 
   try {
-    const { token, user } = await AuthService.Signup(email, username, password)
+    const { token, user } = await AuthService.Signup(email, username, password, code);
     setAuthCookie(res, token);
     return res.status(201).send({
       user,
@@ -38,7 +48,6 @@ router.post('/signup', async function(req, res) {
 // Login route -- validate credentials, return token + user info.
 router.post('/login', async function(req, res) {
   const { email, password } = req.body;
-
   try {
     const { token, user } = await AuthService.Login(email, password)
     setAuthCookie(res, token);

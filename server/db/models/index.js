@@ -4,6 +4,7 @@ var Tracks = require('./tracks');
 var Feedback = require('./feedback');
 var Sessions = require('./sessions');
 var Stats = require('./stats');
+var Invites = require('./invites');
 
 module.exports = {
   User,
@@ -12,4 +13,5 @@ module.exports = {
   Feedback,
   Sessions,
   Stats,
+  Invites,
 }

@@ -2,6 +2,7 @@ var jwt = require('jsonwebtoken');
 
 var config = require('../config');
 var User = require('../db/models').User;
+var Invites = require('../db/models').Invites;
 
 const AUTH_TOKEN_COOKIE = 'ravelPlatform';
 
@@ -26,8 +27,27 @@ async function Login(email, password) {
   }
 }
 
-async function Signup(email, username, password) {
-  const user = await User.create(email, password, { username });
+function createInvitesRemaining(roleId) {
+  try {
+     let invitesRemaining;
+     if (roleId == 0) {
+      invitesRemaining = 1000;
+    } else if (roleId == 1) {
+      invitesRemaining = 10;
+    } else {
+      invitesRemaining = 0;
+    }
+    return invitesRemaining;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+async function Signup(email, username, password, code) {
+  const referrerId = await Invites.getReferrerIdByCode(code);
+  const roleId = await Invites.getRoleIdByCode(code);
+  const invitesRemaining = createInvitesRemaining(roleId);
+  const user = await User.create(email, password, roleId, referrerId, invitesRemaining, { username });
   const userId = user.id;
   const token = createToken(email, userId)
   return {
