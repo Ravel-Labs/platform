@@ -1,6 +1,8 @@
 // import React from 'react';
 import React, { Suspense, lazy, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import CssBaseline from '@material-ui/core/CssBaseline';
+
 import Header from './Header';
 import RouteAnalytics from './RouteAnalytics';
 import { UserContext } from './Context';
@@ -22,6 +24,7 @@ export default function App() {
 
   return (
     <div className="App">
+      <CssBaseline />
       <Router>
         <div>
           <UserContext.Provider value={{user: loggedInUser, onUpdateUser: setLoggedInUser}}>
