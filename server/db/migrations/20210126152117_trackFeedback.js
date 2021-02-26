@@ -5,6 +5,7 @@ exports.up = function(knex) {
   		t.increments('id').primary();
   		t.integer('trackId').references('id').inTable('tracks');
   		t.integer('promptId').references('id').inTable('feedbackPrompts');
+			t.unique(['trackId', 'promptId'])
   	})
   	.table('feedback', t => {
   		t.integer('promptId').references('id').inTable('feedbackPrompts');
