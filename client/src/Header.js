@@ -1,5 +1,6 @@
+import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 
 import { UserContext } from './Context';
 
@@ -12,40 +13,24 @@ const links = [
   {label: 'Signup', path: '/signup', anonymousOnly: true},
   {label: 'Profile', path: '/username123', loggedInOnly: true},
   {label: 'Upload', path: '/upload', loggedInOnly: true},
-  {label: 'API Test', path: '/debug', devOnly: true},
+  {label: 'API Test', path: '/debug'},
 ]
 
-function DevToolToggle({ isEnabled, onClick }) {
-  return (
-    <button onClick={onClick}>{isEnabled ? "Disable" : "Enable"} Dev Tools</button>
-  )
-}
-
 export default function Header() {
-  const [isDevEnabled, setIsDevEnabled] = useState(true)
   const { user, onUpdateUser } = useContext(UserContext)
-  const onClickDevtools = (e) => {
-    e.preventDefault()
-    setIsDevEnabled((prevIsEnabled) => {
-      return !prevIsEnabled
-    })
+
+  const onClickLogout = async () => {
+    onUpdateUser(null);
+    await axios.post("/api/auth/logout");
   }
 
-  const onClickLogout = () => {
-    onUpdateUser(null)
-  }
-
-  const isUserLoggedIn = Boolean(user?.username);
+  const isUserLoggedIn = Boolean(user);
 
   return (
     <header className={styles.Header}>
       <nav>
         <ul>
           {links.map((link) => {
-            const canRenderDev = !link.devOnly || isDevEnabled;
-            if (!canRenderDev) {
-              return null
-            }
             if (!isUserLoggedIn && link.loggedInOnly) {
               return null
             }
@@ -58,14 +43,15 @@ export default function Header() {
               </li>
             )
           })}
-          {/* TODO: Only show to logged in superusers */}
-          <li>
-            <DevToolToggle onClick={onClickDevtools} isEnabled={isDevEnabled} />
-          </li>
           {isUserLoggedIn && (
-            <li>
-              <button onClick={onClickLogout}>Logout</button>
-            </li>
+            <>
+              <li>
+                <strong>{user.email}</strong>
+              </li>
+              <li>
+                <button onClick={onClickLogout}>Logout</button>
+              </li>
+            </>
           )}
         </ul>
       </nav>

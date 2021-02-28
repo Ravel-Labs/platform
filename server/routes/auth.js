@@ -61,7 +61,7 @@ router.post('/signup', async function(req, res) {
   } catch(e) {
     console.log("/signup err", e)
     res.status(400).send({
-      error: e,
+      errorMessage: e.message,
     });
   }
 });
@@ -77,11 +77,16 @@ router.post('/login', async function(req, res) {
       token,
     });
   } catch(e) {
-    console.log("/login err", e)
     res.status(401).send({
-      error: e,
+      errorMessage: e.message,
     });
   }
+});
+
+// Logout route -- remove cookie with jwt value.
+router.post('/logout', async function(req, res) {
+  setAuthCookie(res, "");
+  return res.status(200).send();
 });
 
 module.exports = router;
