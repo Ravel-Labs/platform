@@ -1,0 +1,73 @@
+.AudioPlayer {
+  display: flex;
+}
+
+.PlayerControls {
+  flex-grow: 1;
+  margin: 0 20px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.PlayPause svg {
+  font-size: 120px;
+  color: #0500FF;
+}
+
+@media screen and (max-width: 768px) {
+  .PlayPause svg {
+    font-size: 96px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .PlayPause svg {
+    font-size: 84px;
+  }
+}
+
+.TrackInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: flex-start;
+  margin-left: 4vw;
+}
+
+.TrackInfoTitle {
+  font-size: 72px;
+  margin: 0;
+  text-align: left;
+}
+
+@media screen and (max-width: 768px) {
+  .TrackInfoTitle {
+    font-size: 42px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .TrackInfoTitle {
+    font-size: 24px;
+  }
+}
+
+.TrackInfoArtist {
+  order: -1;
+  color: #5E5E5E;
+  opacity: 80%;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0;
+  position: relative;
+  top: 6px;
+}
+
+@media screen and (max-width: 375px) {
+  .TrackInfoArtist {
+    font-size: 18px;
+  }
+}

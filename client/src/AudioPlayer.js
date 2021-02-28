@@ -1,6 +1,12 @@
 import { useState } from 'react';
+import { PlayCircleFilled, PauseCircleFilled } from "@material-ui/icons";
 import axios from 'axios';
 import debounce from 'lodash.debounce';
+
+import AudioScrubber from './AudioScrubber';
+import useAudioPlayer from './useAudioPlayer';
+
+import styles from './AudioPlayer.module.css';
 
 // TODO: Share these with the backend.
 const playbackEventTypes = {
@@ -20,6 +26,7 @@ export default function AudioPlayer({ track }) {
   const [shouldCreateNewSession, setShouldCreateNewSession] = useState(true)
   const [lastEventTime, setLastEventTime] = useState(null)
 
+  const { currentTime, duration, isPlaying, setIsPlaying, setClickedTime } = useAudioPlayer(track?.slug)
 
   const sendAnalytics = async (payload) => {
     if (sessionId === null) {
@@ -44,6 +51,7 @@ export default function AudioPlayer({ track }) {
   }
 
   const onClickPlay = (e) => {
+    setIsPlaying(true)
     sendAnalytics({
       eventType: playbackEventTypes.play,
       eventData: {
@@ -53,6 +61,7 @@ export default function AudioPlayer({ track }) {
   }
 
   const onClickPause = (e) => {
+    setIsPlaying(false)
     sendAnalytics({
       eventType: playbackEventTypes.pause,
       eventData: {
@@ -82,16 +91,27 @@ export default function AudioPlayer({ track }) {
   const debouncedOnSeekComplete = debounce(onSeekComplete, 100)
 
   return (
-    <div>
+    <div className={styles.AudioPlayer}>
       <audio
+        id={track?.slug}
         src={track?.path}
-        controls
         preload="metadata"
         onEnded={onPlayEnded}
-        onPlay={onClickPlay}
-        onPause={onClickPause}
         onSeeked={debouncedOnSeekComplete}
       />
+      <div className={styles.PlayerControls}>
+        <div className={styles.PlayPause}>
+          {isPlaying ? 
+            <PauseCircleFilled onClick={onClickPause} /> :
+            <PlayCircleFilled onClick={onClickPlay} />
+          }
+        </div>
+        <div className={styles.TrackInfo}>
+          <h1 className={styles.TrackInfoTitle}>{track.trackName}</h1>
+          <h2 className={styles.TrackInfoArtist}>{track.artist || "Artist Name"}</h2>
+        </div>
+        <AudioScrubber currentTime={currentTime} duration={duration} onTimeUpdate={(time) => setClickedTime(time)} />
+      </div>
     </div>
   )
 }
