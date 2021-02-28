@@ -56,7 +56,7 @@ async function create(email, password, roleId, referrerId, invitesRemaining, fie
   const passwordHash = bcrypt.hashSync(password, 10);
   const { username } = fields;
   try {
-    const newUser = await db(tableName).insert({
+    const users = await db(tableName).insert({
       email,
       passwordHash,
       username,
@@ -66,8 +66,8 @@ async function create(email, password, roleId, referrerId, invitesRemaining, fie
       invitesRemaining,
       ...fields,
     }, defaultReturnColumns);
-    console.log(newUser)
-    return newUser;
+    console.log(users)
+    return users.pop();
   } catch(e) {
     console.error(e)
   }

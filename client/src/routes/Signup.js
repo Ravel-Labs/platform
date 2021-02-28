@@ -1,62 +1,83 @@
-import axios from 'axios';
-import { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import axios from "axios";
+import { useContext, useState } from "react";
+import { Link as RouterLink, Redirect } from 'react-router-dom';
+import Link from "@material-ui/core/Link";
+import Grid from "@material-ui/core/Grid";
 
-import PageWrapper from '../PageWrapper';
-import SimpleForm from '../lib/SimpleForm';
+import { UserContext } from '../Context';
+import PageWrapper from "../PageWrapper";
+import SimpleForm from "../lib/SimpleForm";
 
 const signupFields = [
   {
     label: "Email",
     name: "email",
     type: "email",
+    required: true,
   },
   {
     label: "Username",
     name: "username",
     type: "text",
+    required: true,
   },
   {
     label: "Password",
     name: "password",
     type: "password",
+    required: true,
   },
-]
+];
+
+function SignupFooter() {
+  return (
+    <Grid container>
+      <Grid item>
+        <Link to="/login" component={RouterLink} variant="body2">
+          {"Already have an account? Sign in."}
+        </Link>
+      </Grid>
+    </Grid>
+  );
+}
 
 function Signup() {
-  const [shouldDisableForm, setShouldDisableForm] = useState(true);
-  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user, onUpdateUser } = useContext(UserContext)
   const [formError, setFormError] = useState(null);
 
   const onSignupSubmit = async (values) => {
-    setShouldDisableForm(true)
+    setIsLoading(true);
+    
     try {
       const res = await axios.post("/api/auth/signup", values);
-      setShouldDisableForm(false)
+      setIsLoading(false);
       if (res.status === 201) {
-        setUser(res.data.user)
-        setFormError(null)
+        onUpdateUser(res.data.user);
+        setFormError(null);
+      } else {
+        console.log(res)
+        setFormError(res.data.errorMessage);
       }
-    } catch(e) {
-      setShouldDisableForm(false)
-      setFormError(e.message)
+    } catch (e) {
+      setIsLoading(false);
+      setFormError(e.response.data.errorMessage);
     }
-  }
+  };
 
   return (
     <PageWrapper>
-      <h1>Signup</h1>
       {user?.username && <Redirect to={`/${user?.username}`} />}
-      <SimpleForm 
+      <SimpleForm
+        formTitle="Sign Up"
         fields={signupFields}
-        isDisabled={shouldDisableForm}
+        isLoading={isLoading}
         onSubmit={onSignupSubmit}
+        FooterComponent={SignupFooter}
+        errorText={formError}
       />
-      <div>
-        {formError && <div>{formError}</div>}
-      </div>
     </PageWrapper>
-  )
+  );
 }
 
 export default Signup;

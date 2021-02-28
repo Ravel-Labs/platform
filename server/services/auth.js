@@ -18,7 +18,7 @@ function createToken(email, userId) {
 async function Login(email, password) {
   const { isValid, user } = await User.validateCredentials(email, password);
   if (!isValid) {
-    throw Error('Invalid login credentials')
+    throw Error('Invalid login credentials.')
   }
   const userId = user.id;
   const token = createToken(email, userId)
@@ -52,8 +52,7 @@ async function Signup(email, username, password, code) {
     }
     const invitesRemaining = createInvitesRemaining(roleId);
     const user = await User.create(email, password, roleId, referrerId, invitesRemaining, { username });
-    const userId = user[0].id;
-    const claimedInvite = await Invites.claimInvite(code, userId);
+    const claimedInvite = await Invites.claimInvite(code, user.id);
     const token = createToken(email, userId);
     return {
       token,
