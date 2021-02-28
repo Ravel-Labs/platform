@@ -1,5 +1,5 @@
-// import React from 'react';
-import React, { Suspense, lazy, useState } from 'react';
+import axios from 'axios';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -21,6 +21,18 @@ const APITest = lazy(() => import('./routes/APITest'));
 
 export default function App() {
   const [loggedInUser, setLoggedInUser] = useState(null);
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await axios.get("/api/user");
+        setLoggedInUser(res.data);
+      } catch(e) {
+        console.error(e);
+        setLoggedInUser(null);
+      }
+    }
+    fetchUser();
+  }, []);
 
   return (
     <div className="App">

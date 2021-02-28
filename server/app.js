@@ -14,7 +14,7 @@ var feedbackRouter = require('./routes/feedback');
 var indexRouter = require('./routes/index');
 var testRouter = require('./routes/test');
 var tracksRouter = require('./routes/tracks');
-var usersRouter = require('./routes/users');
+var userRouter = require('./routes/user');
 var statsRouter = require('./routes/stats');
 
 // Middleware
@@ -50,7 +50,7 @@ app.use(`${apiPrefix}/auth`, authRouter);
 app.use(`${apiPrefix}/feedback`, tokenMiddleware.withUser, feedbackRouter);
 app.use(`${apiPrefix}/test`, tokenMiddleware.withUser, testRouter);
 app.use(`${apiPrefix}/tracks`, tokenMiddleware.requireAccess, tracksRouter);
-app.use(`${apiPrefix}/users`, usersRouter);
+app.use(`${apiPrefix}/user`, tokenMiddleware.withUser, userRouter);
 app.use(`${apiPrefix}/stats`, tokenMiddleware.withUser, statsRouter)
 
 // catch 404 and forward to error handler
