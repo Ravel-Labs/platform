@@ -3,7 +3,7 @@ var config = require('../knexfile.js')[environment]
 var knex = require('knex')(config);
 
 try {
-  knex('eventTypes').columnInfo().then((info) => console.log("EventTypes info: ", info));
+  knex('eventTypes').columnInfo().then(() => console.log("DB connected."));
 } catch(e) {
   console.error(e)
 }
