@@ -49,7 +49,7 @@ app.use(`${apiPrefix}/analytics`, tokenMiddleware.withUser, analyticsRouter);
 app.use(`${apiPrefix}/auth`, authRouter);
 app.use(`${apiPrefix}/feedback`, tokenMiddleware.withUser, feedbackRouter);
 app.use(`${apiPrefix}/test`, tokenMiddleware.withUser, testRouter);
-app.use(`${apiPrefix}/tracks`, tokenMiddleware.withUser, tracksRouter);
+app.use(`${apiPrefix}/tracks`, tokenMiddleware.requireAccess, tracksRouter);
 app.use(`${apiPrefix}/users`, usersRouter);
 app.use(`${apiPrefix}/stats`, tokenMiddleware.withUser, statsRouter)
 

@@ -3,6 +3,11 @@ var bcrypt = require('bcrypt');
 var db = require('../knex');
 
 const tableName = 'users';
+const ROLES = {
+  "admin": 0,
+  "betaArtist": 1,
+  "betaUser" : 2
+};
 const defaultReturnColumns = [
   'id',
   'name',
@@ -14,6 +19,7 @@ const defaultReturnColumns = [
   'referrerId',
   'invitesRemaining'
 ];
+
 
 /**
  * Return the user with the provided email, if exists.
@@ -67,8 +73,39 @@ async function create(email, password, roleId, referrerId, invitesRemaining, fie
   }
 }
 
+async function getRoleIdbyUserId(userId) {
+  try {
+    const roleId = await db(tableName).where({id:userId}).first().then((row) => row['roleId']);
+    return roleId;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+async function updateInvitesRemaining(userId) {
+  try {
+    const user = await db(tableName).where({id:userId}).decrement({invitesRemaining: 1});
+    return user;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+async function getUserInvitesRemaining(userId) {
+  try {
+    const invitesRemaining = await db(tableName).where({id:userId}).first().then((row) => row['invitesRemaining']);
+    return invitesRemaining;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 module.exports = {
   create,
   getByEmail,
   validateCredentials,
+  getRoleIdbyUserId,
+  updateInvitesRemaining,
+  getUserInvitesRemaining,
+  ROLES,
 };

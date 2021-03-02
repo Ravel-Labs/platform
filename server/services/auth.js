@@ -3,6 +3,7 @@ var jwt = require('jsonwebtoken');
 var config = require('../config');
 var User = require('../db/models').User;
 var Invites = require('../db/models').Invites;
+var Tracks = require('../db/models').Tracks;
 
 const AUTH_TOKEN_COOKIE = 'ravelPlatform';
 
@@ -65,9 +66,26 @@ function Validate(token) {
   }
 }
 
+async function validateAccess(listenerUserId, trackSlug) {
+  try {
+    const isPrivate = await Tracks.getPrivacyBySlug(trackSlug);
+    if(!isPrivate) {
+      return { hasAccess: true, error: null };
+    }
+    const trackUserId = await Tracks.getUserIdBySlug(trackSlug);
+    const check = Invites.checkInviteCodeForUserId(listenerUserId, trackUserId);
+    if (!check) {
+      return { hasAccess: false, error: null };
+    }
+  } catch(err) {
+    return { hasAccess: false, error: err};
+  }
+}
+
 module.exports = {
   Login,
   Signup,
   Validate,
+  validateAccess,
   AUTH_TOKEN_COOKIE,
 };

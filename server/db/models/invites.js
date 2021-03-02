@@ -67,10 +67,23 @@ async function getInviteCodesByUserId(userId) {
   }
 }
 
+async function checkInviteCodeForUserId(invitedUserId, userId) {
+  try {
+    const check = await db(tableName).where({userId: userId, invitedUserId:invitedUserId});
+    if (!check) {
+      return false;
+    }
+    return true;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 module.exports = {
   create,
   update,
   getReferrerIdByCode,
   getRoleIdByCode,
   getInviteCodesByUserId,
+  checkInviteCodeForUserId,
 }

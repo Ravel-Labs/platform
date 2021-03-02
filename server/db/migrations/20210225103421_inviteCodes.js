@@ -32,6 +32,9 @@ exports.up = function(knex) {
     .table('tracks', t => {
       t.boolean('isPrivate').defaultTo(false).notNullable();
     })
+    .table('sessions', t => {
+      t.timestamp('createdAt').defaultTo(knex.fn.now());
+    })
 };
 
 exports.down = function(knex) {
@@ -47,5 +50,8 @@ exports.down = function(knex) {
     })
     .table('tracks', t => {
       t.dropColumn('isPrivate');
+    })
+    .table('tracks', t => {
+      t.dropColumn('createdAt');
     })
 };
