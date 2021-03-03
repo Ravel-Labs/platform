@@ -1,7 +1,9 @@
 import React from "react";
-import { Avatar, Button, Box, Container, TextField, Typography } from "@material-ui/core";
+import { Avatar, Button, Box, Container, Typography } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import { makeStyles } from "@material-ui/core/styles";
+
+import InputField from "./InputField";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -31,24 +33,6 @@ field:
   required
   type
 */
-
-function InputField({ label, name, type, required, defaultValue, shouldAutoFocus }) {
-  return (
-    <TextField
-    fullWidth
-      autoFocus={shouldAutoFocus}
-      autoComplete={type}
-      defaultValue={defaultValue}
-      id={name}
-      label={label}
-      margin="normal"
-      name={name}
-      required={required}
-      type={type}
-      variant="outlined"
-    />
-  );
-}
 
 export default function Form({
   errorText,

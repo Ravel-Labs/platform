@@ -6,7 +6,7 @@ import Grid from "@material-ui/core/Grid";
 
 import { UserContext } from '../Context';
 import PageWrapper from "../PageWrapper";
-import SimpleForm from "../lib/SimpleForm";
+import SimpleForm from "../SimpleForm";
 
 const signupFields = [
   {

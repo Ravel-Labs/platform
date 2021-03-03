@@ -5,7 +5,7 @@ import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 
 import PageWrapper from '../PageWrapper';
-import SimpleForm from '../lib/SimpleForm';
+import SimpleForm from '../SimpleForm';
 import { UserContext } from '../Context';
 
 const loginFields = [
