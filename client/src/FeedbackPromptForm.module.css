@@ -1,6 +1,11 @@
-.PromptText {
-  font-weight: 600;
-  font-size: 32px;
+.PromptWrapper {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.PromptOptionGroup {
+  margin-bottom: 13px;
+  justify-content: left;
 }
 
 .PromptOption {
@@ -8,9 +13,16 @@
   cursor: pointer;
   font-size: 17px;
   font-weight: 600;
-  margin-bottom: 13pt;
-  padding: 24px;
-  display: inline-block;
+  height: 60px;
+  max-width: 60px;
+  width: 10%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.PromptOptionVal {
+  float: left;
 }
 
 .PromptOption:nth-child(n+2) {

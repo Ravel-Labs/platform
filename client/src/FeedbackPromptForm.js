@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { Button, Grid, Typography } from '@material-ui/core';
 import classNames from 'classnames';
 
 import styles from './FeedbackPromptForm.module.css';
@@ -34,22 +35,25 @@ function FeedbackPromptForm({ prompt }) {
   }
 
   return (
-    <div>
-      <p className={styles.PromptText}>{prompt.prompt}</p>
-      <div>
-        {values.map((val) => {
+    <div className={styles.PromptWrapper}>
+      <Typography variant="h4" component="h3">{prompt.prompt}</Typography>
+      <Grid container direction="row" justify="center" alignItems="center" className={styles.PromptOptionGroup}>
+        {values.map((idx) => {
+          const val = idx + 1;
           const classname = classNames({
             [styles.PromptOption]: true,
             [styles.PromptOption_Selected]: selectedVal === val,
           });
           return (
             <span key={val} onClick={onClickRating.bind(this, val)} className={classname}>
-              {val}
+              <span className={styles.PromptOptionVal}>{val}</span>
             </span>
           )
         })}
-      </div>
-      <button onClick={onSubmitRating} disabled={selectedVal === null}>Submit</button>
+      </Grid>
+      <Button onClick={onSubmitRating} disabled={selectedVal === null} variant="contained" color="primary">
+        Submit
+      </Button>
     </div>
   )
 }
