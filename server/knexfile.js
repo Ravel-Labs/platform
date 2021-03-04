@@ -17,8 +17,8 @@ module.exports = {
   },
   development: {
     ...defaultConfig,
-    // connection: 'postgres://localhost/ravel',
-    connection: process.env.DATABASE_URL
+    connection: 'postgres://localhost/ravel',
+    // connection: process.env.DATABASE_URL
   },
   production: {
     ...defaultConfig,

@@ -49,12 +49,13 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
+	// NOTE: order matters here to ensure we can run this backward without error.
   return knex.schema
-  	.dropTable('users')
-  	.dropTable('tracks')
-  	.dropTable('trackCredits')
-  	.dropTable('eventTypes')
+		.dropTable('trackCredits')
   	.dropTable('events')
-  	.dropTable('feedbackPrompts')
+  	.dropTable('eventTypes')
   	.dropTable('feedback')
+  	.dropTable('tracks')
+  	.dropTable('users')
+  	.dropTable('feedbackPrompts')
 };

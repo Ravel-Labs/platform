@@ -1,7 +1,7 @@
 
 exports.up = function(knex) {
   return knex.schema.table('tracks', t => {
-    t.string('slug').notNullable().defaultTo('');
+    t.string('slug').unique().notNullable();
 	})
 };
 

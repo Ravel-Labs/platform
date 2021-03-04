@@ -102,12 +102,11 @@ async function Upload(trackName, fileContent, genre) {
 
     // TODO: This upload is taking quite a long time (40-80s) every so often. Why?
     console.info('END Upload time (hr): %ds %dms', hrend[0], hrend[1] / 1000000);
-
-    // TODO: create track DB record w/ path to file
+    
     const slug = util.slugify(trackName);
-    const track = await Tracks.create(trackName, "genre", res.Location, slug);
 
-    // TODO: return new track DB record instead
+    // TODO: Update "genre" with real genre here!
+    const track = await Tracks.create(trackName, "genre", res.Location, slug);
     return track;
   } catch(e) {
     console.error("error upload", e)
