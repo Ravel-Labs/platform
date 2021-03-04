@@ -1,48 +1,52 @@
-var express = require('express');
-var multer = require('multer')
+var express = require("express");
+var multer = require("multer");
 
-var UploadService = require('../services/upload');
-var Tracks = require('../db/models').Tracks;
-var Feedback = require('../db/models').Feedback;
+var UploadService = require("../services/upload");
+var Tracks = require("../db/models").Tracks;
+var Feedback = require("../db/models").Feedback;
 
 var router = express.Router();
 
-
 // GET resource for track data.
-router.get('/:slug', async function(req, res, next) {
+router.get("/:slug", async function (req, res, next) {
+  const track = await Tracks.getTrackBySlug(req.params.slug);
+  if (!track || !track.id) {
+    res.status(404).send("No track found");
+  }
+  const trackPrompts = await Feedback.getFeedbackPromptsbyTrackId(track.id);
 
-  const dummyTrack = await Tracks.getTrackBySlug(req.params.slug);
-  const dummyTrackId = dummyTrack.id
-  const dummyPrompts = await Feedback.getFeedbackPromptsbyTrackId(dummyTrackId);
+  track.prompts = trackPrompts.map((x) => ({
+    ...x,
+    trackId: track.id,
+  }));
 
-  dummyTrack.prompts = dummyPrompts.map(x => ({...x, trackId: dummyTrackId}));
-
-  res.status(200).send(dummyTrack);
+  res.status(200).send(track);
 });
 
 // In-memory handling for form data from incoming multipart/form-data request
-var processFile = multer()
+var processFile = multer();
 
 // POST resource for track upload.
-router.post('/', processFile.single("audio"), async function(req, res, next) {
+router.post("/", processFile.single("audio"), async function (req, res, next) {
   try {
-    const track = await UploadService.Upload(req.body.name, req.file, req.body.genre, req.body.isPrivate);
-  } catch(e) {
-    console.log("error", e)
+    const track = await UploadService.Upload(req.body, req.file);
+    res.status(201).send(track);
+  } catch (e) {
+    console.log("error", e);
     res.status(400).send(e);
   }
-  
-  // TODO: send back uploaded track info
-  res.status(201).send(track);
 });
 
-router.post('/privacy/:slug', async function(req, res, next) {
+router.post("/privacy/:slug", async function (req, res, next) {
   try {
-    const track = Tracks.updateTrackPrivacy(req.params.slug, req.body.isPrivate);
-  } catch(e) {
-    console.log("error", e)
+    const track = Tracks.updateTrackPrivacy(
+      req.params.slug,
+      req.body.isPrivate
+    );
+  } catch (e) {
+    console.log("error", e);
     res.status(400).send(e);
   }
-})
+});
 
 module.exports = router;

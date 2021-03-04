@@ -1,10 +1,10 @@
-import { Chip, Grid, Typography } from '@material-ui/core';
-import { PlayArrow } from '@material-ui/icons';
+import { Chip, Grid, Typography } from "@material-ui/core";
+import { PlayArrow } from "@material-ui/icons";
 
-import AudioPlayer from './AudioPlayer';
-import FeedbackPromptForm from './FeedbackPromptForm';
+import AudioPlayer from "./AudioPlayer";
+import FeedbackPromptForm from "./FeedbackPromptForm";
 
-import styles from './TrackDisplay.module.css';
+import styles from "./TrackDisplay.module.css";
 
 function TrackDisplay({ track }) {
   return (
@@ -12,7 +12,7 @@ function TrackDisplay({ track }) {
       {track && (
         <>
           <Grid item xs={12}>
-            <AudioPlayer track={track}/>
+            <AudioPlayer track={track} />
           </Grid>
           <Grid item xs={12} md={2}>
             <Grid container justify="center" xs={12}>
@@ -21,7 +21,9 @@ function TrackDisplay({ track }) {
               </Grid>
               <Grid>
                 {/* TODO: Make this real play count */}
-                <Typography variant="body1" component="span">123</Typography>
+                <Typography variant="body1" component="span">
+                  123
+                </Typography>
               </Grid>
             </Grid>
             <Chip label={track.genre} />
@@ -34,12 +36,16 @@ function TrackDisplay({ track }) {
           <Grid item xs={12} md={3} className={styles.ArtistGridItem}>
             {/* TODO: Make this real artist info */}
             <Typography variant="h2">Tyler Herro</Typography>
-            <Typography variant="body1">Flaunting sleek flows, nimble wordplay, unpredictable rhyme patterns and vast ambition, Jack Harlow raps with old school dedication and raw individuality.</Typography>
+            <Typography variant="body1">
+              Flaunting sleek flows, nimble wordplay, unpredictable rhyme
+              patterns and vast ambition, Jack Harlow raps with old school
+              dedication and raw individuality.
+            </Typography>
           </Grid>
         </>
       )}
     </Grid>
-  )
+  );
 }
 
 export default TrackDisplay;
