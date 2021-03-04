@@ -12,8 +12,10 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.table("events", (t) => {
-    t.integer("listenerUserId").references("id").inTable("users").nullable();
-    t.dropColumn("sessionId");
-  }).dropTable("sessions");
+  return knex.schema
+    .table("events", (t) => {
+      t.integer("listenerUserId").references("id").inTable("users").nullable();
+      t.dropColumn("sessionId");
+    })
+    .dropTable("sessions");
 };

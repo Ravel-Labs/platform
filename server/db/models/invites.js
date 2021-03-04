@@ -7,7 +7,7 @@ const defaultReturnColumns = [
   'code',
   'createdAt',
   'grantedRoleId',
-  'claimed',
+  'isClaimed',
   'invitedUserId'
 ]
 
@@ -28,10 +28,10 @@ async function create(userId, grantedRoleId, fields={}) {
   }
 }
 
-async function update(code, invitedUserId) {
+async function claimInvite(code, invitedUserId) {
   try {
     const inviteCode = await db(tableName).where({code:code}).update({
-      claimed: true,
+      isClaimed: true,
       invitedUserId: invitedUserId
     })
     return inviteCode;
@@ -53,6 +53,16 @@ async function getRoleIdByCode(code) {
   try {
     const roleId = await db(tableName).where({code: code}).select('roleId').first().then((row) => row['roleId']);
     return roleId;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+async function getRoleIdAndReferrerIdByCode(code) {
+  try {
+    const codeInfo = await db(tableName).where({code: code}).select('grantedRoleId', 'userId').first();
+    console.log({roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId});
+    return {roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId};
   } catch(e) {
     console.error(e);
   }
@@ -81,9 +91,10 @@ async function checkInviteCodeForUserId(invitedUserId, userId) {
 
 module.exports = {
   create,
-  update,
+  claimInvite,
   getReferrerIdByCode,
   getRoleIdByCode,
+  getRoleIdAndReferrerIdByCode,
   getInviteCodesByUserId,
   checkInviteCodeForUserId,
 }

@@ -14,4 +14,5 @@ module.exports = {
   jwtSecret: process.env.JWT_SECRET,
   nodeEnv: process.env.NODE_ENV,
   port: process.env.PORT,
+  adminPassword: process.env.ADMIN_PASSWORD
 }

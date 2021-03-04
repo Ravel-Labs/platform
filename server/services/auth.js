@@ -45,11 +45,11 @@ function createInvitesRemaining(roleId) {
 }
 
 async function Signup(email, username, password, code) {
-  const referrerId = await Invites.getReferrerIdByCode(code);
-  const roleId = await Invites.getRoleIdByCode(code);
+  const {roleId, referrerId} = await Invites.getRoleIdAndReferrerIdByCode(code);
   const invitesRemaining = createInvitesRemaining(roleId);
   const user = await User.create(email, password, roleId, referrerId, invitesRemaining, { username });
   const userId = user.id;
+  const claimedInvite = await Invites.claimInvite(code, userId);
   const token = createToken(email, userId)
   return {
     token,
@@ -74,8 +74,11 @@ async function validateAccess(listenerUserId, trackSlug) {
     }
     const trackUserId = await Tracks.getUserIdBySlug(trackSlug);
     const check = Invites.checkInviteCodeForUserId(listenerUserId, trackUserId);
-    if (!check) {
+    const roleId = User.getRoleIdbyUserId(listenerUserId);
+    if (!check && roleId !== User.ROLES.admin) {
       return { hasAccess: false, error: null };
+    } else {
+      return { hasAccess: true, error: null };
     }
   } catch(err) {
     return { hasAccess: false, error: err};

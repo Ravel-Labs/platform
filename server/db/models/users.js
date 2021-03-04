@@ -75,14 +75,14 @@ async function create(email, password, roleId, referrerId, invitesRemaining, fie
 
 async function getRoleIdbyUserId(userId) {
   try {
-    const roleId = await db(tableName).where({id:userId}).first().then((row) => row['roleId']);
+    const roleId = await db(tableName).where({id:userId}).select('roleId').first().then((row) => row['roleId']);
     return roleId;
   } catch(e) {
     console.error(e);
   }
 }
 
-async function updateInvitesRemaining(userId) {
+async function decrementInvitesRemaining(userId) {
   try {
     const user = await db(tableName).where({id:userId}).decrement({invitesRemaining: 1});
     return user;
@@ -93,7 +93,7 @@ async function updateInvitesRemaining(userId) {
 
 async function getUserInvitesRemaining(userId) {
   try {
-    const invitesRemaining = await db(tableName).where({id:userId}).first().then((row) => row['invitesRemaining']);
+    const invitesRemaining = await db(tableName).where({id:userId}).select('invitesRemaining').first().then((row) => row['invitesRemaining']);
     return invitesRemaining;
   } catch(e) {
     console.error(e);
@@ -105,7 +105,7 @@ module.exports = {
   getByEmail,
   validateCredentials,
   getRoleIdbyUserId,
-  updateInvitesRemaining,
+  decrementInvitesRemaining,
   getUserInvitesRemaining,
   ROLES,
 };

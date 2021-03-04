@@ -2,6 +2,7 @@ var express = require('express');
 var AuthService = require('../services/auth');
 var config = require('../config');
 var User = require('../db/models').User
+var Invites = require('../db/models').Invites;
 var router = express.Router();
 
 const dayMs = 24 * 60 * 60 * 1000
@@ -20,9 +21,12 @@ function setAuthCookie(res, token) {
 router.post('/create-code', async function (req, res, next) {
   try {
     const userInvitesRemaining = await User.getUserInvitesRemaining(req.body.userId);
+    console.log(userInvitesRemaining);
     if (userInvitesRemaining > 0) {
       const inviteCode = await Invites.create(req.body.userId, User.ROLES.betaUser);
-      const user = await User.updateInvitesRemaining(req.body.userId);
+      console.log(inviteCode);
+      const user = await User.decrementInvitesRemaining(req.body.userId);
+      res.status(200).send(inviteCode);
     } else {
       console.log("/create-code: user has no codes to give")
     }
@@ -30,17 +34,17 @@ router.post('/create-code', async function (req, res, next) {
     console.log("/create-code err", e);
     res.status(400).send(e);   
   }
-  res.status(200).send(inviteCode);
 })
 
 router.get('/invite-codes', async function(req, res, next) {
   try {
-    const inviteCodes = Invites.getInviteCodesByUserId(req.body.userId);
+    const inviteCodes = await Invites.getInviteCodesByUserId(req.body.userId);
+    console.log(inviteCodes);
+    res.status(200).send(inviteCodes);
   } catch(e) {
     console.log("/invite-codes err", e);
     res.status(400).send(e);
   }
-  res.status(200).send(inviteCodes);
 })
 
 // Signup route -- create a new user, return token.
