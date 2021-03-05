@@ -45,15 +45,22 @@ function createInvitesRemaining(roleId) {
 }
 
 async function Signup(email, username, password, code) {
-  const {roleId, referrerId} = await Invites.getRoleIdAndReferrerIdByCode(code);
-  const invitesRemaining = createInvitesRemaining(roleId);
-  const user = await User.create(email, password, roleId, referrerId, invitesRemaining, { username });
-  const userId = user.id;
-  const claimedInvite = await Invites.claimInvite(code, userId);
-  const token = createToken(email, userId)
-  return {
-    token,
-    user,
+  try {
+    const {roleId, referrerId, isClaimed} = await Invites.getInviteCodeInfo(code);
+    if (isClaimed) {
+      throw Error('Invite code has already been claimed');
+    }
+    const invitesRemaining = createInvitesRemaining(roleId);
+    const user = await User.create(email, password, roleId, referrerId, invitesRemaining, { username });
+    const userId = user[0].id;
+    const claimedInvite = await Invites.claimInvite(code, userId);
+    const token = createToken(email, userId);
+    return {
+      token,
+      user,
+    };
+  } catch(e) {
+    return console.error(e);
   }
 }
 

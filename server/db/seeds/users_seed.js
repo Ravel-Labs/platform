@@ -12,7 +12,7 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('users').insert([
         {
-          id: 0,
+          // id: 0,
           name: 'Garrett', 
           email: "garrett@ravelmusic.io",
           // passwordHash: createPasswordHash(config.ADMIN_PASSWORD),
@@ -25,7 +25,7 @@ exports.seed = function(knex) {
           invitesRemaining: 1000  
         },
         {
-          id: 1,
+          // id: 1,
           name: 'Mark', 
           email: "mark@ravelmusic.io",
           // passwordHash: createPasswordHash(config.ADMIN_PASSWORD),
@@ -38,7 +38,7 @@ exports.seed = function(knex) {
           invitesRemaining: 1000  
         },
         {
-          id: 2,
+          // id: 2,
           name: 'Gaelen', 
           email: "gaelen@ravelmusic.io",
           // passwordHash: createPasswordHash(config.ADMIN_PASSWORD),

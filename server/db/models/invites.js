@@ -58,11 +58,11 @@ async function getRoleIdByCode(code) {
   }
 }
 
-async function getRoleIdAndReferrerIdByCode(code) {
+async function getInviteCodeInfo(code) {
   try {
-    const codeInfo = await db(tableName).where({code: code}).select('grantedRoleId', 'userId').first();
-    console.log({roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId});
-    return {roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId};
+    const codeInfo = await db(tableName).where({code: code}).select('grantedRoleId', 'userId', 'isClaimed').first();
+    console.log({roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId, isClaimed: codeInfo.isClaimed});
+    return {roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId, isClaimed: codeInfo.isClaimed};
   } catch(e) {
     console.error(e);
   }
@@ -94,7 +94,7 @@ module.exports = {
   claimInvite,
   getReferrerIdByCode,
   getRoleIdByCode,
-  getRoleIdAndReferrerIdByCode,
+  getInviteCodeInfo,
   getInviteCodesByUserId,
   checkInviteCodeForUserId,
 }
