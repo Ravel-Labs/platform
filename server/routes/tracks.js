@@ -26,7 +26,7 @@ var processFile = multer()
 // POST resource for track upload.
 router.post('/', processFile.single("audio"), async function(req, res, next) {
   try {
-    const track = await UploadService.Upload(req.body.name, req.file, req.body.genre);
+    const track = await UploadService.Upload(req.body.name, req.file, req.body.genre, req.body.isPrivate);
   } catch(e) {
     console.log("error", e)
     res.status(400).send(e);
@@ -35,5 +35,14 @@ router.post('/', processFile.single("audio"), async function(req, res, next) {
   // TODO: send back uploaded track info
   res.status(201).send(track);
 });
+
+router.post('/privacy/:slug', async function(req, res, next) {
+  try {
+    const track = Tracks.updateTrackPrivacy(req.params.slug, req.body.isPrivate);
+  } catch(e) {
+    console.log("error", e)
+    res.status(400).send(e);
+  }
+})
 
 module.exports = router;

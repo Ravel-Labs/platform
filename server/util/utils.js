@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 function slugify(str) {
 	str = str.replace(/^\s+|\s+$/g, '');
 	str = str.toLowerCase();
@@ -15,6 +17,12 @@ function slugify(str) {
 	return str;
 }
 
+function generateCode(size=12) {
+  return crypto.randomBytes(size).toString('hex').slice(0, size);
+}
+
 module.exports = {
 	slugify,
+  generateCode,
 };
+

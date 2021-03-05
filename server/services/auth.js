@@ -2,6 +2,8 @@ var jwt = require('jsonwebtoken');
 
 var config = require('../config');
 var User = require('../db/models').User;
+var Invites = require('../db/models').Invites;
+var Tracks = require('../db/models').Tracks;
 
 const AUTH_TOKEN_COOKIE = 'ravelPlatform';
 
@@ -26,13 +28,39 @@ async function Login(email, password) {
   }
 }
 
-async function Signup(email, username, password) {
-  const user = await User.create(email, password, { username });
-  const userId = user.id;
-  const token = createToken(email, userId)
-  return {
-    token,
-    user,
+function createInvitesRemaining(roleId) {
+  try {
+     let invitesRemaining;
+     if (roleId == 0) {
+      invitesRemaining = 1000;
+    } else if (roleId == 1) {
+      invitesRemaining = 10;
+    } else {
+      invitesRemaining = 0;
+    }
+    return invitesRemaining;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+async function Signup(email, username, password, code) {
+  try {
+    const {roleId, referrerId, isClaimed} = await Invites.getInviteCodeInfo(code);
+    if (isClaimed) {
+      throw Error('Invite code has already been claimed');
+    }
+    const invitesRemaining = createInvitesRemaining(roleId);
+    const user = await User.create(email, password, roleId, referrerId, invitesRemaining, { username });
+    const userId = user[0].id;
+    const claimedInvite = await Invites.claimInvite(code, userId);
+    const token = createToken(email, userId);
+    return {
+      token,
+      user,
+    };
+  } catch(e) {
+    return console.error(e);
   }
 }
 
@@ -45,9 +73,29 @@ function Validate(token) {
   }
 }
 
+async function validateAccess(listenerUserId, trackSlug) {
+  try {
+    const isPrivate = await Tracks.getPrivacyBySlug(trackSlug);
+    if(!isPrivate) {
+      return { hasAccess: true, error: null };
+    }
+    const trackUserId = await Tracks.getUserIdBySlug(trackSlug);
+    const check = Invites.checkInviteCodeForUserId(listenerUserId, trackUserId);
+    const roleId = User.getRoleIdbyUserId(listenerUserId);
+    if (!check && roleId !== User.ROLES.admin) {
+      return { hasAccess: false, error: null };
+    } else {
+      return { hasAccess: true, error: null };
+    }
+  } catch(err) {
+    return { hasAccess: false, error: err};
+  }
+}
+
 module.exports = {
   Login,
   Signup,
   Validate,
+  validateAccess,
   AUTH_TOKEN_COOKIE,
 };

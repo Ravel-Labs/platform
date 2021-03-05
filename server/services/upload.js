@@ -1,9 +1,9 @@
-var S3 = require('aws-sdk/clients/s3');
+var S3 = require("aws-sdk/clients/s3");
 
-var config = require('../config')
+var config = require("../config");
 
-var Tracks = require('../db/models').Tracks;
-var util = require('../util/utils.js');
+var Tracks = require("../db/models").Tracks;
+var util = require("../util/utils.js");
 
 // TODO: Move these constants.
 const trackUploadFolder = "track-uploads";
@@ -36,7 +36,7 @@ const mimetypeToExtension = {
   "audio/x-pn-realaudio": "ram",
   "audio/x-pn-realaudio-plugin": "rmp",
   "audio/x-wav": "wav",
-}
+};
 
 /**
  * createBucket is a helper for creating a new AWS S3 bucket.
@@ -52,17 +52,17 @@ const createBucket = async (s3, bucketName) => {
       },
     };
     const createBucketRes = await s3.createBucket(params).promise();
-    console.log("bucket created successfully", createBucketRes)
-  } catch(e) {
+    console.log("bucket created successfully", createBucketRes);
+  } catch (e) {
     // Only throw an error if it's something other than the bucket already existing.
     if (e.code !== "BucketAlreadyOwnedByYou") {
-      throw e
+      throw e;
     }
-    console.log("bucket already exists, moving on...")
+    console.log("bucket already exists, moving on...");
   }
-}
+};
 
-async function Upload(trackName, fileContent, genre) {
+async function Upload(trackName, fileContent, genre, isPrivate) {
   const s3 = new S3({
     accessKeyId: config.awsAccessKeyId,
     secretAccessKey: config.awsAccessKeySecret,
@@ -70,24 +70,30 @@ async function Upload(trackName, fileContent, genre) {
   });
 
   const allBucketData = await s3.listBuckets().promise();
-  const hasTrackUploadBucket = allBucketData.Buckets.reduce((accum, { Name: name }) => {
-    return (accum || name === config.awsS3BucketName)
-  }, false)
+  const hasTrackUploadBucket = allBucketData.Buckets.reduce(
+    (accum, { Name: name }) => {
+      return accum || name === config.awsS3BucketName;
+    },
+    false
+  );
 
   if (!hasTrackUploadBucket) {
-    console.info("Creating bucket with name ", config.awsS3BucketName)
+    console.info("Creating bucket with name ", config.awsS3BucketName);
     await createBucket(s3, config.awsS3BucketName);
   }
 
   const extension = mimetypeToExtension[fileContent.mimetype];
   if (!extension) {
     const msg = `No extension found for mimetype ${fileContent.mimetype}`;
-    console.error(msg)
-    throw Error(msg)
+    console.error(msg);
+    throw Error(msg);
   }
 
-  const key = `${trackUploadFolder}/${trackName.replace(" ", "_")}-${Date.now().toString()}.${extension}`;
-  const base64data = Buffer.from(fileContent.buffer, 'binary');
+  const key = `${trackUploadFolder}/${trackName.replace(
+    " ",
+    "_"
+  )}-${Date.now().toString()}.${extension}`;
+  const base64data = Buffer.from(fileContent.buffer, "binary");
   const params = {
     ACL: "public-read",
     Body: base64data,
@@ -96,21 +102,29 @@ async function Upload(trackName, fileContent, genre) {
   };
 
   try {
-    var hrstart = process.hrtime()
+    var hrstart = process.hrtime();
     const res = await s3.upload(params).promise();
-    var hrend = process.hrtime(hrstart)
+    var hrend = process.hrtime(hrstart);
 
     // TODO: This upload is taking quite a long time (40-80s) every so often. Why?
-    console.info('END Upload time (hr): %ds %dms', hrend[0], hrend[1] / 1000000);
-    
-    const slug = util.slugify(trackName);
+    console.info(
+      "END Upload time (hr): %ds %dms",
+      hrend[0],
+      hrend[1] / 1000000
+    );
 
-    // TODO: Update "genre" with real genre here!
-    const track = await Tracks.create(trackName, "genre", res.Location, slug);
+    const slug = util.slugify(trackName);
+    const track = await Tracks.create(
+      trackName,
+      "genre",
+      res.Location,
+      slug,
+      isPrivate
+    );
     return track;
-  } catch(e) {
-    console.error("error upload", e)
-    throw e
+  } catch (e) {
+    console.error("error upload", e);
+    throw e;
   }
 }
 
