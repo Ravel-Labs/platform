@@ -1,90 +1,112 @@
-var db = require('../knex');
-var util = require('../../util/utils.js');
+var db = require("../knex");
+var util = require("../../util/utils.js");
 
 const defaultReturnColumns = [
-  'id',
-  'userId',
-  'code',
-  'createdAt',
-  'grantedRoleId',
-  'isClaimed',
-  'invitedUserId'
-]
+  "id",
+  "userId",
+  "code",
+  "createdAt",
+  "grantedRoleId",
+  "isClaimed",
+  "invitedUserId",
+];
 
-const tableName = 'inviteCodes'
+const tableName = "inviteCodes";
 
-async function create(userId, grantedRoleId, fields={}) {
+async function create(userId, grantedRoleId, fields = {}) {
   try {
-    const code = await util.generateCode()
-    const inviteCode = await db(tableName).insert({
-      userId,
-      grantedRoleId,
-      code,
-      ...fields,
-    }, defaultReturnColumns);
+    const code = await util.generateCode();
+    const inviteCode = await db(tableName).insert(
+      {
+        userId,
+        grantedRoleId,
+        code,
+        ...fields,
+      },
+      defaultReturnColumns
+    );
     return inviteCode;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function claimInvite(code, invitedUserId) {
   try {
-    const inviteCode = await db(tableName).where({code:code}).update({
+    const inviteCode = await db(tableName).where({ code: code }).update({
       isClaimed: true,
-      invitedUserId: invitedUserId
-    })
+      invitedUserId: invitedUserId,
+    });
     return inviteCode;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function getReferrerIdByCode(code) {
   try {
-    const referrerId = await db(tableName).where({code: code}).select('userId').first().then((row) => row['userId']);
+    const referrerId = await db(tableName)
+      .where({ code: code })
+      .select("userId")
+      .first()
+      .then((row) => row["userId"]);
     return referrerId;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function getRoleIdByCode(code) {
   try {
-    const roleId = await db(tableName).where({code: code}).select('roleId').first().then((row) => row['roleId']);
+    const roleId = await db(tableName)
+      .where({ code: code })
+      .select("roleId")
+      .first()
+      .then((row) => row["roleId"]);
     return roleId;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function getInviteCodeInfo(code) {
   try {
-    const codeInfo = await db(tableName).where({code: code}).select('grantedRoleId', 'userId', 'isClaimed').first();
-    console.log({roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId, isClaimed: codeInfo.isClaimed});
-    return {roleId: codeInfo.grantedRoleId, referrerId: codeInfo.userId, isClaimed: codeInfo.isClaimed};
-  } catch(e) {
+    const codeInfo = await db(tableName)
+      .where({ code: code })
+      .select("grantedRoleId", "userId", "isClaimed")
+      .first();
+    const res = {
+      roleId: codeInfo.grantedRoleId,
+      referrerId: codeInfo.userId,
+      isClaimed: codeInfo.isClaimed,
+    };
+    console.log(res);
+    return res;
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function getInviteCodesByUserId(userId) {
   try {
-    const inviteCodes = await db(tableName).where({userId: userId});
+    const inviteCodes = await db(tableName).where({ userId: userId });
     return inviteCodes;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function checkInviteCodeForUserId(invitedUserId, userId) {
   try {
-    const check = await db(tableName).where({userId: userId, invitedUserId:invitedUserId});
+    const check = await db(tableName).where({
+      userId: userId,
+      invitedUserId: invitedUserId,
+    });
     if (!check) {
       return false;
     }
     return true;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
@@ -97,4 +119,4 @@ module.exports = {
   getInviteCodeInfo,
   getInviteCodesByUserId,
   checkInviteCodeForUserId,
-}
+};

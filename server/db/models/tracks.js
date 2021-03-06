@@ -14,7 +14,7 @@ const defaultReturnColumns = [
 
 async function create(trackName, genre, path, slug, isPrivate, fields = {}) {
   try {
-    const track = await db(tableName).insert(
+    const tracks = await db(tableName).insert(
       {
         trackName,
         genre,

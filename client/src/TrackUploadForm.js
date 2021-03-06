@@ -64,7 +64,12 @@ const formFields = {
 
 export default function TrackUploadForm() {
   const classes = useFormStyles();
-  const [fieldVals, setFieldVals] = useState({});
+  const [fieldVals, setFieldVals] = useState({
+    title: "",
+    description: "",
+    genre: "",
+    isPrivate: false,
+  });
   const [fileName, setFileName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
