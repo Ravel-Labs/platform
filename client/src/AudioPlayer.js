@@ -114,7 +114,7 @@ export default function AudioPlayer({ track }) {
           )}
         </div>
         <div className={styles.TrackInfo}>
-          <h1 className={styles.TrackInfoTitle}>{track.trackName}</h1>
+          <h1 className={styles.TrackInfoTitle}>{track.title}</h1>
           <h2 className={styles.TrackInfoArtist}>
             {track.artist || "Artist Name"}
           </h2>

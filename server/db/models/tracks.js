@@ -4,7 +4,7 @@ const tableName = "tracks";
 
 const defaultReturnColumns = [
   "id",
-  "trackName",
+  "title",
   "createdAt",
   "genre",
   "path",
@@ -12,16 +12,14 @@ const defaultReturnColumns = [
   "isPrivate",
 ];
 
-async function create(trackName, genre, path, slug, isPrivate, fields = {}) {
+async function create(title, path, genre, additionalFields = {}) {
   try {
     const tracks = await db(tableName).insert(
       {
-        trackName,
+        title,
         genre,
         path,
-        slug,
-        isPrivate,
-        ...fields,
+        ...additionalFields,
       },
       defaultReturnColumns
     );

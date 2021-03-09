@@ -71,7 +71,6 @@ const createBucket = async (s3, bucketName) => {
 };
 
 async function Upload(track, fileContent) {
-  // TODO: Make use of description
   const { title, description, genre, isPrivate } = track;
   const s3 = new S3({
     accessKeyId: config.awsAccessKeyId,
@@ -124,13 +123,11 @@ async function Upload(track, fileContent) {
     );
 
     const slug = util.slugify(`${title}-${new Date().getTime()}`);
-    const track = await Tracks.create(
-      title,
-      genre,
-      res.Location,
+    const track = await Tracks.create(title, res.Location, genre, {
       slug,
-      isPrivate
-    );
+      isPrivate,
+      description,
+    });
     return track;
   } catch (e) {
     console.error("error upload", e);
