@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { PlayCircleFilled, PauseCircleFilled } from "@material-ui/icons";
 import axios from "axios";
 import debounce from "lodash.debounce";
@@ -94,7 +94,7 @@ export default function AudioPlayer({ track }) {
     });
   };
 
-  const debouncedOnSeekComplete = debounce(onSeekComplete, 100);
+  const onSeekCompleteRef = useRef(debounce(onSeekComplete, 1000));
 
   return (
     <div className={styles.AudioPlayer}>
@@ -103,7 +103,7 @@ export default function AudioPlayer({ track }) {
         src={track?.path}
         preload="metadata"
         onEnded={onPlayEnded}
-        onSeeked={debouncedOnSeekComplete}
+        onSeeked={onSeekCompleteRef.current}
       />
       <div className={styles.PlayerControls}>
         <div className={styles.PlayPause}>
