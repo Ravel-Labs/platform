@@ -29,6 +29,7 @@ var processFile = multer();
 // POST resource for track upload.
 router.post("/", processFile.single("audio"), async function (req, res, next) {
   try {
+    // TODO: Separate separate track upload from track creation
     const track = await UploadService.Upload(req.body, req.file);
     res.status(201).send(track);
   } catch (e) {

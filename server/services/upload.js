@@ -2,6 +2,7 @@ var S3 = require("aws-sdk/clients/s3");
 
 var config = require("../config");
 
+var TrackFeedbackPrompts = require("../db/models").TrackFeedbackPrompts;
 var Tracks = require("../db/models").Tracks;
 var util = require("../util/utils.js");
 
@@ -71,7 +72,7 @@ const createBucket = async (s3, bucketName) => {
 };
 
 async function Upload(track, fileContent) {
-  const { title, description, genre, isPrivate } = track;
+  const { title, description, genre, isPrivate, prompts } = track;
   const s3 = new S3({
     accessKeyId: config.awsAccessKeyId,
     secretAccessKey: config.awsAccessKeySecret,
@@ -128,6 +129,24 @@ async function Upload(track, fileContent) {
       isPrivate,
       description,
     });
+
+    // TODO: maybe move this into track creation?
+    if (!track.id) {
+      throw "Track not created successfully.";
+    }
+
+    // If the user didn't add any prompts, that's ok!
+    if (prompts && Array.isArray(prompts)) {
+      const trackPrompts = prompts.map((promptId) => {
+        return {
+          trackId: track.id,
+          promptId,
+        };
+      });
+
+      await TrackFeedbackPrompts.bulkCreate(trackPrompts);
+    }
+
     return track;
   } catch (e) {
     console.error("error upload", e);

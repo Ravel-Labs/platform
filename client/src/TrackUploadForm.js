@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
 import {
   Box,
@@ -9,7 +9,9 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
+  Input,
   InputLabel,
+  ListItemText,
   MenuItem,
   Select,
   TextField,
@@ -33,7 +35,6 @@ const genres = [
   "Dubstep",
   "Electronic",
   "Folk",
-  "Singer-Songwriter",
   "Hip-hop & Rap",
   "House",
   "Indie",
@@ -42,10 +43,11 @@ const genres = [
   "Metal",
   "Pop",
   "R&B",
-  "Soul",
   "Reggae",
   "Reggaeton",
   "Rock",
+  "Singer-Songwriter",
+  "Soul",
   "Soundtrack",
   "Techno",
   "Trance",
@@ -55,35 +57,51 @@ const genres = [
 ];
 
 const formFields = {
-  title: "title",
-  description: "description",
   audio: "audio",
+  description: "description",
   genre: "genre",
   isPrivate: "isPrivate",
+  prompts: "prompts",
+  title: "title",
+};
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
 };
 
 export default function TrackUploadForm() {
   const classes = useFormStyles();
   const [fieldVals, setFieldVals] = useState({
-    title: "",
     description: "",
     genre: "",
     isPrivate: false,
+    prompts: [],
+    title: "",
   });
   const [fileName, setFileName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [newTrack, setNewTrack] = useState("");
+  const [promptOptions, setPromptOptions] = useState([]);
 
-  const onChangeField = (fieldName, value) => {
-    setErrorMessage("");
-    setFieldVals((vals) => {
-      return {
-        ...vals,
-        [fieldName]: value,
-      };
-    });
-  };
+  useEffect(() => {
+    async function fetchPrompts() {
+      try {
+        const res = await axios.get("/api/prompts");
+        setPromptOptions(res.data);
+      } catch (err) {
+        console.error("failed fetching track", err);
+      }
+    }
+    fetchPrompts();
+  }, []);
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
@@ -93,7 +111,12 @@ export default function TrackUploadForm() {
     const formData = new FormData();
 
     Object.entries(formFields).forEach(([_, fieldName]) => {
-      formData.append(fieldName, fieldVals[fieldName]);
+      const val = fieldVals[fieldName];
+      if (Array.isArray(val)) {
+        val.forEach((v) => formData.append(fieldName, v));
+      } else {
+        formData.append(fieldName, val);
+      }
     });
 
     try {
@@ -109,6 +132,25 @@ export default function TrackUploadForm() {
       );
     }
     setIsLoading(false);
+  };
+
+  const onChangeField = (fieldName, value) => {
+    setErrorMessage("");
+    setFieldVals((vals) => {
+      return {
+        ...vals,
+        [fieldName]: value,
+      };
+    });
+  };
+
+  const onChangeSelectedPompts = (event) => {
+    setFieldVals((vals) => {
+      return {
+        ...vals,
+        prompts: [].concat(event.target.value),
+      };
+    });
   };
 
   const onAudioFileChange = async (e) => {
@@ -191,14 +233,14 @@ export default function TrackUploadForm() {
 
         {/* Genre */}
         <FormControl className={classes.formControl} margin="normal">
-          <InputLabel id="genre-select" required>
+          <InputLabel id="genre-select-label" required>
             Genre
           </InputLabel>
           <Select
             fullWidth
             required
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId="genre-select-label"
+            id="genre-select"
             value={fieldVals.genre || ""}
             onChange={(e) => onChangeField(formFields.genre, e.target.value)}
             SelectDisplayProps={{ style: { textAlign: "left" } }}
@@ -242,6 +284,34 @@ export default function TrackUploadForm() {
             }
             label="Private"
           />
+        </FormControl>
+
+        {/* Prompts */}
+        <FormControl className={classes.formControl}>
+          <InputLabel id="multiple-prompt-select">Prompts</InputLabel>
+          <Select
+            fullWidth
+            labelId="multiple-prompt-select"
+            id="demo-mutiple-checkbox"
+            multiple
+            value={fieldVals.prompts}
+            onChange={onChangeSelectedPompts}
+            input={<Input />}
+            renderValue={(selected) => {
+              if (selected.length > 0) {
+                return `(${selected.length} selected)`;
+              }
+              return "";
+            }}
+            MenuProps={MenuProps}
+          >
+            {promptOptions.map((prompt) => (
+              <MenuItem key={prompt.id} value={prompt.id}>
+                <Checkbox checked={fieldVals.prompts.includes(prompt.id)} />
+                <ListItemText primary={prompt.prompt} />
+              </MenuItem>
+            ))}
+          </Select>
         </FormControl>
 
         {/* Submit */}
