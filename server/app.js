@@ -11,6 +11,7 @@ var config = require("./config");
 var analyticsRouter = require("./routes/analytics");
 var authRouter = require("./routes/auth");
 var feedbackRouter = require("./routes/feedback");
+var inviteCodeRouter = require("./routes/inviteCodes");
 var indexRouter = require("./routes/index");
 var promptsRouter = require("./routes/prompts");
 var testRouter = require("./routes/test");
@@ -46,6 +47,11 @@ const apiPrefix = "/api";
 app.use(`${apiPrefix}/analytics`, tokenMiddleware.withUser, analyticsRouter);
 app.use(`${apiPrefix}/auth`, authRouter);
 app.use(`${apiPrefix}/feedback`, tokenMiddleware.withUser, feedbackRouter);
+app.use(
+  `${apiPrefix}/invite-codes`,
+  tokenMiddleware.requireUser,
+  inviteCodeRouter
+);
 app.use(`${apiPrefix}/prompts`, promptsRouter);
 app.use(`${apiPrefix}/test`, tokenMiddleware.withUser, testRouter);
 app.use(`${apiPrefix}/tracks`, tokenMiddleware.requireAccess, tracksRouter);

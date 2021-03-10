@@ -18,40 +18,6 @@ function setAuthCookie(res, token) {
   });
 }
 
-router.post("/create-code", async function (req, res, next) {
-  try {
-    const userInvitesRemaining = await User.getUserInvitesRemaining(
-      req.body.userId
-    );
-    console.log(userInvitesRemaining);
-    if (userInvitesRemaining > 0) {
-      const inviteCode = await Invites.create(
-        req.body.userId,
-        User.ROLES.betaUser
-      );
-      console.log(inviteCode);
-      const user = await User.decrementInvitesRemaining(req.body.userId);
-      res.status(200).send(inviteCode);
-    } else {
-      console.log("/create-code: user has no codes to give");
-    }
-  } catch (e) {
-    console.log("/create-code err", e);
-    res.status(400).send(e);
-  }
-});
-
-router.get("/invite-codes", async function (req, res, next) {
-  try {
-    const inviteCodes = await Invites.getInviteCodesByUserId(req.body.userId);
-    console.log(inviteCodes);
-    res.status(200).send(inviteCodes);
-  } catch (e) {
-    console.log("/invite-codes err", e);
-    res.status(400).send(e);
-  }
-});
-
 // Signup route -- create a new user, return token.
 router.post("/signup", async function (req, res) {
   const { email, username, password, code } = req.body;

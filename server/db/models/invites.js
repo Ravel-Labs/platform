@@ -25,7 +25,7 @@ async function create(userId, grantedRoleId, fields = {}) {
       },
       defaultReturnColumns
     );
-    return inviteCode;
+    return inviteCode[0];
   } catch (e) {
     console.error(e);
   }

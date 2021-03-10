@@ -172,7 +172,7 @@ export default function TrackUploadForm() {
   return (
     <Container component="main" maxWidth="xs">
       {newTrack && <Redirect to={`/track/${newTrack.slug}`} />}
-      <Typography component="h1" variant="h5">
+      <Typography component="h1" variant="h4">
         Upload
       </Typography>
       <form
