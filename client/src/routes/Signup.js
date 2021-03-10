@@ -1,14 +1,20 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import { Link as RouterLink, Redirect } from 'react-router-dom';
+import { Link as RouterLink, Redirect } from "react-router-dom";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 
-import { UserContext } from '../Context';
+import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
 import SimpleForm from "../SimpleForm";
 
 const signupFields = [
+  {
+    label: "Invite Code",
+    name: "code",
+    type: "text",
+    required: true,
+  },
   {
     label: "Email",
     name: "email",
@@ -43,12 +49,12 @@ function SignupFooter() {
 
 function Signup() {
   const [isLoading, setIsLoading] = useState(false);
-  const { user, onUpdateUser } = useContext(UserContext)
+  const { user, onUpdateUser } = useContext(UserContext);
   const [formError, setFormError] = useState(null);
 
   const onSignupSubmit = async (values) => {
     setIsLoading(true);
-    
+
     try {
       const res = await axios.post("/api/auth/signup", values);
       setIsLoading(false);
@@ -56,7 +62,7 @@ function Signup() {
         onUpdateUser(res.data.user);
         setFormError(null);
       } else {
-        console.log(res)
+        console.log(res);
         setFormError(res.data.errorMessage);
       }
     } catch (e) {
