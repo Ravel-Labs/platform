@@ -1,8 +1,14 @@
 import React from "react";
-import { Avatar, Button, Box, Container, Typography } from "@material-ui/core";
+import {
+  Avatar,
+  Button,
+  Box,
+  Container,
+  TextField,
+  Typography,
+} from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
-import InputField from "./InputField";
 import useFormStyles from "./useFormStyles";
 
 /* 
@@ -46,13 +52,30 @@ export default function Form({
         <Typography component="h1" variant="h5">
           {formTitle}
         </Typography>
-        <form className={classes.form} onSubmit={onFormSubmit} disabled={isLoading}>
+        <form
+          className={classes.form}
+          onSubmit={onFormSubmit}
+          disabled={isLoading}
+        >
           <>
             {fields.map((field, i) => (
-              <InputField shouldAutoFocus={i === 0} key={field.name} {...field} />
+              <TextField
+                fullWidth
+                key={field.name}
+                autoFocus={i === 0}
+                autoComplete={field.type}
+                defaultValue={field.defaultValue}
+                id={field.name}
+                label={field.label}
+                margin="normal"
+                name={field.name}
+                required={field.required}
+                type={field.type}
+                variant="outlined"
+              />
             ))}
           </>
-          {errorText && (<Box color="error.main">{errorText}</Box>)}
+          {errorText && <Box color="error.main">{errorText}</Box>}
           <Button
             fullWidth
             disabled={isLoading}
@@ -63,7 +86,7 @@ export default function Form({
           >
             {submitText || "Submit"}
           </Button>
-          {FooterComponent && <FooterComponent/>}
+          {FooterComponent && <FooterComponent />}
         </form>
       </div>
     </Container>
