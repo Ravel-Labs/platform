@@ -42,9 +42,11 @@ function TrackListDisplay({ tracks }) {
       <TableContainer>
         <Table size="small">
           <TableHead>
-            <TableCell>Title</TableCell>
-            <TableCell>Artist</TableCell>
-            <TableCell>Genre</TableCell>
+            <TableRow>
+              <TableCell>Title</TableCell>
+              <TableCell>Artist</TableCell>
+              <TableCell>Genre</TableCell>
+            </TableRow>
           </TableHead>
           <TableBody>
             {tracks.map((track) => (

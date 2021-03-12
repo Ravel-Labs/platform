@@ -1,34 +1,41 @@
-var bcrypt = require('bcrypt');
+var bcrypt = require("bcrypt");
 
-var db = require('../knex');
+var db = require("../knex");
 
-const tableName = 'users';
+const tableName = "users";
 const ROLES = {
-  "admin": 0,
-  "betaArtist": 1,
-  "betaUser" : 2
+  admin: 0,
+  betaArtist: 1,
+  betaUser: 2,
 };
 const defaultReturnColumns = [
-  'id',
-  'name',
-  'email',
-  'username',
-  'displayName',
-  'createdAt',
-  'roleId',
-  'referrerId',
-  'invitesRemaining'
+  "id",
+  "name",
+  "email",
+  "username",
+  "displayName",
+  "createdAt",
+  "roleId",
+  "referrerId",
+  "invitesRemaining",
 ];
-
 
 /**
  * Return the user with the provided email, if exists.
  * @param  {string} email
- * @return {db/User}  
+ * @return {db/User}
  */
 async function getByEmail(email) {
-  const user = await db(tableName).where({email}).first()
+  const user = await db(tableName).where({ email }).first();
   return user;
+}
+/**
+ * Return the user with the provided id, if exists.
+ * @param  {int} id
+ * @param  {array} fields=defaultReturnColumns
+ */
+async function getById(id, fields = defaultReturnColumns) {
+  return await db(tableName).where({ id }).select(fields).first();
 }
 
 /**
@@ -49,53 +56,73 @@ async function validateCredentials(email, password) {
  * Creates a new user record.
  * @param  {string} email
  * @param  {string} password
- * @param  {object} fields={} Additional fields to write when creating the model record. 
+ * @param  {object} fields={} Additional fields to write when creating the model record.
  * @return {db/User}
  */
-async function create(email, password, roleId, referrerId, invitesRemaining, fields={}) {
+async function create(
+  email,
+  password,
+  roleId,
+  referrerId,
+  invitesRemaining,
+  fields = {}
+) {
   const passwordHash = bcrypt.hashSync(password, 10);
   const { username } = fields;
   try {
-    const users = await db(tableName).insert({
-      email,
-      passwordHash,
-      username,
-      displayName: username,
-      roleId,
-      referrerId,
-      invitesRemaining,
-      ...fields,
-    }, defaultReturnColumns);
-    console.log(users)
+    const users = await db(tableName).insert(
+      {
+        email,
+        passwordHash,
+        username,
+        displayName: username,
+        roleId,
+        referrerId,
+        invitesRemaining,
+        ...fields,
+      },
+      defaultReturnColumns
+    );
+    console.log(users);
     return users.pop();
-  } catch(e) {
-    console.error(e)
+  } catch (e) {
+    console.error(e);
   }
 }
 
 async function getRoleIdbyUserId(userId) {
   try {
-    const roleId = await db(tableName).where({id:userId}).select('roleId').first().then((row) => row['roleId']);
+    const roleId = await db(tableName)
+      .where({ id: userId })
+      .select("roleId")
+      .first()
+      .then((row) => row["roleId"]);
     return roleId;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function decrementInvitesRemaining(userId) {
   try {
-    const user = await db(tableName).where({id:userId}).decrement({invitesRemaining: 1});
+    const user = await db(tableName)
+      .where({ id: userId })
+      .decrement({ invitesRemaining: 1 });
     return user;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 async function getUserInvitesRemaining(userId) {
   try {
-    const invitesRemaining = await db(tableName).where({id:userId}).select('invitesRemaining').first().then((row) => row['invitesRemaining']);
+    const invitesRemaining = await db(tableName)
+      .where({ id: userId })
+      .select("invitesRemaining")
+      .first()
+      .then((row) => row["invitesRemaining"]);
     return invitesRemaining;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
@@ -103,6 +130,7 @@ async function getUserInvitesRemaining(userId) {
 module.exports = {
   create,
   getByEmail,
+  getById,
   validateCredentials,
   getRoleIdbyUserId,
   decrementInvitesRemaining,

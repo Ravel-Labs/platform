@@ -5,12 +5,15 @@ const defaultReturnColumns = ["id", "trackId", "userId"];
 
 async function create(trackId, userId) {
   try {
-    const trackCredit = await db(tableName).insert({
-      trackId: trackId,
-      userId: userId
-    }, defaultReturnColumns)
+    const trackCredit = await db(tableName).insert(
+      {
+        trackId: trackId,
+        userId: userId,
+      },
+      defaultReturnColumns
+    );
     return trackCredit;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
@@ -18,12 +21,12 @@ async function create(trackId, userId) {
 async function getUserIdbyTrackId(trackId) {
   try {
     const userId = await db(tableName)
-      .where({trackId: trackId})
+      .where({ trackId: trackId })
       .select("userId")
       .first()
-      .then((row) => row["userId"]);
+      .then((row) => (row ? row["userId"] : null));
     return userId;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }

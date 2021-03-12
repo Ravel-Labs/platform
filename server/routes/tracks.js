@@ -3,8 +3,10 @@ var multer = require("multer");
 
 var AuthService = require("../services/auth");
 var UploadService = require("../services/upload");
-var Tracks = require("../db/models").Tracks;
 var Feedback = require("../db/models").Feedback;
+var TrackCredits = require("../db/models").TrackCredits;
+var Tracks = require("../db/models").Tracks;
+var User = require("../db/models").User;
 var tokenMiddleware = require("../middleware/token");
 
 var router = express.Router();
@@ -31,12 +33,16 @@ router.get("/:slug", async function (req, res, next) {
     return res.status(404).send("User does not have access to view this track");
   }
 
+  // TODO: We can combine all these queries.
   const trackPrompts = await Feedback.getFeedbackPromptsbyTrackId(track.id);
+  const userId = await TrackCredits.getUserIdbyTrackId(track.id);
+  const user = await User.getById(userId, ["displayName"]);
 
   track.prompts = trackPrompts.map((x) => ({
     ...x,
     trackId: track.id,
   }));
+  track.artist = user.displayName;
 
   res.status(200).send(track);
 });
