@@ -25,7 +25,7 @@
   float: left;
 }
 
-.PromptOption:nth-child(n+2) {
+.PromptOption:nth-child(n + 2) {
   margin-left: -1px;
 }
 
@@ -34,6 +34,18 @@
 }
 
 .PromptOption_Selected {
-  background-color: #0500FF;
+  background-color: #0500ff;
   color: #ffffff;
+}
+
+.PromptOption_Submittted {
+  background-color: lightgrey;
+  border: solid 1px grey;
+  cursor: unset;
+  height: 40px;
+  max-width: 40px;
+}
+
+.PromptOption_Submittted:hover {
+  background-color: lightgrey;
 }

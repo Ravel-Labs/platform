@@ -6,7 +6,13 @@ import FeedbackPromptForm from "./FeedbackPromptForm";
 
 import styles from "./TrackDisplay.module.css";
 
-function TrackDisplay({ track }) {
+function TrackDisplay({ track, onFeedbackSubmitted }) {
+  const feedbackByPrompt = {};
+  const feedback = track?.userFeedback || [];
+  feedback.forEach(
+    (feedback) => (feedbackByPrompt[feedback.promptId] = feedback)
+  );
+
   return (
     <Grid container spacing={6} className={styles.TrackDisplayGrid}>
       {track && (
@@ -29,9 +35,16 @@ function TrackDisplay({ track }) {
             <Chip label={track.genre} />
           </Grid>
           <Grid item xs={12} md={7}>
-            {track.prompts.map((prompt) => (
-              <FeedbackPromptForm key={prompt.id} prompt={prompt} />
-            ))}
+            {track.prompts.map((prompt) => {
+              return (
+                <FeedbackPromptForm
+                  key={prompt.id}
+                  prompt={prompt}
+                  previousResponse={feedbackByPrompt[prompt.id]}
+                  onFeedbackSubmitted={onFeedbackSubmitted}
+                />
+              );
+            })}
           </Grid>
           <Grid item xs={12} md={3} className={styles.ArtistGridItem}>
             <Typography variant="h2">{track.artist}</Typography>
