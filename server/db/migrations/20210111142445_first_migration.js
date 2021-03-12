@@ -20,6 +20,7 @@ exports.up = function (knex) {
       t.increments("id").primary();
       t.integer("trackId").references("id").inTable("tracks");
       t.integer("userId").references("id").inTable("users");
+      t.unique(["trackId", "userId"]);
     })
     .createTable("eventTypes", (t) => {
       t.increments("id").primary();

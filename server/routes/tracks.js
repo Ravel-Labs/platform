@@ -1,6 +1,7 @@
 var express = require("express");
 var multer = require("multer");
 
+var AuthService = require("../services/auth");
 var UploadService = require("../services/upload");
 var Tracks = require("../db/models").Tracks;
 var Feedback = require("../db/models").Feedback;
@@ -13,6 +14,15 @@ router.get("/:slug", async function (req, res, next) {
   if (!track || !track.id) {
     res.status(404).send("No track found");
   }
+
+  const { hasAccess } = await AuthService.validateAccess(req.userId, req.params.slug);
+  if (!hasAccess) {
+    // const msg = "User does not have access to view this track";
+    // throw Error(msg);
+    return res.status(404).send("User does not have access to view this track");
+
+  }
+  
   const trackPrompts = await Feedback.getFeedbackPromptsbyTrackId(track.id);
 
   track.prompts = trackPrompts.map((x) => ({
@@ -30,7 +40,8 @@ var processFile = multer();
 router.post("/", processFile.single("audio"), async function (req, res, next) {
   try {
     // TODO: Separate separate track upload from track creation
-    const track = await UploadService.Upload(req.body, req.file);
+    console.log("tracks post userId: ", req.userId);
+    const track = await UploadService.Upload(req.body, req.file, req.userId);
     res.status(201).send(track);
   } catch (e) {
     console.log("error", e);

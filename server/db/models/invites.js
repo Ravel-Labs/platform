@@ -81,10 +81,10 @@ async function checkInviteCodeForUserId(invitedUserId, userId) {
       userId: userId,
       invitedUserId: invitedUserId,
     });
-    if (!check) {
-      return false;
+    if (check.length > 0) {
+      return true;
     }
-    return true;
+    return false;
   } catch (e) {
     console.error(e);
   }

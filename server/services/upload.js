@@ -4,6 +4,7 @@ var config = require("../config");
 
 var TrackFeedbackPrompts = require("../db/models").TrackFeedbackPrompts;
 var Tracks = require("../db/models").Tracks;
+var TrackCredits = require("../db/models").TrackCredits;
 var util = require("../util/utils.js");
 
 // TODO: Move these constants.
@@ -71,8 +72,9 @@ const createBucket = async (s3, bucketName) => {
   }
 };
 
-async function Upload(track, fileContent) {
+async function Upload(track, fileContent, userId) {
   const { title, description, genre, isPrivate, prompts } = track;
+  console.log("upload userId: ", userId);
   const s3 = new S3({
     accessKeyId: config.awsAccessKeyId,
     secretAccessKey: config.awsAccessKeySecret,
@@ -134,6 +136,8 @@ async function Upload(track, fileContent) {
     if (!track.id) {
       throw "Track not created successfully.";
     }
+
+    await TrackCredits.create(track.id, userId);
 
     // If the user didn't add any prompts, that's ok!
     if (prompts && Array.isArray(prompts)) {

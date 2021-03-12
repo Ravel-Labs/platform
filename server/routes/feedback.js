@@ -7,7 +7,7 @@ router.post("/", async function (req, res, next) {
   console.log(`Received feedback from user ${userEmail}`, req.body);
   feedbackRec = await Feedback.create(
     req.body.trackId,
-    req.body.userId,
+    req.userId,
     req.body.value,
     req.body.promptId
   );

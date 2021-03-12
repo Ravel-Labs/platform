@@ -6,7 +6,9 @@ var Sessions = require("./sessions");
 var Stats = require("./stats");
 var TrackFeedbackPrompts = require("./trackFeedbackPrompts");
 var Tracks = require("./tracks");
+var TrackCredits = require("./trackCredits");
 var User = require("./users");
+
 
 module.exports = {
   Events,
@@ -17,5 +19,6 @@ module.exports = {
   Stats,
   TrackFeedbackPrompts,
   Tracks,
+  TrackCredits,
   User,
 };

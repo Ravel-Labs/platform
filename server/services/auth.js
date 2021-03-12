@@ -4,6 +4,7 @@ var config = require("../config");
 var User = require("../db/models").User;
 var Invites = require("../db/models").Invites;
 var Tracks = require("../db/models").Tracks;
+var TrackCredits = require("../db/models").TrackCredits;
 
 const AUTH_TOKEN_COOKIE = "ravelPlatform";
 
@@ -91,21 +92,30 @@ function Validate(token) {
 }
 
 async function validateAccess(listenerUserId, trackSlug) {
-  try {
-    const isPrivate = await Tracks.getPrivacyBySlug(trackSlug);
-    if (!isPrivate) {
-      return { hasAccess: true, error: null };
-    }
-    const trackUserId = await Tracks.getUserIdBySlug(trackSlug);
-    const check = Invites.checkInviteCodeForUserId(listenerUserId, trackUserId);
-    const roleId = User.getRoleIdbyUserId(listenerUserId);
-    if (!check && roleId !== User.ROLES.admin) {
-      return { hasAccess: false, error: null };
-    } else {
-      return { hasAccess: true, error: null };
-    }
-  } catch (err) {
-    return { hasAccess: false, error: err };
+
+  const isPrivate = await Tracks.getPrivacyBySlug(trackSlug);
+  console.log("isPrivate: ", isPrivate);
+  if (!isPrivate) {
+    return { hasAccess: true, error: null };
+  }
+  const trackId = await Tracks.getIdBySlug(trackSlug);
+  const trackUserId = await TrackCredits.getUserIdbyTrackId(trackId);
+  console.log("trackId, trackUserId and listenerUserId", trackId, trackUserId, listenerUserId);
+  if (listenerUserId === trackUserId) {
+    return { hasAccess: true, error: null };
+  }
+
+  const check = Invites.checkInviteCodeForUserId(listenerUserId, trackUserId);
+  console.log("check: ", check);
+  if (check) {
+    return { hasAccess: true, error: null}; 
+  }
+  const roleId = User.getRoleIdbyUserId(listenerUserId);
+  console.log("roleId: ", roleId);
+  if (roleId === User.ROLES.admin) {
+    return { hasAccess: true, error: null };
+  } else {
+    return { hasAccess: false, error: null };
   }
 }
 

@@ -54,7 +54,7 @@ app.use(
 );
 app.use(`${apiPrefix}/prompts`, promptsRouter);
 app.use(`${apiPrefix}/test`, tokenMiddleware.withUser, testRouter);
-app.use(`${apiPrefix}/tracks`, tokenMiddleware.requireAccess, tracksRouter);
+app.use(`${apiPrefix}/tracks`, tokenMiddleware.requireUser, tracksRouter);
 app.use(`${apiPrefix}/user`, tokenMiddleware.withUser, userRouter);
 app.use(`${apiPrefix}/stats`, tokenMiddleware.withUser, statsRouter);
 
