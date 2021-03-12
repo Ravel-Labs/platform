@@ -1,5 +1,6 @@
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
+import { Lock, LockOpen } from "@material-ui/icons";
 import {
   Box,
   Table,
@@ -22,7 +23,12 @@ const useStyles = makeStyles({
   },
 });
 
-export default function TrackListTable({ title, tracks }) {
+export default function TrackListTable({
+  title,
+  tracks,
+  shouldShowPrivacy = false,
+  size = "small",
+}) {
   const history = useHistory();
   const classes = useStyles();
 
@@ -36,9 +42,10 @@ export default function TrackListTable({ title, tracks }) {
         {title}
       </Typography>
       <TableContainer>
-        <Table size="small">
+        <Table size={size}>
           <TableHead>
             <TableRow>
+              {shouldShowPrivacy && <TableCell></TableCell>}
               <TableCell>Title</TableCell>
               <TableCell>Artist</TableCell>
               <TableCell>Genre</TableCell>
@@ -52,6 +59,11 @@ export default function TrackListTable({ title, tracks }) {
                 key={track.id}
                 onClick={() => onClickTrack(track.slug)}
               >
+                {shouldShowPrivacy && (
+                  <TableCell padding="checkbox">
+                    {track.isPrivate ? <Lock /> : <LockOpen />}
+                  </TableCell>
+                )}
                 <TableCell>{track.title}</TableCell>
                 <TableCell>{track.artist}</TableCell>
                 <TableCell>{track.genre}</TableCell>

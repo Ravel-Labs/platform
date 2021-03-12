@@ -77,7 +77,12 @@ function Profile() {
           <Typography variant="body1">
             Joined {new Date(profileUser.createdAt).toLocaleDateString()}
           </Typography>
-          <TrackListTable tracks={filteredTracks} title="Tracks" />
+          <TrackListTable
+            shouldShowPrivacy
+            tracks={filteredTracks}
+            title="Tracks"
+            size="medium"
+          />
         </Box>
       )}
     </PageWrapper>
