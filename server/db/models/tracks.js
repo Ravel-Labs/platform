@@ -92,8 +92,17 @@ async function updateTrackPrivacy(trackSlug, privacyBool) {
 }
 
 async function getFeaturedTracks() {
+  const fields = {
+    artist: "users.displayName",
+  };
+  defaultReturnColumns.forEach((name) => (fields[name] = `tracks.${name}`));
   try {
-    const tracks = await db(tableName).orderBy("createdAt", "desc").limit(20);
+    const tracks = await db(tableName)
+      .select(fields)
+      .join("trackCredits", { "trackCredits.trackId": "tracks.id" })
+      .join("users", { "users.id": "trackCredits.userId" })
+      .orderBy("createdAt", "desc")
+      .limit(20);
     return tracks;
   } catch (e) {
     console.error(e);
