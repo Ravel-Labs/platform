@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
+import { useRouteMatch, Redirect } from "react-router-dom";
 import {
   Box,
   Button,
@@ -142,6 +143,7 @@ function Invites({ invitesRemaining, onInviteCreated }) {
 
 function Profile() {
   const { user, onUpdateUser } = useContext(UserContext);
+  let match = useRouteMatch();
   const classes = useStyles();
 
   const onInviteCreated = () => {
@@ -153,6 +155,7 @@ function Profile() {
 
   return (
     <PageWrapper>
+      {match.params.username !== user?.username && <Redirect to="/" />}
       {user && (
         <Grid container spacing={6}>
           <Grid item xs={12}>
