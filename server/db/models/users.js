@@ -46,6 +46,15 @@ async function getById(id, fields = defaultReturnColumns) {
 }
 
 /**
+ * Return the user with the provided username, if exists.
+ * @param  {string} username
+ * @param  {array} fields=defaultReturnColumns
+ */
+async function getByUsername(username, fields = defaultReturnColumns) {
+  return await db(tableName).where({ username }).select(fields).first();
+}
+
+/**
  * Validates login credentials against the users in our DB.
  * @param  {string}   email
  * @param  {string}   password
@@ -136,11 +145,12 @@ async function getUserInvitesRemaining(userId) {
 
 module.exports = {
   create,
+  decrementInvitesRemaining,
   getByEmail,
   getById,
-  validateCredentials,
+  getByUsername,
   getRoleIdbyUserId,
-  decrementInvitesRemaining,
   getUserInvitesRemaining,
+  validateCredentials,
   ROLES,
 };

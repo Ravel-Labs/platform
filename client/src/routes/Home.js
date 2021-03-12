@@ -1,72 +1,9 @@
 import axios from "axios";
-import { useHistory } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import {
-  Box,
-  Table,
-  TableBody,
-  TableHead,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Typography,
-} from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import { useState, useEffect } from "react";
 
 import PageWrapper from "../PageWrapper";
-
-const useStyles = makeStyles({
-  tableRow: {
-    cursor: "pointer",
-  },
-  header: {
-    textAlign: "left",
-    paddingBottom: ".5em",
-    paddingTop: "1em",
-  },
-});
-
-function TrackListDisplay({ tracks }) {
-  const history = useHistory();
-  const classes = useStyles();
-
-  const onClickTrack = (slug) => {
-    history.push(`/track/${slug}`);
-  };
-
-  return (
-    <Box>
-      <Typography variant="h4" component="h2" className={classes.header}>
-        Today's tracks
-      </Typography>
-      <TableContainer>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Artist</TableCell>
-              <TableCell>Genre</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tracks.map((track) => (
-              <TableRow
-                hover
-                className={classes.tableRow}
-                key={track.id}
-                onClick={() => onClickTrack(track.slug)}
-              >
-                <TableCell>{track.title}</TableCell>
-                <TableCell>{track.artist}</TableCell>
-                <TableCell>{track.genre}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
-  );
-}
+import TrackListTable from "../TrackListTable";
 
 function Home() {
   const [featuredTracks, setFeaturedTracks] = useState([]);
@@ -82,12 +19,13 @@ function Home() {
     }
     fetchTracks();
   }, []);
+
   return (
     <PageWrapper>
       <Typography variant="h2" component="h1">
         Welcome to Ravel
       </Typography>
-      <TrackListDisplay tracks={featuredTracks} />
+      <TrackListTable tracks={featuredTracks} title="Today's tracks" />
     </PageWrapper>
   );
 }

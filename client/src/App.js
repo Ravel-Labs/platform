@@ -9,10 +9,11 @@ import { UserContext } from "./Context";
 
 import "./App.css";
 
+const Account = lazy(() => import("./routes/Account"));
 const Home = lazy(() => import("./routes/Home"));
 const Login = lazy(() => import("./routes/Login"));
-const Signup = lazy(() => import("./routes/Signup"));
 const Profile = lazy(() => import("./routes/Profile"));
+const Signup = lazy(() => import("./routes/Signup"));
 const Track = lazy(() => import("./routes/Track"));
 const TrackFeedback = lazy(() => import("./routes/TrackFeedback"));
 const TrackStats = lazy(() => import("./routes/TrackStats"));
@@ -61,6 +62,9 @@ export default function App() {
                 </Route>
                 <Route path="/upload">
                   <Upload />
+                </Route>
+                <Route path="/:username/account">
+                  <Account />
                 </Route>
                 <Route path="/:username">
                   <Profile />

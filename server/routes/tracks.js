@@ -16,6 +16,12 @@ router.get("/featured", async function (req, res, next) {
   return res.status(200).send(tracks);
 });
 
+// GET resource for tracks from a specific user
+router.get("/user/:username", async function (req, res, next) {
+  const tracks = await Tracks.filterByUsername(req.params.username);
+  return res.status(200).send(tracks);
+});
+
 // GET resource for track data.
 router.get("/:slug", async function (req, res, next) {
   const track = await Tracks.getTrackBySlug(req.params.slug);

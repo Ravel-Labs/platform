@@ -110,8 +110,28 @@ async function getFeaturedTracks() {
   }
 }
 
+async function filterByUsername(username) {
+  const fields = {
+    artist: "users.displayName",
+    userId: "users.id",
+  };
+  defaultReturnColumns.forEach((name) => (fields[name] = `tracks.${name}`));
+  try {
+    const tracks = await db(tableName)
+      .select(fields)
+      .join("trackCredits", { "trackCredits.trackId": "tracks.id" })
+      .join("users", { "users.id": "trackCredits.userId" })
+      .where({ "users.username": username })
+      .orderBy("createdAt", "desc");
+    return tracks;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 module.exports = {
   create,
+  filterByUsername,
   getFeaturedTracks,
   getIdBySlug,
   getPrivacyBySlug,

@@ -1,192 +1,84 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@material-ui/core";
-import { green } from "@material-ui/core/colors";
-import { makeStyles } from "@material-ui/core/styles";
-import { AddCircle, CheckBox, CheckBoxOutlineBlank } from "@material-ui/icons";
+import { Box, Typography } from "@material-ui/core";
+// import { makeStyles } from "@material-ui/core/styles";
+import { useRouteMatch } from "react-router-dom";
 
 import { UserContext } from "../Context";
+import TrackListTable from "../TrackListTable";
 import PageWrapper from "../PageWrapper";
 
-const profileFields = [
-  ["name", "Name"],
-  ["displayName", "Display name"],
-  ["username", "Username"],
-  ["email", "Email"],
-  [
-    "createdAt",
-    "Date joined",
-    (val) =>
-      new Date(val).toDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }),
-  ],
-];
+// const useStyles = makeStyles({
+//   table: {
+//     margin: "2em auto",
+//     maxWidth: "800px",
+//   },
+//   button: {
+//     marginTop: "1em",
+//   },
+// });
 
-const useStyles = makeStyles({
-  table: {
-    margin: "2em auto",
-    maxWidth: "800px",
-  },
-  button: {
-    marginTop: "1em",
-  },
-});
+function Profile() {
+  const [profileTracks, setProfileTracks] = useState([]);
+  const [profileUser, setProfileUser] = useState(null);
+  const { user } = useContext(UserContext);
+  let match = useRouteMatch();
 
-function InvitesTable({ invites }) {
-  const classes = useStyles();
-  return (
-    <TableContainer component={Paper} className={classes.table}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Created</TableCell>
-            <TableCell>Code</TableCell>
-            <TableCell>Status</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {invites.map((invite) => (
-            <TableRow key={invite.id}>
-              <TableCell>
-                {new Date(invite.createdAt).toLocaleDateString()}
-              </TableCell>
-              <TableCell>{invite.code}</TableCell>
-              <TableCell>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {invite.isClaimed ? (
-                    <>
-                      <CheckBox style={{ color: green[500] }} /> Claimed
-                    </>
-                  ) : (
-                    <>
-                      <CheckBoxOutlineBlank color="action" /> Unclaimed
-                    </>
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-}
-
-function Invites({ invitesRemaining, onInviteCreated }) {
-  const classes = useStyles();
-  const [userInviteCodes, setUserInviteCodes] = useState([]);
-
+  // Fetch the tracks from the user corresponding to this profile.
   useEffect(() => {
-    async function fetchInviteCodes() {
+    async function fetchProfileUser() {
       try {
-        const res = await axios.get("/api/invite-codes");
-        setUserInviteCodes(res.data);
-      } catch (err) {
-        console.error("failed fetching track", err);
+        const res = await axios.get(`/api/user/${match.params.username}`);
+        setProfileUser(res.data);
+      } catch (e) {
+        console.error(e);
+        setProfileUser(null);
       }
     }
 
-    fetchInviteCodes();
-  }, []);
-
-  const onClickCreateInvite = async () => {
-    try {
-      const res = await axios.post("/api/invite-codes");
-      setUserInviteCodes((prevCodes) => [res.data].concat(prevCodes));
-      onInviteCreated();
-    } catch (e) {
-      console.log(e);
+    async function fetchProfileTracks() {
+      try {
+        const res = await axios.get(
+          `/api/tracks/user/${match.params.username}`
+        );
+        setProfileTracks(res.data);
+      } catch (e) {
+        console.error(e);
+        setProfileTracks([]);
+      }
     }
-  };
+    fetchProfileUser();
+    fetchProfileTracks();
+  }, [match.params.username]);
 
-  return (
-    <Box>
-      <InvitesTable invites={userInviteCodes} />
-      <Typography variant="body1" color="textSecondary">
-        You have {invitesRemaining} invites remaining.
-      </Typography>
-      <Button
-        disabled={invitesRemaining <= 0}
-        className={classes.button}
-        variant="contained"
-        color="primary"
-        startIcon={<AddCircle />}
-        onClick={onClickCreateInvite}
-      >
-        Create new invite code
-      </Button>
-    </Box>
+  // const classes = useStyles();
+
+  // Only show public tracks, unless the logged-in user was referred by this user
+  // or is an admin.
+  const userPrivileges = user?.privileges || [];
+  const isAdminUser = userPrivileges.reduce(
+    (accum, privilege) => accum || privilege.type === "admin",
+    false
   );
-}
-
-function Profile() {
-  const { user, onUpdateUser } = useContext(UserContext);
-  const classes = useStyles();
-
-  const onInviteCreated = () => {
-    onUpdateUser((prevUser) => ({
-      ...prevUser,
-      invitesRemaining: prevUser.invitesRemaining - 1,
-    }));
-  };
+  const filteredTracks = profileTracks.filter((track) => {
+    if (!track.isPrivate) {
+      return true;
+    }
+    return Boolean(user) && (isAdminUser || user?.referrerId === track.userId);
+  });
 
   return (
     <PageWrapper>
-      {user && (
-        <Grid container spacing={6}>
-          <Grid item xs={12}>
-            <Typography variant="h4" component="h2">
-              Account info
-            </Typography>
-            <TableContainer component={Paper} className={classes.table}>
-              <Table size="small">
-                <TableBody>
-                  {profileFields.map(([field, label, transform]) => {
-                    const val = transform
-                      ? transform(user[field])
-                      : user[field];
-                    return (
-                      <TableRow key={`${field}-${val}`}>
-                        <TableCell>{`${label}:`}</TableCell>
-                        <TableCell>{val}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h4" component="h2">
-              Invites
-            </Typography>
-            <Invites
-              invitesRemaining={user.invitesRemaining}
-              onInviteCreated={onInviteCreated}
-            />
-          </Grid>
-        </Grid>
+      {profileUser && (
+        <Box>
+          <Typography component="h1" variant="h2">
+            {profileUser.displayName}
+          </Typography>
+          <Typography variant="body1">
+            Joined {new Date(profileUser.createdAt).toLocaleDateString()}
+          </Typography>
+          <TrackListTable tracks={filteredTracks} title="Tracks" />
+        </Box>
       )}
     </PageWrapper>
   );
