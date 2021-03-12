@@ -101,6 +101,7 @@ async function getFeaturedTracks() {
       .select(fields)
       .join("trackCredits", { "trackCredits.trackId": "tracks.id" })
       .join("users", { "users.id": "trackCredits.userId" })
+      .where({ isPrivate: false })
       .orderBy("createdAt", "desc")
       .limit(20);
     return tracks;
