@@ -14,6 +14,14 @@ const signupFields = [
     name: "code",
     type: "text",
     required: true,
+    helperText: "Don't have an invite? Reach out to help@ravelmusic.io.",
+  },
+  {
+    label: "Dislay Name",
+    name: "displayName",
+    type: "text",
+    required: true,
+    helperText: "Your artist name, or how you want to appear on Ravel.",
   },
   {
     label: "Email",

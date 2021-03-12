@@ -20,11 +20,12 @@ function setAuthCookie(res, token) {
 
 // Signup route -- create a new user, return token.
 router.post("/signup", async function (req, res) {
-  const { email, username, password, code } = req.body;
+  const { email, username, displayName, password, code } = req.body;
+  const userFields = { email, username, displayName, password };
 
   let userInfo = null;
   try {
-    userInfo = await AuthService.Signup(email, username, password, code);
+    userInfo = await AuthService.Signup(userFields, code);
   } catch (e) {
     console.log("/signup err", e);
     res.status(400).send({

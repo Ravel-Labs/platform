@@ -45,7 +45,7 @@ function createInvitesRemaining(roleId) {
   }
 }
 
-async function Signup(email, username, password, code) {
+async function Signup(userInfo, code) {
   const codeInfo = await Invites.getInviteCodeInfo(code);
   if (!codeInfo) {
     throw Error("Invalid invite code.");
@@ -56,6 +56,7 @@ async function Signup(email, username, password, code) {
     throw Error("Invite code has already been claimed");
   }
 
+  const { email, password, username, displayName } = userInfo;
   try {
     const invitesRemaining = createInvitesRemaining(roleId);
     const user = await User.create(
@@ -64,7 +65,7 @@ async function Signup(email, username, password, code) {
       roleId,
       referrerId,
       invitesRemaining,
-      { username }
+      { username, displayName, name: displayName }
     );
     await Invites.claimInvite(code, user.id);
     const token = createToken(email, user.id);
@@ -92,26 +93,23 @@ function Validate(token) {
 }
 
 async function validateAccess(listenerUserId, trackSlug) {
-
   const isPrivate = await Tracks.getPrivacyBySlug(trackSlug);
-  console.log("isPrivate: ", isPrivate);
   if (!isPrivate) {
     return { hasAccess: true, error: null };
   }
+
   const trackId = await Tracks.getIdBySlug(trackSlug);
   const trackUserId = await TrackCredits.getUserIdbyTrackId(trackId);
-  console.log("trackId, trackUserId and listenerUserId", trackId, trackUserId, listenerUserId);
   if (listenerUserId === trackUserId) {
     return { hasAccess: true, error: null };
   }
 
   const check = Invites.checkInviteCodeForUserId(listenerUserId, trackUserId);
-  console.log("check: ", check);
   if (check) {
-    return { hasAccess: true, error: null}; 
+    return { hasAccess: true, error: null };
   }
+
   const roleId = User.getRoleIdbyUserId(listenerUserId);
-  console.log("roleId: ", roleId);
   if (roleId === User.ROLES.admin) {
     return { hasAccess: true, error: null };
   } else {

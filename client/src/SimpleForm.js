@@ -71,6 +71,7 @@ export default function Form({
                 name={field.name}
                 required={field.required}
                 type={field.type}
+                helperText={field.helperText || ""}
                 variant="outlined"
               />
             ))}
