@@ -74,7 +74,6 @@ const createBucket = async (s3, bucketName) => {
 
 async function Upload(track, fileContent, userId) {
   const { title, description, genre, isPrivate, prompts } = track;
-  console.log("upload userId: ", userId);
   const s3 = new S3({
     accessKeyId: config.awsAccessKeyId,
     secretAccessKey: config.awsAccessKeySecret,

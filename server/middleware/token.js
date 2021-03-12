@@ -8,7 +8,6 @@ function requireUser(req, res, next) {
   }
   req.userEmail = userEmail;
   req.userId = userId;
-  console.log("userId: ", req.userId);
   next();
 }
 

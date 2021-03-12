@@ -5,8 +5,14 @@ var AuthService = require("../services/auth");
 var UploadService = require("../services/upload");
 var Tracks = require("../db/models").Tracks;
 var Feedback = require("../db/models").Feedback;
+var tokenMiddleware = require("../middleware/token");
 
 var router = express.Router();
+
+router.get("/featured", async function (req, res, next) {
+  const tracks = await Tracks.getFeaturedTracks();
+  return res.status(200).send(tracks);
+});
 
 // GET resource for track data.
 router.get("/:slug", async function (req, res, next) {
@@ -15,14 +21,16 @@ router.get("/:slug", async function (req, res, next) {
     res.status(404).send("No track found");
   }
 
-  const { hasAccess } = await AuthService.validateAccess(req.userId, req.params.slug);
+  const { hasAccess } = await AuthService.validateAccess(
+    req.userId,
+    req.params.slug
+  );
   if (!hasAccess) {
     // const msg = "User does not have access to view this track";
     // throw Error(msg);
     return res.status(404).send("User does not have access to view this track");
-
   }
-  
+
   const trackPrompts = await Feedback.getFeedbackPromptsbyTrackId(track.id);
 
   track.prompts = trackPrompts.map((x) => ({
@@ -37,17 +45,21 @@ router.get("/:slug", async function (req, res, next) {
 var processFile = multer();
 
 // POST resource for track upload.
-router.post("/", processFile.single("audio"), async function (req, res, next) {
-  try {
-    // TODO: Separate separate track upload from track creation
-    console.log("tracks post userId: ", req.userId);
-    const track = await UploadService.Upload(req.body, req.file, req.userId);
-    res.status(201).send(track);
-  } catch (e) {
-    console.log("error", e);
-    res.status(400).send(e);
+router.post(
+  "/",
+  tokenMiddleware.requireUser,
+  processFile.single("audio"),
+  async function (req, res, next) {
+    try {
+      // TODO: Separate separate track upload from track creation
+      const track = await UploadService.Upload(req.body, req.file, req.userId);
+      res.status(201).send(track);
+    } catch (e) {
+      console.log("error", e);
+      res.status(400).send(e);
+    }
   }
-});
+);
 
 router.post("/privacy/:slug", async function (req, res, next) {
   try {
