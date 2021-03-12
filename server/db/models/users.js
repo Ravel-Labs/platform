@@ -27,6 +27,13 @@ const defaultReturnColumns = [
  */
 async function getByEmail(email) {
   const user = await db(tableName).where({ email }).first();
+  const privileges = await db("privileges")
+    .select("type")
+    .join("privilegeRoles", {
+      "privilegeRoles.privilegeId": "privileges.id",
+    })
+    .where("privilegeRoles.roleId", user.roleId);
+  user.privileges = privileges;
   return user;
 }
 /**

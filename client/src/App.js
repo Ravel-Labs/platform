@@ -1,23 +1,22 @@
-import axios from 'axios';
-import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import axios from "axios";
+import React, { Suspense, lazy, useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
-import Header from './Header';
-import RouteAnalytics from './RouteAnalytics';
-import { UserContext } from './Context';
+import Header from "./Header";
+import RouteAnalytics from "./RouteAnalytics";
+import { UserContext } from "./Context";
 
-import './App.css';
+import "./App.css";
 
-const Home = lazy(() => import('./routes/Home'));
-const Login = lazy(() => import('./routes/Login'));
-const Signup = lazy(() => import('./routes/Signup'));
-const Profile = lazy(() => import('./routes/Profile'));
-const Track = lazy(() => import('./routes/Track'));
-const TrackFeedback = lazy(() => import('./routes/TrackFeedback'));
-const TrackStats = lazy(() => import('./routes/TrackStats'));
-const Upload = lazy(() => import('./routes/Upload'));
-const APITest = lazy(() => import('./routes/APITest'));
+const Home = lazy(() => import("./routes/Home"));
+const Login = lazy(() => import("./routes/Login"));
+const Signup = lazy(() => import("./routes/Signup"));
+const Profile = lazy(() => import("./routes/Profile"));
+const Track = lazy(() => import("./routes/Track"));
+const TrackFeedback = lazy(() => import("./routes/TrackFeedback"));
+const TrackStats = lazy(() => import("./routes/TrackStats"));
+const Upload = lazy(() => import("./routes/Upload"));
 
 export default function App() {
   const [loggedInUser, setLoggedInUser] = useState(null);
@@ -26,7 +25,7 @@ export default function App() {
       try {
         const res = await axios.get("/api/user");
         setLoggedInUser(res.data);
-      } catch(e) {
+      } catch (e) {
         console.error(e);
         setLoggedInUser(null);
       }
@@ -39,7 +38,9 @@ export default function App() {
       <CssBaseline />
       <Router>
         <div>
-          <UserContext.Provider value={{user: loggedInUser, onUpdateUser: setLoggedInUser}}>
+          <UserContext.Provider
+            value={{ user: loggedInUser, onUpdateUser: setLoggedInUser }}
+          >
             <Header />
             <Suspense fallback={<div>Loading...</div>}>
               <Switch>
@@ -60,9 +61,6 @@ export default function App() {
                 </Route>
                 <Route path="/upload">
                   <Upload />
-                </Route>
-                <Route path="/debug">
-                  <APITest />
                 </Route>
                 <Route path="/:username">
                   <Profile />

@@ -83,7 +83,7 @@ function Signup() {
     <PageWrapper>
       {user?.username && <Redirect to={`/${user?.username}`} />}
       <SimpleForm
-        formTitle="Sign Up"
+        formTitle="Join Ravel"
         fields={signupFields}
         isLoading={isLoading}
         onSubmit={onSignupSubmit}
