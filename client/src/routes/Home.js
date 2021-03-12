@@ -84,7 +84,7 @@ function Home() {
   }, []);
   return (
     <PageWrapper>
-      <Typography variant="h1" component="h2">
+      <Typography variant="h2" component="h1">
         Welcome to Ravel
       </Typography>
       <TrackListDisplay tracks={featuredTracks} />

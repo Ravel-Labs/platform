@@ -1,9 +1,21 @@
 import axios from "axios";
 import { useHistory, Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { ExpandMore, ExpandLess } from "@material-ui/icons";
 import { grey } from "@material-ui/core/colors";
-import { AppBar, Box, Button, Toolbar } from "@material-ui/core";
+import {
+  AppBar,
+  Box,
+  Button,
+  ClickAwayListener,
+  Grow,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+  Toolbar,
+} from "@material-ui/core";
 
 import { UserContext } from "./Context";
 
@@ -19,12 +31,6 @@ const links = [
     label: "Join",
     path: "/signup",
     anonymousOnly: true,
-    isPrivileged: (user) => true,
-  },
-  {
-    label: "Profile",
-    path: "/username123",
-    loggedInOnly: true,
     isPrivileged: (user) => true,
   },
   {
@@ -55,6 +61,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     display: "flex",
   },
+  popper: {
+    zIndex: 1,
+  },
 }));
 
 export default function Header() {
@@ -62,11 +71,57 @@ export default function Header() {
   const history = useHistory();
 
   const { user, onUpdateUser } = useContext(UserContext);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const anchorRef = useRef(null);
 
-  const onClickLogout = async () => {
+  const handleToggleMenu = () => {
+    setIsMenuOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setIsMenuOpen(false);
+  };
+
+  function handleListKeyDown(event) {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      setIsMenuOpen(false);
+    }
+  }
+
+  // return focus to the button when we transitioned from !open -> open
+  const prevOpen = useRef(isMenuOpen);
+  useEffect(() => {
+    if (
+      prevOpen.current === true &&
+      isMenuOpen === false &&
+      anchorRef.current
+    ) {
+      anchorRef.current.focus();
+    }
+
+    prevOpen.current = isMenuOpen;
+  }, [isMenuOpen]);
+
+  const onClickLogout = async (e) => {
+    handleClose(e);
     onUpdateUser(null);
     await axios.post("/api/auth/logout");
     history.push("/");
+  };
+
+  const onClickProfile = async (e) => {
+    handleClose(e);
+    history.push(`/${user.username}`);
+  };
+
+  const onClickAccount = async (e) => {
+    handleClose(e);
+    history.push(`/${user.username}/account`);
   };
 
   const isUserLoggedIn = Boolean(user);
@@ -111,11 +166,45 @@ export default function Header() {
             <>
               <Button
                 color="inherit"
+                endIcon={isMenuOpen ? <ExpandLess /> : <ExpandMore />}
                 className={classes.button}
-                onClick={onClickLogout}
+                onClick={handleToggleMenu}
+                ref={anchorRef}
               >
-                Log out
+                {user.username}
               </Button>
+              <Popper
+                className={classes.popper}
+                open={isMenuOpen}
+                anchorEl={anchorRef.current}
+                role={undefined}
+                transition
+                disablePortal
+              >
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    style={{
+                      transformOrigin:
+                        placement === "bottom" ? "center top" : "center bottom",
+                    }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList
+                          autoFocusItem={isMenuOpen}
+                          id="menu-list-grow"
+                          onKeyDown={handleListKeyDown}
+                        >
+                          <MenuItem onClick={onClickProfile}>Profile</MenuItem>
+                          <MenuItem onClick={onClickAccount}>Account</MenuItem>
+                          <MenuItem onClick={onClickLogout}>Logout</MenuItem>
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Popper>
             </>
           )}
         </Toolbar>
