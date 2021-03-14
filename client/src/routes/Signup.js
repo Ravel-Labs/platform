@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { Link as RouterLink, Redirect } from "react-router-dom";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
+import { Container, FormHelperText, Grid, Link } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
 import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
@@ -43,6 +43,15 @@ const signupFields = [
   },
 ];
 
+const useStyles = makeStyles((theme) => ({
+  termsContainer: {
+    paddingTop: "3vw",
+  },
+  termsText: {
+    textAlign: "center",
+  },
+}));
+
 function SignupFooter() {
   return (
     <Grid container>
@@ -56,6 +65,7 @@ function SignupFooter() {
 }
 
 function Signup() {
+  const classes = useStyles();
   const [isLoading, setIsLoading] = useState(false);
   const { user, onUpdateUser } = useContext(UserContext);
   const [formError, setFormError] = useState(null);
@@ -90,6 +100,25 @@ function Signup() {
         FooterComponent={SignupFooter}
         errorText={formError}
       />
+      <Container className={classes.termsContainer}>
+        <FormHelperText className={classes.termsText}>
+          By signing up, you agree to our{" "}
+          <Link
+            href="https://docs.google.com/document/d/1o66wU5GrbpQg6vhLRfke-lf6wnmIVJmY03cAT2_kn0c/edit?usp=sharing"
+            target="_blank"
+          >
+            terms of use
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="https://docs.google.com/document/d/1Kui9Ao_1MixtJeVHR47rRTjkQYy9kIKz7DIwJYhtNIA/edit?usp=sharing"
+            target="_blank"
+          >
+            privacy policy
+          </Link>
+          .
+        </FormHelperText>
+      </Container>
     </PageWrapper>
   );
 }
