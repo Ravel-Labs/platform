@@ -9,6 +9,7 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
+  FormHelperText,
   Input,
   InputLabel,
   ListItemText,
@@ -266,7 +267,7 @@ export default function TrackUploadForm() {
           margin="normal"
           name={formFields.description}
           type="text"
-          helperText="Describe your track"
+          helperText="What do you want listeners to know about this track?"
         />
 
         {/* Private */}
@@ -284,6 +285,9 @@ export default function TrackUploadForm() {
             }
             label="Private"
           />
+          <FormHelperText>
+            Private tracks are only visible to users you have invited to Ravel.
+          </FormHelperText>
         </FormControl>
 
         {/* Prompts */}
@@ -312,6 +316,9 @@ export default function TrackUploadForm() {
               </MenuItem>
             ))}
           </Select>
+          <FormHelperText>
+            What would you like to learn from listeners?
+          </FormHelperText>
         </FormControl>
 
         {/* Submit */}
