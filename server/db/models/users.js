@@ -25,8 +25,8 @@ const defaultReturnColumns = [
  * @param  {string} email
  * @return {db/User}
  */
-async function getByEmail(email) {
-  const user = await db(tableName).where({ email }).first();
+async function getByEmail(email, fields = defaultReturnColumns) {
+  const user = await db(tableName).where({ email }).select(fields).first();
   const privileges = await db("privileges")
     .select("type")
     .join("privilegeRoles", {
