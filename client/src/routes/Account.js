@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Grid,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -51,7 +50,7 @@ const useStyles = makeStyles({
 function InvitesTable({ invites }) {
   const classes = useStyles();
   return (
-    <TableContainer component={Paper} className={classes.table}>
+    <TableContainer className={classes.table}>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -162,7 +161,7 @@ function Profile() {
             <Typography variant="h4" component="h2">
               Account info
             </Typography>
-            <TableContainer component={Paper} className={classes.table}>
+            <TableContainer className={classes.table}>
               <Table size="small">
                 <TableBody>
                   {profileFields.map(([field, label, transform]) => {
