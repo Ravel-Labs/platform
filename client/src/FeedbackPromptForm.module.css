@@ -1,6 +1,11 @@
-.PromptText {
-  font-weight: 600;
-  font-size: 32px;
+.PromptWrapper {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.PromptOptionGroup {
+  margin-bottom: 13px;
+  justify-content: left;
 }
 
 .PromptOption {
@@ -8,12 +13,19 @@
   cursor: pointer;
   font-size: 17px;
   font-weight: 600;
-  margin-bottom: 13pt;
-  padding: 24px;
-  display: inline-block;
+  height: 60px;
+  max-width: 60px;
+  width: 10%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
-.PromptOption:nth-child(n+2) {
+.PromptOptionVal {
+  float: left;
+}
+
+.PromptOption:nth-child(n + 2) {
   margin-left: -1px;
 }
 
@@ -22,6 +34,18 @@
 }
 
 .PromptOption_Selected {
-  background-color: #0500FF;
+  background-color: #0500ff;
   color: #ffffff;
+}
+
+.PromptOption_Submittted {
+  background-color: lightgrey;
+  border: solid 1px grey;
+  cursor: unset;
+  height: 40px;
+  max-width: 40px;
+}
+
+.PromptOption_Submittted:hover {
+  background-color: lightgrey;
 }

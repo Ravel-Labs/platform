@@ -1,0 +1,31 @@
+.AudioScrubber {
+  user-select: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.AudioScrubberTime {
+  background-color: #0500FF;
+  padding: 2px 4px;
+  font-size: 14px;
+  color: white;
+  font-weight: 600;
+}
+
+.AudioScrubberProgress {
+  flex: 1;
+  margin: 0 20px;
+  height: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.AudioScrubberKnob {
+  position: relative;
+  height: 60px;
+  width: 2px;
+  background-color: #0500FF;
+}

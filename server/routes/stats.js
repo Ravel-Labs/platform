@@ -6,18 +6,21 @@ var router = express.Router();
 
 router.post("/:slug", async function (req, res, next) {
   try {
-    const trackId = await Tracks.getIdBySlug(req.body.trackSlug);
-    if (trackId === null || trackId === undefined) {
-      return res.status(404).send(`No track found for slug ${req.body.trackSlug}`);
+    const track = await Tracks.getTrackBySlug(req.body.trackSlug);
+    if (!track) {
+      return res
+        .status(404)
+        .send(`No track found for slug ${req.body.trackSlug}`);
     }
-    const playbackStats = await Stats.getPlaybackStatsByTrackId(trackId);
-    const feedbackStats = await Stats.getFeedbackStatsByTrackId(trackId);
-    const stats = {
-      playbackStats,
+    // TODO: Resolve query
+    // const playbackStats = await Stats.getPlaybackStatsByTrackId(track.id);
+    const feedbackStats = await Stats.getFeedbackStatsByTrackId(track.id);
+    const resData = {
+      track,
+      // playbackStats,
       feedbackStats,
     };
-    console.log(stats);
-    res.status(201).send(stats);
+    res.status(201).send(resData);
   } catch (e) {
     console.log("error", e);
     res.status(400).send(e);

@@ -2,23 +2,33 @@ var S3 = require("aws-sdk/clients/s3");
 
 var config = require("../config");
 
+var TrackFeedbackPrompts = require("../db/models").TrackFeedbackPrompts;
 var Tracks = require("../db/models").Tracks;
+var TrackCredits = require("../db/models").TrackCredits;
 var util = require("../util/utils.js");
 
 // TODO: Move these constants.
 const trackUploadFolder = "track-uploads";
 const mimetypeToExtension = {
+  "audio/aac": "aac",
   "audio/adpcm": "adp",
+  "audio/aiff": "aif",
   "audio/basic": "au",
   "audio/midi": "mid",
+  "audio/x-midi": "mid",
+  "audio/mid": "mid",
+  "audio/mp3": "mp3",
   "audio/mp4": "mp4a",
-  "audio/mpeg": "mpga",
+  "audio/3gpp": "3gp",
+  "audio/3gpp2": "3g2",
+  "audio/mpeg": "mp3",
   "audio/ogg": "oga",
+  "audio/opus": "opus",
   "audio/vnd.dece.audio": "uva",
   "audio/vnd.digital-winds": "eol",
   "audio/vnd.dra": "dra",
-  "audio/vnd.dts": "dts",
   "audio/vnd.dts.hd": "dtshd",
+  "audio/vnd.dts": "dts",
   "audio/vnd.lucent.voice": "lvp",
   "audio/vnd.ms-playready.media.pya": "pya",
   "audio/vnd.nuera.ecelp4800": "ecelp4800",
@@ -29,12 +39,12 @@ const mimetypeToExtension = {
   "audio/webm": "weba",
   "audio/x-aac": "aac",
   "audio/x-aiff": "aif",
-  "audio/x-mpegurl": "m3u",
   "audio/x-m4a": "m4a",
+  "audio/x-mpegurl": "m3u",
   "audio/x-ms-wax": "wax",
   "audio/x-ms-wma": "wma",
-  "audio/x-pn-realaudio": "ram",
   "audio/x-pn-realaudio-plugin": "rmp",
+  "audio/x-pn-realaudio": "ram",
   "audio/x-wav": "wav",
 };
 
@@ -62,7 +72,8 @@ const createBucket = async (s3, bucketName) => {
   }
 };
 
-async function Upload(trackName, fileContent, genre, isPrivate) {
+async function Upload(track, fileContent, userId) {
+  const { title, description, genre, isPrivate, prompts } = track;
   const s3 = new S3({
     accessKeyId: config.awsAccessKeyId,
     secretAccessKey: config.awsAccessKeySecret,
@@ -89,7 +100,7 @@ async function Upload(trackName, fileContent, genre, isPrivate) {
     throw Error(msg);
   }
 
-  const key = `${trackUploadFolder}/${trackName.replace(
+  const key = `${trackUploadFolder}/${title.replace(
     " ",
     "_"
   )}-${Date.now().toString()}.${extension}`;
@@ -113,14 +124,32 @@ async function Upload(trackName, fileContent, genre, isPrivate) {
       hrend[1] / 1000000
     );
 
-    const slug = util.slugify(trackName);
-    const track = await Tracks.create(
-      trackName,
-      "genre",
-      res.Location,
+    const slug = util.slugify(`${title}-${new Date().getTime()}`);
+    const track = await Tracks.create(title, res.Location, genre, {
       slug,
-      isPrivate
-    );
+      isPrivate,
+      description,
+    });
+
+    // TODO: maybe move this into track creation?
+    if (!track.id) {
+      throw "Track not created successfully.";
+    }
+
+    await TrackCredits.create(track.id, userId);
+
+    // If the user didn't add any prompts, that's ok!
+    if (prompts && Array.isArray(prompts)) {
+      const trackPrompts = prompts.map((promptId) => {
+        return {
+          trackId: track.id,
+          promptId,
+        };
+      });
+
+      await TrackFeedbackPrompts.bulkCreate(trackPrompts);
+    }
+
     return track;
   } catch (e) {
     console.error("error upload", e);

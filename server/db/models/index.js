@@ -1,17 +1,24 @@
-var User = require('./users');
-var Events = require('./events');
-var Tracks = require('./tracks');
-var Feedback = require('./feedback');
-var Sessions = require('./sessions');
-var Stats = require('./stats');
-var Invites = require('./invites');
+var Events = require("./events");
+var Feedback = require("./feedback");
+var FeedbackPrompts = require("./feedbackPrompts");
+var Invites = require("./invites");
+var Sessions = require("./sessions");
+var Stats = require("./stats");
+var TrackFeedbackPrompts = require("./trackFeedbackPrompts");
+var Tracks = require("./tracks");
+var TrackCredits = require("./trackCredits");
+var User = require("./users");
+
 
 module.exports = {
-  User,
   Events,
-  Tracks,
   Feedback,
+  FeedbackPrompts,
+  Invites,
   Sessions,
   Stats,
-  Invites,
-}
+  TrackFeedbackPrompts,
+  Tracks,
+  TrackCredits,
+  User,
+};

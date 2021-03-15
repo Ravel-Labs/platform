@@ -1,74 +1,214 @@
-import { Link } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import axios from "axios";
+import { useHistory, Link } from "react-router-dom";
+import { useContext, useEffect, useState, useRef } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import { ExpandMore, ExpandLess } from "@material-ui/icons";
+import { grey } from "@material-ui/core/colors";
+import {
+  AppBar,
+  Box,
+  Button,
+  ClickAwayListener,
+  Grow,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+  Toolbar,
+} from "@material-ui/core";
 
-import { UserContext } from './Context';
+import { UserContext } from "./Context";
 
-import styles from './Header.module.css';
-
+const uploadPrivilegeType = "upload";
 const links = [
-  {label: 'Ravel', path: '/'},
-  {label: 'Track', path: '/track/testSlug'},
-  {label: 'Login', path: '/login', anonymousOnly: true},
-  {label: 'Signup', path: '/signup', anonymousOnly: true},
-  {label: 'Profile', path: '/username123', loggedInOnly: true},
-  {label: 'Upload', path: '/upload', loggedInOnly: true},
-  {label: 'API Test', path: '/debug', devOnly: true},
-]
+  {
+    label: "Sign in",
+    path: "/login",
+    anonymousOnly: true,
+    isPrivileged: (user) => true,
+  },
+  {
+    label: "Join",
+    path: "/signup",
+    anonymousOnly: true,
+    isPrivileged: (user) => true,
+  },
+  {
+    label: "Upload",
+    path: "/upload",
+    loggedInOnly: true,
+    isPrivileged: (user) => {
+      if (!user) return false;
+      return user.privileges
+        .map((privilege) => privilege.type)
+        .includes(uploadPrivilegeType);
+    },
+  },
+];
 
-function DevToolToggle({ isEnabled, onClick }) {
-  return (
-    <button onClick={onClick}>{isEnabled ? "Disable" : "Enable"} Dev Tools</button>
-  )
-}
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  appBar: {
+    color: grey[700],
+    backgroundColor: grey[200],
+  },
+  button: {
+    textTransform: "unset",
+  },
+  titleWrapper: {
+    flexGrow: 1,
+    display: "flex",
+  },
+  popper: {
+    zIndex: 1,
+  },
+}));
 
 export default function Header() {
-  const [isDevEnabled, setIsDevEnabled] = useState(true)
-  const { user, onUpdateUser } = useContext(UserContext)
-  const onClickDevtools = (e) => {
-    e.preventDefault()
-    setIsDevEnabled((prevIsEnabled) => {
-      return !prevIsEnabled
-    })
+  const classes = useStyles();
+  const history = useHistory();
+
+  const { user, onUpdateUser } = useContext(UserContext);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const anchorRef = useRef(null);
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setIsMenuOpen(false);
+  };
+
+  function handleListKeyDown(event) {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      setIsMenuOpen(false);
+    }
   }
 
-  const onClickLogout = () => {
-    onUpdateUser(null)
-  }
+  // return focus to the button when we transitioned from !open -> open
+  const prevOpen = useRef(isMenuOpen);
+  useEffect(() => {
+    if (
+      prevOpen.current === true &&
+      isMenuOpen === false &&
+      anchorRef.current
+    ) {
+      anchorRef.current.focus();
+    }
 
-  const isUserLoggedIn = Boolean(user?.username);
+    prevOpen.current = isMenuOpen;
+  }, [isMenuOpen]);
+
+  const onClickLogout = async (e) => {
+    handleClose(e);
+    onUpdateUser(null);
+    await axios.post("/api/auth/logout");
+    history.push("/");
+  };
+
+  const onClickProfile = async (e) => {
+    handleClose(e);
+    history.push(`/${user.username}`);
+  };
+
+  const onClickAccount = async (e) => {
+    handleClose(e);
+    history.push(`/${user.username}/account`);
+  };
+
+  const isUserLoggedIn = Boolean(user);
 
   return (
-    <header className={styles.Header}>
-      <nav>
-        <ul>
+    <div className={classes.root}>
+      <AppBar position="static" className={classes.appBar}>
+        <Toolbar>
+          <Box className={classes.titleWrapper}>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/"
+              className={classes.button}
+            >
+              Ravel
+            </Button>
+          </Box>
           {links.map((link) => {
-            const canRenderDev = !link.devOnly || isDevEnabled;
-            if (!canRenderDev) {
-              return null
-            }
             if (!isUserLoggedIn && link.loggedInOnly) {
-              return null
+              return null;
             }
-            if (isUserLoggedIn && link.anonymousOnly) {
-              return null
+            if (
+              isUserLoggedIn &&
+              (link.anonymousOnly || !link.isPrivileged(user))
+            ) {
+              return null;
             }
             return (
-              <li key={link.label}>
-                <Link to={link.path}>{link.label}</Link>
-              </li>
-            )
+              <Button
+                color="inherit"
+                component={Link}
+                key={link.label}
+                to={link.path}
+                className={classes.button}
+              >
+                {link.label}
+              </Button>
+            );
           })}
-          {/* TODO: Only show to logged in superusers */}
-          <li>
-            <DevToolToggle onClick={onClickDevtools} isEnabled={isDevEnabled} />
-          </li>
           {isUserLoggedIn && (
-            <li>
-              <button onClick={onClickLogout}>Logout</button>
-            </li>
+            <>
+              <Button
+                color="inherit"
+                endIcon={isMenuOpen ? <ExpandLess /> : <ExpandMore />}
+                className={classes.button}
+                onClick={handleToggleMenu}
+                ref={anchorRef}
+              >
+                {user.username}
+              </Button>
+              <Popper
+                className={classes.popper}
+                open={isMenuOpen}
+                anchorEl={anchorRef.current}
+                role={undefined}
+                transition
+                disablePortal
+              >
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    style={{
+                      transformOrigin:
+                        placement === "bottom" ? "center top" : "center bottom",
+                    }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList
+                          autoFocusItem={isMenuOpen}
+                          id="menu-list-grow"
+                          onKeyDown={handleListKeyDown}
+                        >
+                          <MenuItem onClick={onClickProfile}>Profile</MenuItem>
+                          <MenuItem onClick={onClickAccount}>Account</MenuItem>
+                          <MenuItem onClick={onClickLogout}>Logout</MenuItem>
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Popper>
+            </>
           )}
-        </ul>
-      </nav>
-    </header>
-  )
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
 }

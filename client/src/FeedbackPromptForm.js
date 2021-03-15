@@ -1,57 +1,111 @@
-import axios from 'axios';
-import { useState } from 'react';
-import classNames from 'classnames';
+import axios from "axios";
+import { useState } from "react";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { Edit } from "@material-ui/icons";
+import classNames from "classnames";
 
-import styles from './FeedbackPromptForm.module.css';
+import styles from "./FeedbackPromptForm.module.css";
 
-function FeedbackPromptForm({ prompt }) {
+const useStyles = makeStyles((theme) => ({
+  score: {
+    color: theme.palette.primary.main,
+  },
+}));
+
+function FeedbackPromptForm({ prompt, previousResponse, onFeedbackSubmitted }) {
+  const classes = useStyles();
   const values = Array.from(Array(prompt.scale).keys());
   const [selectedVal, setSelectedVal] = useState(null);
+  const [isEditingResponse, setIsEditingResponse] = useState(false);
 
   const onClickRating = (val) => {
     setSelectedVal((prev) => {
       if (prev === val) {
-        return null
+        return null;
       }
-      return val
-    })
-  }
+      return val;
+    });
+  };
 
   const onSubmitRating = async (e) => {
     e.preventDefault();
+    const payload = {
+      trackId: prompt.trackId,
+      promptId: prompt.id,
+      value: selectedVal,
+    };
     try {
-      const res = await axios.post("/api/feedback", {
-        trackId: prompt.trackId,
-        promptId: prompt.id,
-        value: selectedVal,
-      })
+      const res = await axios.post("/api/feedback", payload);
       if (res.status === 201) {
-        console.log("Feedback received.")
+        onFeedbackSubmitted(payload);
+        setIsEditingResponse(false);
       }
-    } catch(e) {
-      console.error(e)
+    } catch (e) {
+      console.error(e);
     }
-  }
+  };
 
   return (
-    <div>
-      <p className={styles.PromptText}>{prompt.prompt}</p>
-      <div>
-        {values.map((val) => {
-          const classname = classNames({
-            [styles.PromptOption]: true,
-            [styles.PromptOption_Selected]: selectedVal === val,
-          });
-          return (
-            <span key={val} onClick={onClickRating.bind(this, val)} className={classname}>
-              {val}
-            </span>
-          )
-        })}
-      </div>
-      <button onClick={onSubmitRating} disabled={selectedVal === null}>Submit</button>
+    <div className={styles.PromptWrapper}>
+      <Typography variant="h4" component="h3">
+        {prompt.prompt}
+      </Typography>
+      {!previousResponse || isEditingResponse ? (
+        <Box>
+          <Grid
+            container
+            direction="row"
+            justify="center"
+            alignItems="center"
+            className={styles.PromptOptionGroup}
+          >
+            {values.map((idx) => {
+              const val = idx + 1;
+              const classname = classNames({
+                [styles.PromptOption]: true,
+                [styles.PromptOption_Selected]: selectedVal === val,
+              });
+              return (
+                <span
+                  key={val}
+                  onClick={onClickRating.bind(this, val)}
+                  className={classname}
+                >
+                  <span className={styles.PromptOptionVal}>{val}</span>
+                </span>
+              );
+            })}
+          </Grid>
+          <Button
+            onClick={onSubmitRating}
+            disabled={selectedVal === null}
+            variant="contained"
+            color="primary"
+          >
+            Submit
+          </Button>
+        </Box>
+      ) : (
+        <Box>
+          <Typography variant="subtitle1">
+            Your response:{" "}
+            <span
+              className={classes.score}
+            >{`${previousResponse.value}/${prompt.scale}`}</span>
+          </Typography>
+          <Button
+            startIcon={<Edit />}
+            onClick={() => setIsEditingResponse(true)}
+            variant="contained"
+            color="primary"
+          >
+            Edit
+          </Button>
+        </Box>
+      )}
     </div>
-  )
+  );
 }
 
 export default FeedbackPromptForm;

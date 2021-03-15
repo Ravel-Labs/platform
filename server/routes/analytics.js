@@ -22,7 +22,7 @@ router.post('/', async function(req, res, next) {
     }
         
     if (shouldCreateNewSession) {
-      const session = await Sessions.create(trackId, req.body.userId);
+      const session = await Sessions.create(trackId, req.userId);
       sessionId = session[0].id;
       console.log(sessionId);
     }
