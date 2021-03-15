@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export default function useAudioPlayer(elementId) {
   const [duration, setDuration] = useState();
@@ -11,7 +11,7 @@ export default function useAudioPlayer(elementId) {
     const setAudioData = () => {
       setDuration(audio.duration);
       setCurrentTime(audio.currentTime);
-    }
+    };
     const setAudioTime = () => setCurrentTime(audio.currentTime);
 
     // DOM listeners: update React state on DOM events
@@ -24,13 +24,13 @@ export default function useAudioPlayer(elementId) {
     if (clickedTime && clickedTime !== currentTime) {
       audio.currentTime = clickedTime;
       setClickedTime(null);
-    } 
+    }
 
     // effect cleanup
     return () => {
       audio.removeEventListener("loadeddata", setAudioData);
       audio.removeEventListener("timeupdate", setAudioTime);
-    }
+    };
   }, [currentTime, clickedTime, elementId, isPlaying]);
 
   return {
@@ -38,6 +38,6 @@ export default function useAudioPlayer(elementId) {
     duration,
     isPlaying,
     setIsPlaying,
-    setClickedTime
-  }
+    setClickedTime,
+  };
 }

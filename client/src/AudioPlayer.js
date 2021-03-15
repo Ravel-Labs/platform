@@ -61,7 +61,7 @@ export default function AudioPlayer({ track }) {
     sendAnalytics({
       eventType: playbackEventTypes.play,
       eventData: {
-        currentTime: e.target.currentTime,
+        currentTime,
       },
     });
   };
@@ -71,16 +71,17 @@ export default function AudioPlayer({ track }) {
     sendAnalytics({
       eventType: playbackEventTypes.pause,
       eventData: {
-        currentTime: e.target.currentTime,
+        currentTime,
       },
     });
   };
 
   const onPlayEnded = (e) => {
+    setIsPlaying(false);
     sendAnalytics({
       eventType: playbackEventTypes.playEnded,
       eventData: {
-        currentTime: e.target.currentTime,
+        currentTime,
       },
     });
   };
