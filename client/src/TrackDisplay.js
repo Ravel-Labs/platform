@@ -1,12 +1,18 @@
-import { Chip, Grid, Typography } from "@material-ui/core";
+import { useContext } from "react";
+import { Chip, Grid, Link, Typography } from "@material-ui/core";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 // import { PlayArrow } from "@material-ui/icons";
 
+import { UserContext } from "./Context";
 import AudioPlayer from "./AudioPlayer";
 import FeedbackPromptForm from "./FeedbackPromptForm";
 
 import styles from "./TrackDisplay.module.css";
 
 function TrackDisplay({ track, onFeedbackSubmitted }) {
+  const { user } = useContext(UserContext);
+  let location = useLocation();
+
   const feedbackByPrompt = {};
   const feedback = track?.userFeedback || [];
   feedback.forEach(
@@ -35,16 +41,30 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
             <Chip label={track.genre} />
           </Grid>
           <Grid item xs={12} md={7}>
-            {track.prompts.map((prompt) => {
-              return (
-                <FeedbackPromptForm
-                  key={prompt.id}
-                  prompt={prompt}
-                  previousResponse={feedbackByPrompt[prompt.id]}
-                  onFeedbackSubmitted={onFeedbackSubmitted}
-                />
-              );
-            })}
+            {user ? (
+              <div>
+                {track.prompts.map((prompt) => {
+                  return (
+                    <FeedbackPromptForm
+                      key={prompt.id}
+                      prompt={prompt}
+                      previousResponse={feedbackByPrompt[prompt.id]}
+                      onFeedbackSubmitted={onFeedbackSubmitted}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <Typography variant="body1">
+                Want to share your thoughts on this track?{" "}
+                <Link
+                  to={`/signup?next=${location.pathname}`}
+                  component={RouterLink}
+                >
+                  Sign up.
+                </Link>
+              </Typography>
+            )}
           </Grid>
           <Grid item xs={12} md={3} className={styles.ArtistGridItem}>
             <Typography variant="h2">{track.artist}</Typography>

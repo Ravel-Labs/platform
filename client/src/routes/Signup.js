@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import { Link as RouterLink, Redirect } from "react-router-dom";
+import { Link as RouterLink, Redirect, useLocation } from "react-router-dom";
 import { Container, FormHelperText, Grid, Link } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
+import useNextParam from "../useNextParam";
 import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
 import SimpleForm from "../SimpleForm";
@@ -53,10 +54,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function SignupFooter() {
+  let { search } = useLocation();
   return (
     <Grid container>
       <Grid item>
-        <Link to="/login" component={RouterLink} variant="body2">
+        <Link to={`/login${search}`} component={RouterLink} variant="body2">
           {"Already have an account? Sign in."}
         </Link>
       </Grid>
@@ -69,6 +71,8 @@ function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, onUpdateUser } = useContext(UserContext);
   const [formError, setFormError] = useState(null);
+  const fallback = user?.username ? `/${user.username}` : "/";
+  let nextRoute = useNextParam(fallback);
 
   const onSignupSubmit = async (values) => {
     setIsLoading(true);
@@ -91,7 +95,7 @@ function Signup() {
 
   return (
     <PageWrapper>
-      {user?.username && <Redirect to={`/${user?.username}`} />}
+      {user?.username && <Redirect to={nextRoute} />}
       <SimpleForm
         formTitle="Join Ravel"
         fields={signupFields}

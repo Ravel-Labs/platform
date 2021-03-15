@@ -20,6 +20,15 @@ const defaultReturnColumns = [
   "invitesRemaining",
 ];
 
+async function getUserPrivileges(roleId) {
+  return await db("privileges")
+    .select("type")
+    .join("privilegeRoles", {
+      "privilegeRoles.privilegeId": "privileges.id",
+    })
+    .where("privilegeRoles.roleId", roleId);
+}
+
 /**
  * Return the user with the provided email, if exists.
  * @param  {string} email
@@ -27,13 +36,11 @@ const defaultReturnColumns = [
  */
 async function getByEmail(email, fields = defaultReturnColumns) {
   const user = await db(tableName).where({ email }).select(fields).first();
-  const privileges = await db("privileges")
-    .select("type")
-    .join("privilegeRoles", {
-      "privilegeRoles.privilegeId": "privileges.id",
-    })
-    .where("privilegeRoles.roleId", user.roleId);
-  user.privileges = privileges;
+  if (!user) {
+    return null;
+  }
+
+  user.privileges = await getUserPrivileges(user.roleId);
   return user;
 }
 /**
@@ -63,8 +70,19 @@ async function getByUsername(username, fields = defaultReturnColumns) {
  * @return {db/User}  resp.user
  */
 async function validateCredentials(email, password) {
-  const user = await getByEmail(email);
+  const user = await getByEmail(
+    email,
+    ["passwordHash"].concat(defaultReturnColumns)
+  );
+  if (!user) {
+    return {
+      user,
+      isValid: false,
+    };
+  }
   const isValid = bcrypt.compareSync(password, user.passwordHash);
+  // Remove the password hash before returning
+  delete user.passwordHash;
   return { isValid, user };
 }
 
@@ -86,7 +104,7 @@ async function create(
   const passwordHash = bcrypt.hashSync(password, 10);
   const { username } = fields;
   try {
-    const users = await db(tableName).insert(
+    const [user] = await db(tableName).insert(
       {
         email,
         passwordHash,
@@ -99,8 +117,8 @@ async function create(
       },
       defaultReturnColumns
     );
-    console.log(users);
-    return users.pop();
+    user.privileges = await getUserPrivileges(user.roleId);
+    return user;
   } catch (e) {
     console.error(e);
   }

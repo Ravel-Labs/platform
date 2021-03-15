@@ -7,6 +7,9 @@ var Tracks = require("../db/models").Tracks;
 var TrackCredits = require("../db/models").TrackCredits;
 
 const AUTH_TOKEN_COOKIE = "ravelPlatform";
+const adminInviteCount = 1000;
+const betaArtistInviteCount = 10;
+const betaUserInviteCount = 0;
 
 function createToken(email, userId) {
   try {
@@ -29,19 +32,17 @@ async function Login(email, password) {
   };
 }
 
-function createInvitesRemaining(roleId) {
-  try {
-    let invitesRemaining;
-    if (roleId == 0) {
-      invitesRemaining = 1000;
-    } else if (roleId == 1) {
-      invitesRemaining = 10;
-    } else {
-      invitesRemaining = 0;
-    }
-    return invitesRemaining;
-  } catch (e) {
-    console.error(e);
+// TODO: We should key this off of role name rather than id.
+function getInvitesRemaining(roleId) {
+  switch (roleId) {
+    case 0:
+      return adminInviteCount;
+    case 1:
+      return betaArtistInviteCount;
+    case 2:
+      return betaUserInviteCount;
+    default:
+      return 0;
   }
 }
 
@@ -58,7 +59,7 @@ async function Signup(userInfo, code) {
 
   const { email, password, username, displayName } = userInfo;
   try {
-    const invitesRemaining = createInvitesRemaining(roleId);
+    const invitesRemaining = getInvitesRemaining(roleId);
     const user = await User.create(
       email,
       password,
