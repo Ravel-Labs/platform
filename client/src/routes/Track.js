@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useRouteMatch } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import axios from "axios";
 
 import PageWrapper from "../PageWrapper";
@@ -48,13 +48,6 @@ function Track() {
   return (
     <PageWrapper>
       <TrackDisplay track={track} onFeedbackSubmitted={onFeedbackSubmitted} />
-      {/* TODO: Restrict to only uploader of this track. */}
-      <div>
-        <Link to={`${match.url}/feedback`}>View track feedback</Link>
-      </div>
-      <div>
-        <Link to={`${match.url}/stats`}>View track stats</Link>
-      </div>
     </PageWrapper>
   );
 }

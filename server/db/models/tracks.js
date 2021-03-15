@@ -94,6 +94,7 @@ async function updateTrackPrivacy(trackSlug, privacyBool) {
 async function getFeaturedTracks() {
   const fields = {
     artist: "users.displayName",
+    username: "users.username",
   };
   defaultReturnColumns.forEach((name) => (fields[name] = `tracks.${name}`));
   try {
@@ -114,6 +115,7 @@ async function filterByUsername(username) {
   const fields = {
     artist: "users.displayName",
     userId: "users.id",
+    username: "users.username",
   };
   defaultReturnColumns.forEach((name) => (fields[name] = `tracks.${name}`));
   try {

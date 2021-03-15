@@ -1,7 +1,11 @@
 import { useContext } from "react";
-import { Chip, Grid, Link, Typography } from "@material-ui/core";
-import { Link as RouterLink, useLocation } from "react-router-dom";
-// import { PlayArrow } from "@material-ui/icons";
+import { Box, Chip, Grid, Link, Typography } from "@material-ui/core";
+import {
+  Link as RouterLink,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
+import { TrendingUp } from "@material-ui/icons";
 
 import { UserContext } from "./Context";
 import AudioPlayer from "./AudioPlayer";
@@ -11,6 +15,7 @@ import styles from "./TrackDisplay.module.css";
 
 function TrackDisplay({ track, onFeedbackSubmitted }) {
   const { user } = useContext(UserContext);
+  let match = useRouteMatch();
   let location = useLocation();
 
   const feedbackByPrompt = {};
@@ -69,6 +74,13 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
           <Grid item xs={12} md={3} className={styles.ArtistGridItem}>
             <Typography variant="h2">{track.artist}</Typography>
             <Typography variant="body1">{track.description}</Typography>
+            {user?.username === track?.username && (
+              <Box paddingTop={2}>
+                <Link to={`${match.url}/stats`} component={RouterLink}>
+                  <TrendingUp /> View track stats
+                </Link>
+              </Box>
+            )}
           </Grid>
         </>
       )}

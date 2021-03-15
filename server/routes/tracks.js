@@ -47,8 +47,9 @@ router.get("/:slug", async function (req, res, next) {
   }));
 
   const userId = await TrackCredits.getUserIdbyTrackId(track.id);
-  const user = await User.getById(userId, ["displayName"]);
+  const user = await User.getById(userId, ["displayName", "username"]);
   track.artist = user.displayName;
+  track.username = user.username;
 
   const feedback = await Feedback.filterForTrackIdUserId(track.id, userId);
   track.userFeedback = feedback;
