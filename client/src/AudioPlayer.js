@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Typography } from "@material-ui/core";
 import { PlayCircleFilled, PauseCircleFilled } from "@material-ui/icons";
 import axios from "axios";
 import debounce from "lodash.debounce";
@@ -115,10 +116,22 @@ export default function AudioPlayer({ track }) {
           )}
         </div>
         <div className={styles.TrackInfo}>
-          <h1 className={styles.TrackInfoTitle}>{track.title}</h1>
-          <h2 className={styles.TrackInfoArtist}>
-            {track.artist || "Artist Name"}
-          </h2>
+          <Typography
+            variant="h2"
+            component="h1"
+            className={styles.TrackInfoTitle}
+          >
+            {track.title}
+          </Typography>
+          {track.artist && (
+            <Typography
+              variant="h2"
+              component="h1"
+              className={styles.TrackInfoArtist}
+            >
+              {track.artist}
+            </Typography>
+          )}
         </div>
         <AudioScrubber
           currentTime={currentTime}
