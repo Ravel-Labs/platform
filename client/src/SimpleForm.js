@@ -28,6 +28,7 @@ export default function Form({
   isLoading,
   onSubmit,
   submitText,
+  SubtitleComponent,
 }) {
   const classes = useFormStyles();
 
@@ -52,6 +53,7 @@ export default function Form({
         <Typography component="h1" variant="h4">
           {formTitle}
         </Typography>
+        {SubtitleComponent && <SubtitleComponent />}
         <form
           className={classes.form}
           onSubmit={onFormSubmit}

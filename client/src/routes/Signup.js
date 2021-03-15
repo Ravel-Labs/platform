@@ -1,7 +1,13 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { Link as RouterLink, Redirect, useLocation } from "react-router-dom";
-import { Container, FormHelperText, Grid, Link } from "@material-ui/core";
+import {
+  Container,
+  FormHelperText,
+  Grid,
+  Link,
+  Typography,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 import useNextParam from "../useNextParam";
@@ -46,7 +52,7 @@ const signupFields = [
 
 const useStyles = makeStyles((theme) => ({
   termsContainer: {
-    paddingTop: "3vw",
+    paddingTop: "2vw",
   },
   termsText: {
     textAlign: "center",
@@ -63,6 +69,24 @@ function SignupFooter() {
         </Link>
       </Grid>
     </Grid>
+  );
+}
+
+const subtitleStyles = makeStyles((theme) => ({
+  subtitle: {
+    paddingTop: "2vw",
+    paddingBottom: "1vw",
+    fontSize: "0.9rem",
+  },
+}));
+
+function SignupSubtitle() {
+  const classes = subtitleStyles();
+  return (
+    <Typography variant="subtitle1" className={classes.subtitle}>
+      <strong>Create an account. Listen to tracks. Help music happen.</strong>{" "}
+      Give rising artists feedback on their upcoming releases.
+    </Typography>
   );
 }
 
@@ -101,6 +125,7 @@ function Signup() {
         fields={signupFields}
         isLoading={isLoading}
         onSubmit={onSignupSubmit}
+        SubtitleComponent={SignupSubtitle}
         FooterComponent={SignupFooter}
         errorText={formError}
       />

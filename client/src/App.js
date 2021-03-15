@@ -9,6 +9,7 @@ import { UserContext } from "./Context";
 
 import "./App.css";
 
+const About = lazy(() => import("./routes/About"));
 const Account = lazy(() => import("./routes/Account"));
 const Home = lazy(() => import("./routes/Home"));
 const Login = lazy(() => import("./routes/Login"));
@@ -50,6 +51,9 @@ export default function App() {
                 </Route>
                 <Route path="/signup">
                   <Signup />
+                </Route>
+                <Route path="/about">
+                  <About />
                 </Route>
                 <Route path="/track/:trackSlug/feedback">
                   <TrackFeedback />

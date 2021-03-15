@@ -38,7 +38,7 @@ export default function TrackListTable({
 
   return (
     <Box>
-      <Typography variant="h4" component="h2" className={classes.header}>
+      <Typography variant="h5" component="h3" className={classes.header}>
         {title}
       </Typography>
       <TableContainer>

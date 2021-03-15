@@ -1,11 +1,20 @@
+import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouteMatch } from "react-router-dom";
-import axios from "axios";
+import { Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
 import PageWrapper from "../PageWrapper";
 import TrackDisplay from "../TrackDisplay";
 
+const useStyles = makeStyles({
+  copy: {
+    paddingBottom: "2vw",
+  },
+});
+
 function Track() {
+  const classes = useStyles();
   let match = useRouteMatch();
   const { trackSlug } = match.params;
   const [track, setTrack] = useState(null);
@@ -47,6 +56,10 @@ function Track() {
 
   return (
     <PageWrapper>
+      <Typography variant="subtitle2" className={classes.copy}>
+        What do you think of the track below? Listen in and don’t forget to
+        leave a rating.
+      </Typography>
       <TrackDisplay track={track} onFeedbackSubmitted={onFeedbackSubmitted} />
     </PageWrapper>
   );
