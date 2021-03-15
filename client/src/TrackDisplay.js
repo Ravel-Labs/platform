@@ -72,6 +72,9 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
             )}
           </Grid>
           <Grid item xs={12} md={3} className={styles.ArtistGridItem}>
+            <Typography variant="overline" display="block" gutterBottom>
+              From the artist
+            </Typography>
             <Typography variant="h2">{track.artist}</Typography>
             <Typography variant="body1">{track.description}</Typography>
             {user?.username === track?.username && (
