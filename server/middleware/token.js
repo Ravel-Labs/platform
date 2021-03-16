@@ -1,6 +1,7 @@
 var AuthService = require("../services/auth");
 
 function requireUser(req, res, next) {
+  console.log("found cookie", req.cookies[AuthService.AUTH_TOKEN_COOKIE]);
   const authToken = req.cookies[AuthService.AUTH_TOKEN_COOKIE];
   const { isValid, userEmail, userId } = AuthService.Validate(authToken);
   console.log("token info isValid ", isValid, "userEmail: ", userEmail);
@@ -13,6 +14,7 @@ function requireUser(req, res, next) {
 }
 
 function withUser(req, res, next) {
+  console.log("found cookie", req.cookies[AuthService.AUTH_TOKEN_COOKIE]);
   const authToken = req.cookies[AuthService.AUTH_TOKEN_COOKIE];
   const { userEmail, userId } = AuthService.Validate(authToken);
   console.log("token info userEmail: ", userEmail);

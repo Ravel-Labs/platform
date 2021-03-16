@@ -1,8 +1,6 @@
 var express = require("express");
 var AuthService = require("../services/auth");
 var config = require("../config");
-var User = require("../db/models").User;
-var Invites = require("../db/models").Invites;
 var router = express.Router();
 
 const dayMs = 24 * 60 * 60 * 1000;
@@ -11,6 +9,7 @@ const tokenLengthMs = 30 * dayMs;
 // const testTokenLengthMs = 60 * 1000
 
 function setAuthCookie(res, token) {
+  console.log("cookie name", AuthService.AUTH_TOKEN_COOKIE);
   res.cookie(AuthService.AUTH_TOKEN_COOKIE, token, {
     expires: new Date(Date.now() + tokenLengthMs),
     secure: config.nodeEnv === "production", // set to true if your using https
