@@ -12,7 +12,8 @@ function setAuthCookie(res, token) {
   console.log("cookie name", AuthService.AUTH_TOKEN_COOKIE);
   res.cookie(AuthService.AUTH_TOKEN_COOKIE, token, {
     expires: new Date(Date.now() + tokenLengthMs),
-    secure: config.nodeEnv === "production", // set to true if your using https
+    secure: false, // set to true if your using https
+    // secure: config.nodeEnv === "production", // set to true if your using https
     httpOnly: true,
   });
 }
