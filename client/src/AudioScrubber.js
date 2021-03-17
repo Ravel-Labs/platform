@@ -2,6 +2,11 @@ import React, { useRef } from "react";
 
 import styles from "./AudioScrubber.module.css";
 
+const scrubEventTypes = {
+  touch: "touch",
+  mouse: "mouse",
+};
+
 export default function AudioScrubber({ duration, currentTime, onTimeUpdate }) {
   const currentProgress = (currentTime / duration) * 100;
   const scrubberEl = useRef(null);
@@ -21,18 +26,26 @@ export default function AudioScrubber({ duration, currentTime, onTimeUpdate }) {
     return timePerPixel * clickPositionInBar;
   }
 
-  function onScrub(e) {
+  function onScrub(e, eventType) {
     onTimeUpdate(getTimeFromEvent(e));
 
     const updateTimeOnMove = (eMove) => {
       onTimeUpdate(getTimeFromEvent(eMove));
     };
 
-    document.addEventListener("mousemove", updateTimeOnMove);
+    if (eventType === scrubEventTypes.mouse) {
+      document.addEventListener("mousemove", updateTimeOnMove);
 
-    document.addEventListener("mouseup", () => {
-      document.removeEventListener("mousemove", updateTimeOnMove);
-    });
+      document.addEventListener("mouseup", () => {
+        document.removeEventListener("mousemove", updateTimeOnMove);
+      });
+    } else if (eventType === scrubEventTypes.touch) {
+      document.addEventListener("touchmove", updateTimeOnMove);
+
+      document.addEventListener("touchend", () => {
+        document.removeEventListener("touchmove", updateTimeOnMove);
+      });
+    }
   }
 
   return (
@@ -43,7 +56,8 @@ export default function AudioScrubber({ duration, currentTime, onTimeUpdate }) {
         style={{
           background: `linear-gradient(to right, #303f9f ${currentProgress}%, #d3d3d3 0)`,
         }}
-        onMouseDown={(e) => onScrub(e)}
+        onMouseDown={(e) => onScrub(e, scrubEventTypes.mouse)}
+        onTouchStart={(e) => onScrub(e, scrubEventTypes.touch)}
       >
         <span
           className={styles.AudioScrubberKnob}

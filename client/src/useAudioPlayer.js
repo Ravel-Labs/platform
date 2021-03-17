@@ -6,6 +6,21 @@ export default function useAudioPlayer(elementId) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [clickedTime, setClickedTime] = useState();
 
+  const updatePlayState = async (newIsPlaying) => {
+    const audio = document.getElementById(elementId);
+    if (!audio) {
+      console.error("Unable to find audio element");
+      return;
+    }
+
+    if (newIsPlaying) {
+      await audio.play();
+    } else {
+      await audio.pause();
+    }
+    setIsPlaying(newIsPlaying);
+  };
+
   useEffect(() => {
     const audio = document.getElementById(elementId);
     const setAudioData = () => {
@@ -17,9 +32,6 @@ export default function useAudioPlayer(elementId) {
     // DOM listeners: update React state on DOM events
     audio.addEventListener("loadeddata", setAudioData);
     audio.addEventListener("timeupdate", setAudioTime);
-
-    // React state listeners: update DOM on React state changes
-    isPlaying ? audio.play() : audio.pause();
 
     if (clickedTime && clickedTime !== currentTime) {
       audio.currentTime = clickedTime;
@@ -37,7 +49,7 @@ export default function useAudioPlayer(elementId) {
     currentTime,
     duration,
     isPlaying,
-    setIsPlaying,
     setClickedTime,
+    setIsPlaying: updatePlayState,
   };
 }

@@ -17,7 +17,7 @@
 .AudioScrubberProgress {
   flex: 1;
   margin: 0 20px;
-  height: 4px;
+  height: 6px;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -26,6 +26,17 @@
 .AudioScrubberKnob {
   position: relative;
   height: 40px;
-  width: 4px;
+  width: 6px;
   background-color: #303f9f;
+}
+
+@media screen and (max-width: 768px) {
+  .AudioScrubberProgress {
+    margin: 0 10px;
+    height: 10px;
+  }
+  
+  .AudioScrubberKnob {
+    width: 10px;
+  }
 }
