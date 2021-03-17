@@ -12,7 +12,19 @@ var tokenMiddleware = require("../middleware/token");
 var router = express.Router();
 
 router.get("/featured", async function (req, res, next) {
-  const tracks = await Tracks.getFeaturedTracks();
+  // For featured tracks, we only want to include private tracks if they are from users
+  // that the logged-in user can follow. Currently, that's the logged in user themself,
+  // or the user that referred the logged-in user
+  const privateTrackUserIds = [];
+  if (req.userId !== undefined || req.userId !== null) {
+    privateTrackUserIds.push(req.userId);
+    const userFields = await User.getById(req.userId, ["referrerId"]);
+    if (userFields.referrerId !== null) {
+      privateTrackUserIds.push(userFields.referrerId);
+    }
+  }
+
+  const tracks = await Tracks.getFeaturedTracks(privateTrackUserIds);
   return res.status(200).send(tracks);
 });
 

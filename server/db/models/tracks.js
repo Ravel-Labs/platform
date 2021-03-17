@@ -91,20 +91,37 @@ async function updateTrackPrivacy(trackSlug, privacyBool) {
   }
 }
 
-async function getFeaturedTracks() {
+async function getFeaturedTracks(privateTracksAllowedUserIds) {
   const fields = {
     artist: "users.displayName",
     username: "users.username",
+    userId: "users.id",
   };
   defaultReturnColumns.forEach((name) => (fields[name] = `tracks.${name}`));
   try {
-    const tracks = await db(tableName)
+    let tracks = await db(tableName)
       .select(fields)
       .join("trackCredits", { "trackCredits.trackId": "tracks.id" })
       .join("users", { "users.id": "trackCredits.userId" })
       .where({ isPrivate: false })
       .orderBy("createdAt", "desc")
       .limit(20);
+
+    // Add private tracks from privateTracksAllowedUserIds.
+    // TODO: could probably find a way to combine this with above query so we only hit the DB once.
+    if (privateTracksAllowedUserIds.length) {
+      const viewablePrivateTracks = await db(tableName)
+        .select(fields)
+        .join("trackCredits", { "trackCredits.trackId": "tracks.id" })
+        .join("users", { "users.id": "trackCredits.userId" })
+        .where({ isPrivate: true })
+        .whereIn("userId", privateTracksAllowedUserIds)
+        .orderBy("createdAt", "desc")
+        .limit(20);
+
+      tracks = tracks.concat(viewablePrivateTracks);
+    }
+
     return tracks;
   } catch (e) {
     console.error(e);
