@@ -51,7 +51,11 @@ function Home() {
           . Check out the music below and let your voice be heard.
         </Typography>
       </div>
-      <TrackListTable tracks={featuredTracks} title="Today's tracks" />
+      <TrackListTable
+        shouldShowPrivacy
+        tracks={featuredTracks}
+        title="Today's tracks"
+      />
     </PageWrapper>
   );
 }

@@ -61,7 +61,11 @@ export default function TrackListTable({
               >
                 {shouldShowPrivacy && (
                   <TableCell padding="checkbox">
-                    {track.isPrivate ? <Lock /> : <LockOpen />}
+                    {track.isPrivate ? (
+                      <Lock alt="Private" />
+                    ) : (
+                      <LockOpen alt="Public" />
+                    )}
                   </TableCell>
                 )}
                 <TableCell>{track.title}</TableCell>
