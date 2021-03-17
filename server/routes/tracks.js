@@ -16,7 +16,7 @@ router.get("/featured", async function (req, res, next) {
   // that the logged-in user can follow. Currently, that's the logged in user themself,
   // or the user that referred the logged-in user
   const privateTrackUserIds = [];
-  if (req.userId !== undefined || req.userId !== null) {
+  if (req.userId !== undefined && req.userId !== null) {
     privateTrackUserIds.push(req.userId);
     const userFields = await User.getById(req.userId, ["referrerId"]);
     if (userFields.referrerId !== null) {
