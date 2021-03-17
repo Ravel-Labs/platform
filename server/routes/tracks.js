@@ -58,13 +58,21 @@ router.get("/:slug", async function (req, res, next) {
     trackId: track.id,
   }));
 
-  const userId = await TrackCredits.getUserIdbyTrackId(track.id);
-  const user = await User.getById(userId, ["displayName", "username"]);
-  track.artist = user.displayName;
-  track.username = user.username;
+  const artistUserId = await TrackCredits.getUserIdbyTrackId(track.id);
+  const artistUser = await User.getById(artistUserId, [
+    "displayName",
+    "username",
+  ]);
+  track.artist = artistUser.displayName;
+  track.username = artistUser.username;
 
-  const feedback = await Feedback.filterForTrackIdUserId(track.id, userId);
-  track.userFeedback = feedback;
+  if (req.userId !== undefined) {
+    const feedback = await Feedback.filterForTrackIdUserId(
+      track.id,
+      req.userId
+    );
+    track.userFeedback = feedback;
+  }
 
   res.status(200).send(track);
 });
