@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useRouteMatch } from "react-router-dom";
+import { useRouteMatch, Link as RouterLink } from "react-router-dom";
 import {
   Box,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -10,6 +11,8 @@ import {
   TableRow,
   Typography,
 } from "@material-ui/core";
+import { ArrowBackIos } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 
 import PageWrapper from "../PageWrapper";
@@ -44,7 +47,15 @@ import PageWrapper from "../PageWrapper";
 //   );
 // }
 
+const useStyles = makeStyles({
+  bodyText: {
+    textAlign: "left",
+    marginTop: "2em",
+  },
+});
+
 function TrackStats() {
+  const classes = useStyles();
   let match = useRouteMatch();
   const trackSlug = match.params.trackSlug;
   const [stats, setStats] = useState({});
@@ -66,7 +77,7 @@ function TrackStats() {
       <Typography variant="h2" component="h1">
         {stats.track?.title}
       </Typography>
-      {stats?.feedbackStats?.length > 0 && (
+      {stats?.feedbackStats?.length > 0 ? (
         <Box paddingTop={4}>
           <Typography variant="h4" component="h2">
             Listener feedback
@@ -94,7 +105,22 @@ function TrackStats() {
             </Table>
           </TableContainer>
         </Box>
+      ) : (
+        <Typography variant="body1" className={classes.bodyText}>
+          No track feedback yet. Check back soon for initial responses from
+          listeners.{" "}
+        </Typography>
       )}
+      <Typography variant="body1" className={classes.bodyText}>
+        <Button
+          component={RouterLink}
+          to={`/track/${trackSlug}`}
+          startIcon={<ArrowBackIos />}
+          color="primary"
+        >
+          Back
+        </Button>
+      </Typography>
       {/* TODO: Display playback stats once query is resolved. */}
       {/* <StatGroupDisplay stats={stats?.playbackStats} title="Playback stats" /> */}
     </PageWrapper>

@@ -1,24 +1,22 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { Box, Typography } from "@material-ui/core";
-// import { makeStyles } from "@material-ui/core/styles";
-import { useRouteMatch } from "react-router-dom";
+import { Box, Link, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { useRouteMatch, Link as RouterLink } from "react-router-dom";
 
 import { UserContext } from "../Context";
 import TrackListTable from "../TrackListTable";
 import PageWrapper from "../PageWrapper";
 
-// const useStyles = makeStyles({
-//   table: {
-//     margin: "2em auto",
-//     maxWidth: "800px",
-//   },
-//   button: {
-//     marginTop: "1em",
-//   },
-// });
+const useStyles = makeStyles({
+  bodyText: {
+    textAlign: "left",
+    marginTop: "2em",
+  },
+});
 
 function Profile() {
+  const classes = useStyles();
   const [profileTracks, setProfileTracks] = useState([]);
   const [profileUser, setProfileUser] = useState(null);
   const { user } = useContext(UserContext);
@@ -51,8 +49,6 @@ function Profile() {
     fetchProfileTracks();
   }, [match.params.username]);
 
-  // const classes = useStyles();
-
   // Only show public tracks, unless the logged-in user was referred by this user
   // or is an admin.
   const userPrivileges = user?.privileges || [];
@@ -60,11 +56,20 @@ function Profile() {
     (accum, privilege) => accum || privilege.type === "admin",
     false
   );
+  const hasUploadPrivilege = userPrivileges.reduce(
+    (accum, privilege) => accum || privilege.type === "upload",
+    false
+  );
   const filteredTracks = profileTracks.filter((track) => {
     if (!track.isPrivate) {
       return true;
     }
-    return Boolean(user) && (isAdminUser || user?.referrerId === track.userId);
+    return (
+      Boolean(user) &&
+      (isAdminUser ||
+        user?.referrerId === track.userId ||
+        user?.id === track.userId)
+    );
   });
 
   return (
@@ -77,12 +82,34 @@ function Profile() {
           <Typography variant="body1">
             Joined {new Date(profileUser.createdAt).toLocaleDateString()}
           </Typography>
-          <TrackListTable
-            shouldShowPrivacy
-            tracks={filteredTracks}
-            title="Tracks"
-            size="medium"
-          />
+          {filteredTracks.length === 0 ? (
+            <Typography variant="body1" className={classes.bodyText}>
+              {hasUploadPrivilege ? (
+                <>
+                  You don't have any tracks yet.{" "}
+                  <Link to="/upload" component={RouterLink}>
+                    Upload
+                  </Link>{" "}
+                  to start sharing your music.
+                </>
+              ) : (
+                <>
+                  Get started by checking out{" "}
+                  <Link to="/" component={RouterLink}>
+                    featured tracks
+                  </Link>
+                  {"."}
+                </>
+              )}
+            </Typography>
+          ) : (
+            <TrackListTable
+              shouldShowPrivacy
+              tracks={filteredTracks}
+              title="Tracks"
+              size="medium"
+            />
+          )}
         </Box>
       )}
     </PageWrapper>

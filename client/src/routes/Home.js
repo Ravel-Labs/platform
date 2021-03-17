@@ -8,15 +8,19 @@ import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
 import TrackListTable from "../TrackListTable";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   welcomeBody: {
     textAlign: "left",
     maxWidth: "500px",
   },
+  welcomeBodyEmphasis: {
+    fontWeight: 700,
+    color: theme.palette.primary.main,
+  },
   welcomeBodySection: {
     paddingTop: "2vw",
   },
-});
+}));
 
 function Home() {
   const [featuredTracks, setFeaturedTracks] = useState([]);
@@ -47,12 +51,19 @@ function Home() {
           variant="h4"
           component="h2"
           className={classes.welcomeBodySection}
+          color="primary"
         >
           We’re glad you’re here.
         </Typography>
         <Typography variant="body1" className={classes.welcomeBodySection}>
           We are building a community{" "}
-          <strong>where artists and listeners can build with each other</strong>
+          <Typography
+            variant="body1"
+            component="span"
+            className={classes.welcomeBodyEmphasis}
+          >
+            where artists and listeners can build with each other
+          </Typography>
           . Check out the music below and let your voice be heard.
         </Typography>
       </div>
