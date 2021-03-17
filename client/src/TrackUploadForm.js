@@ -310,7 +310,11 @@ export default function TrackUploadForm() {
             MenuProps={MenuProps}
           >
             {promptOptions.map((prompt) => (
-              <MenuItem key={prompt.id} value={prompt.id}>
+              <MenuItem
+                key={prompt.id}
+                value={prompt.id}
+                className={classes.menuItem}
+              >
                 <Checkbox checked={fieldVals.prompts.includes(prompt.id)} />
                 <ListItemText primary={prompt.prompt} />
               </MenuItem>
