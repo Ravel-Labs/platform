@@ -9,7 +9,6 @@ const tokenLengthMs = 30 * dayMs;
 // const testTokenLengthMs = 60 * 1000
 
 function setAuthCookie(res, token) {
-  console.log("cookie name", AuthService.AUTH_TOKEN_COOKIE);
   res.cookie(AuthService.AUTH_TOKEN_COOKIE, token, {
     expires: new Date(Date.now() + tokenLengthMs),
     secure: false, // set to true if your using https
