@@ -109,8 +109,8 @@ export default function Header() {
 
   const onClickLogout = async (e) => {
     handleClose(e);
-    onUpdateUser(null);
     await axios.post("/api/auth/logout");
+    onUpdateUser(null);
     history.push("/");
   };
 
