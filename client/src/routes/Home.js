@@ -1,8 +1,10 @@
 import axios from "axios";
+import { useContext } from "react";
 import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useState, useEffect } from "react";
 
+import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
 import TrackListTable from "../TrackListTable";
 
@@ -18,7 +20,9 @@ const useStyles = makeStyles({
 
 function Home() {
   const [featuredTracks, setFeaturedTracks] = useState([]);
+  const { user } = useContext(UserContext);
   const classes = useStyles();
+
   useEffect(() => {
     async function fetchTracks() {
       try {
@@ -30,7 +34,8 @@ function Home() {
       }
     }
     fetchTracks();
-  }, []);
+    // Ensure we re-fetch tracks when the user logs out.
+  }, [user]);
 
   return (
     <PageWrapper>
