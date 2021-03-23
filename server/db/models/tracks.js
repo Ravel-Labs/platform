@@ -31,6 +31,20 @@ async function create(title, path, genre, additionalFields = {}) {
   }
 }
 
+async function deleteTrack(track) {
+  try {
+    await db("trackCredits").where({trackId: track.id}).del();
+    await db("trackFeedbackPrompts").where({trackId: track.id}).del();
+    const deletedTrack = await db(tableName).where({id: track.id}).del();
+    console.log(deletedTrack);
+    return deletedTrack;
+  } catch(e) {
+    console.error(e);
+  }
+
+
+}
+
 async function getTrackBySlug(trackSlug) {
   try {
     const track = await db(tableName).where({ slug: trackSlug }).first();
@@ -150,6 +164,7 @@ async function filterByUsername(username) {
 
 module.exports = {
   create,
+  deletedTrack,
   filterByUsername,
   getFeaturedTracks,
   getIdBySlug,
