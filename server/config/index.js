@@ -1,6 +1,6 @@
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
 
@@ -14,5 +14,5 @@ module.exports = {
   jwtSecret: process.env.JWT_SECRET,
   nodeEnv: process.env.NODE_ENV,
   port: process.env.PORT,
-  adminPassword: process.env.ADMIN_PASSWORD
-}
+  adminPassword: process.env.ADMIN_PASSWORD,
+};
