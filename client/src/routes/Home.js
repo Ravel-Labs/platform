@@ -69,6 +69,7 @@ function Home() {
       </div>
       <TrackListTable
         shouldShowPrivacy
+        shouldShowDelete={false}
         tracks={featuredTracks}
         title="Today's tracks"
       />

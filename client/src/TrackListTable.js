@@ -1,6 +1,8 @@
+import axios from "axios";
+import { useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import { Lock, LockOpen } from "@material-ui/icons";
+import { Lock, LockOpen, DeleteOutline } from "@material-ui/icons";
 import {
   Box,
   Table,
@@ -11,6 +13,8 @@ import {
   TableRow,
   Typography,
 } from "@material-ui/core";
+
+import ConfirmDialog from './ConfirmDialog';
 
 const useStyles = makeStyles({
   tableRow: {
@@ -26,15 +30,44 @@ const useStyles = makeStyles({
 export default function TrackListTable({
   title,
   tracks,
+  setProfileTracks,
   shouldShowPrivacy = false,
+  shouldShowDelete = false,
   size = "small",
 }) {
   const history = useHistory();
   const classes = useStyles();
+  // const [currentTracks, setCurrentTracks] = useState(tracks);
+  const [selectedDeleteTrack, setSelectedDeleteTrack] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
 
   const onClickTrack = (slug) => {
     history.push(`/track/${slug}`);
   };
+
+  const handleDeleteClickOpen = (track) => {
+    setOpenDelete(true);
+    setSelectedDeleteTrack(track);
+    console.log("clicked delete button for track: ", track.title);
+  }
+
+  const onDeleteClose = () => {
+    setOpenDelete(false);
+    setSelectedDeleteTrack(null);
+  }
+
+  const confirmDeleteTrack = async (slug) => {
+    console.log("confirm delete track title:", title);
+    try {
+      const res = await axios.delete(`api/tracks/delete/${slug}`);
+      if (res.status === 200) {
+        const updatedProfileTracks = tracks.filter((track) => slug !== track.slug);
+        setProfileTracks(updatedProfileTracks);        
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
 
   return (
     <Box>
@@ -49,6 +82,7 @@ export default function TrackListTable({
               <TableCell>Title</TableCell>
               <TableCell>Artist</TableCell>
               <TableCell>Genre</TableCell>
+              {shouldShowDelete && <TableCell></TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -57,7 +91,7 @@ export default function TrackListTable({
                 hover
                 className={classes.tableRow}
                 key={track.id}
-                onClick={() => onClickTrack(track.slug)}
+                // onClick={() => onClickTrack(track.slug)}
               >
                 {shouldShowPrivacy && (
                   <TableCell padding="checkbox">
@@ -68,9 +102,26 @@ export default function TrackListTable({
                     )}
                   </TableCell>
                 )}
-                <TableCell>{track.title}</TableCell>
+                <TableCell 
+                  onClick={() => onClickTrack(track.slug)}>
+                  {track.title}
+                </TableCell>
                 <TableCell>{track.artist}</TableCell>
                 <TableCell>{track.genre}</TableCell>
+                {shouldShowDelete && (
+                  <TableCell padding="checkbox">
+                    <DeleteOutline onClick={() => handleDeleteClickOpen(track)} />
+                      <ConfirmDialog
+                        title="Delete Track"
+                        open={openDelete}
+                        setOpen={setOpenDelete}
+                        onClose={onDeleteClose}
+                        onConfirm={() => confirmDeleteTrack(selectedDeleteTrack.slug)}
+                      >
+                        Are you sure that you want to delete this track?
+                      </ConfirmDialog>
+                  </TableCell>
+                  )}
               </TableRow>
             ))}
           </TableBody>

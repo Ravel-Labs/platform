@@ -105,7 +105,9 @@ function Profile() {
           ) : (
             <TrackListTable
               shouldShowPrivacy
+              shouldShowDelete={true}
               tracks={filteredTracks}
+              setProfileTracks={setProfileTracks}
               title="Tracks"
               size="medium"
             />

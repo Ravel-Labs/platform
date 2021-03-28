@@ -101,7 +101,7 @@ router.post(
 router.delete("/delete/:slug", async function (req, res, next) {
   try {
     const deletedTrack = await DeleteService.Delete(req.params.slug);
-    res.status(200).send(deletedTrack);
+    res.status(200).send(`deleted track with slug ${req.params.slug}`);
   } catch (e) {
     console.log("error", e);
     res.status(400).send(e);

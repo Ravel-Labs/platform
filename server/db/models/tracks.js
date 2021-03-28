@@ -35,8 +35,9 @@ async function deleteTrack(track) {
   try {
     await db("trackCredits").where({trackId: track.id}).del();
     await db("trackFeedbackPrompts").where({trackId: track.id}).del();
+    await db("events").where({trackId: track.id}).del();
     const deletedTrack = await db(tableName).where({id: track.id}).del();
-    console.log(deletedTrack);
+    console.log("deletedTrack: ", track.id);
     return deletedTrack;
   } catch(e) {
     console.error(e);
@@ -164,7 +165,7 @@ async function filterByUsername(username) {
 
 module.exports = {
   create,
-  deletedTrack,
+  deleteTrack,
   filterByUsername,
   getFeaturedTracks,
   getIdBySlug,
