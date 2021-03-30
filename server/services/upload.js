@@ -1,52 +1,67 @@
 var S3 = require("aws-sdk/clients/s3");
+var Sharp = require("sharp");
 
 var config = require("../config");
 
 var TrackFeedbackPrompts = require("../db/models").TrackFeedbackPrompts;
 var Tracks = require("../db/models").Tracks;
 var TrackCredits = require("../db/models").TrackCredits;
+var Users = require("../db/models").Users;
 var util = require("../util/utils.js");
 
 // TODO: Move these constants.
 const trackUploadFolder = "track-uploads";
+const trackImageFolder = "track-images";
+const userProfileImageFolder = "user-profile-images";
 const mimetypeToExtension = {
-  "audio/aac": "aac",
-  "audio/adpcm": "adp",
-  "audio/aiff": "aif",
-  "audio/basic": "au",
-  "audio/midi": "mid",
-  "audio/x-midi": "mid",
-  "audio/mid": "mid",
-  "audio/mp3": "mp3",
-  "audio/mp4": "mp4a",
-  "audio/3gpp": "3gp",
-  "audio/3gpp2": "3g2",
-  "audio/mpeg": "mp3",
-  "audio/ogg": "oga",
-  "audio/opus": "opus",
-  "audio/vnd.dece.audio": "uva",
-  "audio/vnd.digital-winds": "eol",
-  "audio/vnd.dra": "dra",
-  "audio/vnd.dts.hd": "dtshd",
-  "audio/vnd.dts": "dts",
-  "audio/vnd.lucent.voice": "lvp",
-  "audio/vnd.ms-playready.media.pya": "pya",
-  "audio/vnd.nuera.ecelp4800": "ecelp4800",
-  "audio/vnd.nuera.ecelp7470": "ecelp7470",
-  "audio/vnd.nuera.ecelp9600": "ecelp9600",
-  "audio/vnd.rip": "rip",
-  "audio/wav": "wav",
-  "audio/webm": "weba",
-  "audio/x-aac": "aac",
-  "audio/x-aiff": "aif",
-  "audio/x-m4a": "m4a",
-  "audio/x-mpegurl": "m3u",
-  "audio/x-ms-wax": "wax",
-  "audio/x-ms-wma": "wma",
-  "audio/x-pn-realaudio-plugin": "rmp",
-  "audio/x-pn-realaudio": "ram",
-  "audio/x-wav": "wav",
+  "audio": {
+    "audio/aac": "aac",
+    "audio/adpcm": "adp",
+    "audio/aiff": "aif",
+    "audio/basic": "au",
+    "audio/midi": "mid",
+    "audio/x-midi": "mid",
+    "audio/mid": "mid",
+    "audio/mp3": "mp3",
+    "audio/mp4": "mp4a",
+    "audio/3gpp": "3gp",
+    "audio/3gpp2": "3g2",
+    "audio/mpeg": "mp3",
+    "audio/ogg": "oga",
+    "audio/opus": "opus",
+    "audio/vnd.dece.audio": "uva",
+    "audio/vnd.digital-winds": "eol",
+    "audio/vnd.dra": "dra",
+    "audio/vnd.dts.hd": "dtshd",
+    "audio/vnd.dts": "dts",
+    "audio/vnd.lucent.voice": "lvp",
+    "audio/vnd.ms-playready.media.pya": "pya",
+    "audio/vnd.nuera.ecelp4800": "ecelp4800",
+    "audio/vnd.nuera.ecelp7470": "ecelp7470",
+    "audio/vnd.nuera.ecelp9600": "ecelp9600",
+    "audio/vnd.rip": "rip",
+    "audio/wav": "wav",
+    "audio/webm": "weba",
+    "audio/x-aac": "aac",
+    "audio/x-aiff": "aif",
+    "audio/x-m4a": "m4a",
+    "audio/x-mpegurl": "m3u",
+    "audio/x-ms-wax": "wax",
+    "audio/x-ms-wma": "wma",
+    "audio/x-pn-realaudio-plugin": "rmp",
+    "audio/x-pn-realaudio": "ram",
+    "audio/x-wav": "wav",
+  },
+  "image": {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+  }
 };
+
+// const imgMimetypeToExtension = {
+//   "image/jpeg": "jpg",
+//   "image/png": "png",
+// }
 
 /**
  * createBucket is a helper for creating a new AWS S3 bucket.
@@ -72,45 +87,55 @@ const createBucket = async (s3, bucketName) => {
   }
 };
 
+const createUploadParams = async (fileContent, uploadFolder, filetype, filePrefix) => {
+  try {
+    const s3 = new S3({
+      accessKeyId: config.awsAccessKeyId,
+      secretAccessKey: config.awsAccessKeySecret,
+      region: config.awsRegion,
+    });
+
+    const allBucketData = await s3.listBuckets().promise();
+    const hasUploadBucket = allBucketData.Buckets.reduce(
+      (accum, { Name: name }) => {
+        return accum || name === config.awsS3BucketName;
+      },
+      false
+    );
+
+    if (!hasUploadBucket) {
+      console.info("Creating bucket with name ", config.awsS3BucketName);
+      await createBucket(s3, config.awsS3BucketName);
+    }
+
+    const extension = mimetypeToExtension[filetype][fileContent.mimetype];
+    if (!extension) {
+      const msg = `No extension found for mimetype ${fileContent.mimetype}`;
+      console.error(msg);
+      throw Error(msg);
+    }
+
+    const key = `${uploadFolder}/${filePrefix.replace(
+      " ",
+      "_"
+    )}-${Date.now().toString()}.${extension}`;
+    const base64data = Buffer.from(fileContent.buffer, "binary");
+    const params = {
+      ACL: "public-read",
+      Body: base64data,
+      Bucket: config.awsS3BucketName,
+      Key: key,
+    };
+    return {s3:s3, params:params};
+  } catch(e) {
+    console.error("error during upload configuration: ", e);
+  }
+};
+
 async function Upload(track, fileContent, userId) {
   const { title, description, genre, isPrivate, prompts } = track;
-  const s3 = new S3({
-    accessKeyId: config.awsAccessKeyId,
-    secretAccessKey: config.awsAccessKeySecret,
-    region: config.awsRegion,
-  });
 
-  const allBucketData = await s3.listBuckets().promise();
-  const hasTrackUploadBucket = allBucketData.Buckets.reduce(
-    (accum, { Name: name }) => {
-      return accum || name === config.awsS3BucketName;
-    },
-    false
-  );
-
-  if (!hasTrackUploadBucket) {
-    console.info("Creating bucket with name ", config.awsS3BucketName);
-    await createBucket(s3, config.awsS3BucketName);
-  }
-
-  const extension = mimetypeToExtension[fileContent.mimetype];
-  if (!extension) {
-    const msg = `No extension found for mimetype ${fileContent.mimetype}`;
-    console.error(msg);
-    throw Error(msg);
-  }
-
-  const key = `${trackUploadFolder}/${title.replace(
-    " ",
-    "_"
-  )}-${Date.now().toString()}.${extension}`;
-  const base64data = Buffer.from(fileContent.buffer, "binary");
-  const params = {
-    ACL: "public-read",
-    Body: base64data,
-    Bucket: config.awsS3BucketName,
-    Key: key,
-  };
+  const {s3, params} = await createUploadParams(fileContent, trackUploadFolder, "audio", title);
 
   try {
     var hrstart = process.hrtime();
@@ -157,6 +182,46 @@ async function Upload(track, fileContent, userId) {
   }
 }
 
+// options is json object ex: options { resize: { width: 300, height: 400 } }
+async function UserProfileImageUpload(imageContent, type, userId, options) {
+  const user = await User.getById(userId);
+  const userFilePrefix = `${user.username}${userId}`;
+  const {s3, params} = createUploadParams(fileContent, userProfileImageFolder, "image", userFilePrefix);
+  
+  if (
+    typeof options !== "undefined" &&
+    typeof options.resize !== "undefined" &&
+    typeof options.resize.width === "number" &&
+    typeof options.resize.height === "number"
+  ) {
+    let width = options.resize.width;
+    let height = options.resize.height;
+
+    Sharp(params.Body)
+      .resize(width, height)
+      .then((buffer) => params.Body = buffer);
+  }
+
+  try {
+    var hrstart = process.hrtime();
+    const res = await s3.upload(params).promise();
+    var hrend = process.hrtime(hrstart);
+
+    console.info(
+      "END Upload time (hr): %ds %dms",
+      hrend[0],
+      hrend[1] / 1000000
+    );
+
+    const updatedUser = await Users.updateUserProfileField(userId, "imagePath", res.Location);
+    return updatedUser;
+  } catch(e) {
+    console.error("error upload", e);
+    throw e;
+  }
+}
+
 module.exports = {
   Upload,
+  UserProfileImageUpload
 };

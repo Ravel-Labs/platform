@@ -10,6 +10,7 @@ const defaultReturnColumns = [
   "path",
   "slug",
   "isPrivate",
+  "imagePath",
 ];
 
 async function create(title, path, genre, additionalFields = {}) {
@@ -163,6 +164,17 @@ async function filterByUsername(username) {
   }
 }
 
+async function updateTrackImage(trackSlug, trackImagePath) {
+  try {
+    const tracks = await db(tableName)
+      .where({slug: trackSlug})
+      .update({imagePath: trackImagePath});
+    return tracks;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 module.exports = {
   create,
   deleteTrack,
@@ -172,5 +184,6 @@ module.exports = {
   getPrivacyBySlug,
   getTrackBySlug,
   getUserIdBySlug,
+  updateTrackImage,
   updateTrackPrivacy,
 };

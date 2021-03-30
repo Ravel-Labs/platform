@@ -18,6 +18,10 @@ const defaultReturnColumns = [
   "roleId",
   "referrerId",
   "invitesRemaining",
+  "imagePath",
+  "bio",
+  "city",
+  "country"
 ];
 
 async function getUserPrivileges(roleId) {
@@ -161,6 +165,28 @@ async function getUserInvitesRemaining(userId) {
   }
 }
 
+// async function updateUserProfileImage(userId, profileImagePath) {
+//   try {
+//     const user = await db(tableName)
+//       .where({id: userId})
+//       .update({imagePath: profileImagePath});
+//     return user;
+//   } catch(e) {
+//     console.error(e);
+//   }
+// }
+
+async function updateUserProfileField(userId, fieldName, fieldValue) {
+  try {
+    const user = await db(tableName)
+      .where({id: userId})
+      .update({fieldName: fieldValue})
+    return user;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 module.exports = {
   create,
   decrementInvitesRemaining,
@@ -169,6 +195,7 @@ module.exports = {
   getByUsername,
   getRoleIdbyUserId,
   getUserInvitesRemaining,
+  updateUserProfileField,
   validateCredentials,
   ROLES,
 };
