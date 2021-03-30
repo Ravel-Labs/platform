@@ -39,5 +39,5 @@ jobs:
 
       # Runs tests
       - name: Run tests
-        run: npm test -- --forceExit
+        run: NODE_ENV=testCI npm test -- --forceExit
         working-directory: server

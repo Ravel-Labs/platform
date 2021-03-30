@@ -10,7 +10,8 @@ const defaultConfig = {
 };
 
 module.exports = {
-  test: {
+  // testCI runs test suite in CI.
+  testCI: {
     ...defaultConfig,
     connection: {
       host: "postgres",
@@ -19,6 +20,11 @@ module.exports = {
       password: "postgres",
       database: "ravel_test",
     },
+  },
+  // test runs in local test runs.
+  test: {
+    ...defaultConfig,
+    connection: process.env.DATABASE_URL_LOCAL_TEST,
   },
   development: {
     ...defaultConfig,
