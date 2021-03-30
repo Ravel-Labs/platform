@@ -1,4 +1,5 @@
-const knexConfiguration = require("../knexfile")[process.env.NODE_ENV];
+var config = require("../config");
+const knexConfiguration = require("../knexfile")[config.nodeEnv];
 const knex = require("knex");
 
 const setup = async () => {

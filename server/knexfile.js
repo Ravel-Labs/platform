@@ -1,3 +1,5 @@
+var config = require("./config");
+
 const defaultConfig = {
   client: "pg",
   migrations: {
@@ -10,6 +12,15 @@ const defaultConfig = {
 };
 
 module.exports = {
+  development: {
+    ...defaultConfig,
+    connection: config.databaseURLDev,
+  },
+  // test runs in local test runs.
+  test: {
+    ...defaultConfig,
+    connection: config.databaseURLTest,
+  },
   // testCI runs test suite in CI.
   testCI: {
     ...defaultConfig,
@@ -21,17 +32,8 @@ module.exports = {
       database: "ravel_test",
     },
   },
-  // test runs in local test runs.
-  test: {
-    ...defaultConfig,
-    connection: process.env.DATABASE_URL_LOCAL_TEST,
-  },
-  development: {
-    ...defaultConfig,
-    connection: process.env.DATABASE_URL_DEV,
-  },
   production: {
     ...defaultConfig,
-    connection: process.env.DATABASE_URL,
+    connection: config.databaseURLProd,
   },
 };
