@@ -33,8 +33,8 @@ async function getPlaybackStatsByTrackId(trackId) {
           "sessionId", \
           type, \
           CASE \
-            WHEN "eventType" = 5 THEN ("eventData"::jsonb -> \'duration\')::float / 1000.00 \
-            ELSE ("eventData"::jsonb -> \'currentTime\')::float \
+            WHEN "eventType" = 5 THEN ("eventData"::jsonb ->> \'duration\')::float / 1000.00 \
+            ELSE ("eventData"::jsonb ->> \'currentTime\')::float \
           END as "trackTime", \
           "createdAt" \
           FROM events \
