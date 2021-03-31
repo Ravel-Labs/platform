@@ -6,7 +6,7 @@ var config = require("../config");
 var TrackFeedbackPrompts = require("../db/models").TrackFeedbackPrompts;
 var Tracks = require("../db/models").Tracks;
 var TrackCredits = require("../db/models").TrackCredits;
-var Users = require("../db/models").Users;
+var User = require("../db/models").User;
 var util = require("../util/utils.js");
 
 // TODO: Move these constants.
@@ -109,6 +109,7 @@ const createUploadParams = async (fileContent, uploadFolder, filetype, filePrefi
     }
 
     const extension = mimetypeToExtension[filetype][fileContent.mimetype];
+    console.log(extension);
     if (!extension) {
       const msg = `No extension found for mimetype ${fileContent.mimetype}`;
       console.error(msg);
@@ -183,10 +184,12 @@ async function Upload(track, fileContent, userId) {
 }
 
 // options is json object ex: options { resize: { width: 300, height: 400 } }
-async function UserProfileImageUpload(imageContent, type, userId, options) {
-  const user = await User.getById(userId);
-  const userFilePrefix = `${user.username}${userId}`;
-  const {s3, params} = createUploadParams(fileContent, userProfileImageFolder, "image", userFilePrefix);
+async function UserProfileImageUpload(imageContent, userId, options) {
+  console.log(userId);
+  const username = await User.getById(userId, ["username"]);
+  console.log(username.username);
+  const userFilePrefix = `${username.username}${userId}`;
+  const {s3, params} = await createUploadParams(imageContent, userProfileImageFolder, "image", userFilePrefix);
   
   if (
     typeof options !== "undefined" &&
@@ -197,9 +200,8 @@ async function UserProfileImageUpload(imageContent, type, userId, options) {
     let width = options.resize.width;
     let height = options.resize.height;
 
-    Sharp(params.Body)
-      .resize(width, height)
-      .then((buffer) => params.Body = buffer);
+    const newParamBody = await Sharp(params.Body).resize(width, height).toBuffer();
+    params.Body = newParamBody;
   }
 
   try {
@@ -213,8 +215,10 @@ async function UserProfileImageUpload(imageContent, type, userId, options) {
       hrend[1] / 1000000
     );
 
-    const updatedUser = await Users.updateUserProfileField(userId, "imagePath", res.Location);
-    return updatedUser;
+    await User.updateUserProfileField(userId, "imagePath", res.Location);
+    const user = await User.getById(userId);
+    console.log(user);
+    return user;
   } catch(e) {
     console.error("error upload", e);
     throw e;

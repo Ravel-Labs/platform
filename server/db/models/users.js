@@ -180,7 +180,7 @@ async function updateUserProfileField(userId, fieldName, fieldValue) {
   try {
     const user = await db(tableName)
       .where({id: userId})
-      .update({fieldName: fieldValue})
+      .update(fieldName, fieldValue);
     return user;
   } catch(e) {
     console.error(e);
