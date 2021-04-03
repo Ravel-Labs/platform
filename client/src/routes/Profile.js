@@ -7,6 +7,7 @@ import { useRouteMatch, Link as RouterLink } from "react-router-dom";
 import { UserContext } from "../Context";
 import TrackListTable from "../TrackListTable";
 import PageWrapper from "../PageWrapper";
+import ProfileHeader from "../ProfileHeader";
 
 const useStyles = makeStyles({
   bodyText: {
@@ -19,6 +20,7 @@ function Profile() {
   const classes = useStyles();
   const [profileTracks, setProfileTracks] = useState([]);
   const [profileUser, setProfileUser] = useState(null);
+  const [profileStats, setProfileStats] = useState(null);
   const { user } = useContext(UserContext);
   let match = useRouteMatch();
 
@@ -45,8 +47,19 @@ function Profile() {
         setProfileTracks([]);
       }
     }
+
+    async function fetchProfileStats() {
+      try {
+        const res = await axios.get(`/api/user/profile-stats/${match.params.username}`);
+        setProfileStats(res.data);
+      } catch(e) {
+        console.error(e);
+        setProfileStats(null);
+      }
+    }
     fetchProfileUser();
     fetchProfileTracks();
+    fetchProfileStats();
   }, [match.params.username]);
 
   // Only show public tracks, unless the logged-in user was referred by this user
@@ -74,6 +87,11 @@ function Profile() {
 
   return (
     <PageWrapper>
+    {(profileUser && profileTracks && profileStats) && 
+      <ProfileHeader 
+        profileUser={profileUser} 
+        tracks={profileTracks} 
+        profileStats={profileStats} />}
       {profileUser && (
         <Box>
           <Typography component="h1" variant="h2">

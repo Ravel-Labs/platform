@@ -186,9 +186,9 @@ async function Upload(track, fileContent, userId) {
 // options is json object ex: options { resize: { width: 300, height: 400 } }
 async function UserProfileImageUpload(imageContent, userId, options) {
   console.log(userId);
-  const username = await User.getById(userId, ["username"]);
-  console.log(username.username);
-  const userFilePrefix = `${username.username}${userId}`;
+  const { username } = await User.getById(userId, ["username"]);
+  console.log(username);
+  const userFilePrefix = `${username}${userId}`;
   const {s3, params} = await createUploadParams(imageContent, userProfileImageFolder, "image", userFilePrefix);
   
   if (

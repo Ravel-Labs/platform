@@ -4,6 +4,7 @@ var router = express.Router();
 
 var UploadService = require("../services/upload");
 var User = require("../db/models").User;
+var Feedback = require("../db/models").Feedback;
 var tokenMiddleware = require("../middleware/token");
 
 
@@ -12,6 +13,10 @@ router.get("/:username", async function (req, res, next) {
   const user = await User.getByUsername(req.params.username, [
     "displayName",
     "createdAt",
+    "username",
+    "bio",
+    "city",
+    "country"
   ]);
   res.status(200).send(user);
 });
@@ -34,6 +39,20 @@ router.post(
     }
   }
 );
+
+router.get("/profile-stats/:username", async function (req, res, next) {
+  try {
+    const feedbackCount = await Feedback.getFeedbackCountByUsername(req.params.username);
+    const avgFeedbackRating = await Feedback.getAvgFeedbackRatingByUsername(req.params.username);
+    const profileStats = {
+      ...feedbackCount,
+      ...avgFeedbackRating
+    };
+    res.status(200).send(profileStats);
+  } catch(e) {
+    console.error(e);
+  }
+})
 
 // GET resource for the currently logged in user.
 router.get("/", async function (req, res, next) {

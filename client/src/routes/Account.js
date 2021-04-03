@@ -19,7 +19,7 @@ import { AddCircle, CheckBox, CheckBoxOutlineBlank } from "@material-ui/icons";
 
 import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
-import ImageUploadForm from "../ImageUploadForm";
+// import ImageUploadForm from "../ImageUploadForm";
 
 const profileFields = [
   ["name", "Name"],
@@ -158,7 +158,7 @@ function Profile() {
       {match.params.username !== user?.username && <Redirect to="/" />}
       {user && (
         <Grid container spacing={6}>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Typography variant="h4" component="h2">
               Account info
             </Typography>
@@ -179,12 +179,6 @@ function Profile() {
                 </TableBody>
               </Table>
             </TableContainer>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="h4" component="h2">
-              Profile Image
-            </Typography>
-            <ImageUploadForm />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h4" component="h2">

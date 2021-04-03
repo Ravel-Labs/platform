@@ -67,8 +67,45 @@ async function create(trackId, listenerUserId, value, promptId, fields = {}) {
   }
 }
 
+async function getFeedbackCountByUsername(username) {
+  try {
+    const feedbackCount = await db(tableName)
+      .join("tracks", {"tracks.id": `${tableName}.trackId`})
+      .join("trackCredits", {"trackCredits.trackId": "tracks.id"})
+      .join("users", {"users.id": "trackCredits.userId"})
+      .where({"users.username": username})
+      .count("* as feedbackCount")
+      .first();
+    console.log(feedbackCount);
+    return feedbackCount;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+async function getAvgFeedbackRatingByUsername(username) {
+  try {
+    const avgFeedbackRating = await db(tableName)
+      .avg({avgRating: "value"})
+      .join("tracks", {"tracks.id": `${tableName}.trackId`})
+      .join("trackCredits", {"trackCredits.trackId": "tracks.id"})
+      .join("users", {"users.id": "trackCredits.userId"})
+      .where({"users.username": username})
+      .first();
+
+    rating = parseFloat(avgFeedbackRating.avgRating);
+    avgFeedbackRating.avgRating = rating.toPrecision(2);
+    console.log(avgFeedbackRating);
+    return avgFeedbackRating;
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 module.exports = {
   create,
   filterForTrackIdUserId,
   getFeedbackPromptsbyTrackId,
+  getFeedbackCountByUsername,
+  getAvgFeedbackRatingByUsername,
 };
