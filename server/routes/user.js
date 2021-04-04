@@ -5,6 +5,7 @@ var router = express.Router();
 var UploadService = require("../services/upload");
 var User = require("../db/models").User;
 var Feedback = require("../db/models").Feedback;
+var Links = require("../db/models").Links;
 var tokenMiddleware = require("../middleware/token");
 
 
@@ -16,9 +17,16 @@ router.get("/:username", async function (req, res, next) {
     "username",
     "bio",
     "city",
-    "country"
+    "country",
+    "imagePath"
   ]);
-  res.status(200).send(user);
+  const links = await Links.getLinksByUsername(req.params.username);
+  const profileUser = {
+    ...user,
+    ...links
+  }
+  console.log(profileUser);
+  res.status(200).send(profileUser);
 });
 
 var processFile = multer();

@@ -84,7 +84,7 @@ function Profile() {
         user?.id === track.userId)
     );
   });
-
+  console.log("Profile", profileUser);
   return (
     <PageWrapper>
     {(profileUser && profileTracks && profileStats) && 
@@ -125,7 +125,8 @@ function Profile() {
               shouldShowPrivacy
               shouldShowDelete={true}
               tracks={filteredTracks}
-              setProfileTracks={setProfileTracks}
+              user={profileUser}
+              setProfileUser={setProfileUser}
               title="Tracks"
               size="medium"
             />

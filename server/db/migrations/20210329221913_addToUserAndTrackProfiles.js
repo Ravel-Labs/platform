@@ -12,9 +12,10 @@ exports.up = function(knex) {
     })
     .createTable("links", (t) => {
       t.increments("id").primary();
-      t.string("link").notNullable();
+      t.string("url").notNullable();
+      t.string("name").notNullable();
       t.integer("userId").references("id").inTable("users").notNullable();
-      t.unique(["link", "userId"]);
+      t.unique(["url", "userId"]);
     })
 };
 

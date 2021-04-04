@@ -12,9 +12,11 @@ import {
   TableContainer,
   TableRow,
   Typography,
+  Grid,
 } from "@material-ui/core";
 
 import ConfirmDialog from './ConfirmDialog';
+import TrackItem from "./TrackItem";
 
 const useStyles = makeStyles({
   tableRow: {
@@ -31,6 +33,7 @@ export default function TrackListTable({
   title,
   tracks,
   setProfileTracks,
+  user,
   shouldShowPrivacy = false,
   shouldShowDelete = false,
   size = "small",
@@ -69,8 +72,25 @@ export default function TrackListTable({
     }
   }
 
+  console.log("TrackListTable", user);
+
   return (
-    <Box>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+    >
+    <Grid 
+      container 
+      spacing={2}
+      justify="center"
+      alignItems="center">
+        {tracks.map((track) => {
+          return <TrackItem key={track.id} track={track} user={user} />
+        })}
+    </Grid>
+    </Box>
+/*    <Box>
       <Typography variant="h5" component="h3" className={classes.header}>
         {title}
       </Typography>
@@ -127,6 +147,6 @@ export default function TrackListTable({
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+    </Box>*/
   );
 }

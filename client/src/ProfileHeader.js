@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "flex",
   },
   text: {
-    // borderLeft: "2px solid black",
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
@@ -112,7 +111,7 @@ function ProfileHeader({profileUser, tracks, profileStats}) {
         </Typography>
         <Box component="span" className={classes.Box}>
           {/*<Button variant="outlined">Edit Profile</Button>*/}
-          <EditProfile />
+          <EditProfile profileUser={profileUser} />
         </Box>
       </Grid>
     </Grid>
