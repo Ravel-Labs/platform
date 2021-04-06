@@ -12,7 +12,7 @@ router.post("/:slug", async function (req, res, next) {
         .status(404)
         .send(`No track found for slug ${req.body.trackSlug}`);
     }
-    // TODO: Resolve query
+
     const playbackStats = await Stats.getPlaybackStatsByTrackId(track.id);
     const feedbackStats = await Stats.getFeedbackStatsByTrackId(track.id);
     const resData = {

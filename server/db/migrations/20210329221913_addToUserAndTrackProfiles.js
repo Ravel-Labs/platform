@@ -6,14 +6,15 @@ exports.up = function(knex) {
     })
     .table("users", (t) => {
       t.string("imagePath").nullable();
-      t.text("bio").nullable();
-      t.string("city").nullable();
-      t.string("country").nullable();
+      t.text("bio").notNullable().defaultTo("");
+      t.string("city").notNullable().defaultTo("");
+      t.string("country").notNullable().defaultTo("");
     })
     .createTable("links", (t) => {
       t.increments("id").primary();
       t.string("url").notNullable();
       t.string("name").notNullable();
+      t.string("type").notNullable();
       t.integer("userId").references("id").inTable("users").notNullable();
       t.unique(["url", "userId"]);
     })

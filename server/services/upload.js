@@ -58,11 +58,6 @@ const mimetypeToExtension = {
   }
 };
 
-// const imgMimetypeToExtension = {
-//   "image/jpeg": "jpg",
-//   "image/png": "png",
-// }
-
 /**
  * createBucket is a helper for creating a new AWS S3 bucket.
  * @param  {aws S3} s3
@@ -186,9 +181,9 @@ async function Upload(track, fileContent, userId) {
 // options is json object ex: options { resize: { width: 300, height: 400 } }
 async function UserProfileImageUpload(imageContent, userId, options) {
   console.log(userId);
-  const { username } = await User.getById(userId, ["username"]);
-  console.log(username);
-  const userFilePrefix = `${username}${userId}`;
+  const user = await User.getById(userId, ["username"]);
+  console.log(user.username);
+  const userFilePrefix = `${user.username}${userId}`;
   const {s3, params} = await createUploadParams(imageContent, userProfileImageFolder, "image", userFilePrefix);
   
   if (
@@ -215,10 +210,10 @@ async function UserProfileImageUpload(imageContent, userId, options) {
       hrend[1] / 1000000
     );
 
-    await User.updateUserProfileField(userId, "imagePath", res.Location);
-    const user = await User.getById(userId);
-    console.log(user);
-    return user;
+    // await User.updateUserProfileField(userId, "imagePath", res.Location);
+    // const user = await User.getById(userId);
+    // console.log(user);
+    return res.Location;
   } catch(e) {
     console.error("error upload", e);
     throw e;

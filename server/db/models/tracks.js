@@ -32,13 +32,12 @@ async function create(title, path, genre, additionalFields = {}) {
   }
 }
 
-async function deleteTrack(track) {
+async function deleteById(trackId) {
   try {
-    await db("trackCredits").where({trackId: track.id}).del();
-    await db("trackFeedbackPrompts").where({trackId: track.id}).del();
-    await db("events").where({trackId: track.id}).del();
-    const deletedTrack = await db(tableName).where({id: track.id}).del();
-    console.log("deletedTrack: ", track.id);
+    await db("trackCredits").where({trackId: trackId}).del();
+    await db("trackFeedbackPrompts").where({trackId: trackId}).del();
+    await db("events").where({trackId: trackId}).del();
+    const deletedTrack = await db(tableName).where({id: trackId}).del();
     return deletedTrack;
   } catch(e) {
     console.error(e);
@@ -177,7 +176,7 @@ async function updateTrackImage(trackSlug, trackImagePath) {
 
 module.exports = {
   create,
-  deleteTrack,
+  deleteById,
   filterByUsername,
   getFeaturedTracks,
   getIdBySlug,

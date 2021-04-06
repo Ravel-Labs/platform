@@ -31,22 +31,59 @@ router.get("/:username", async function (req, res, next) {
 
 var processFile = multer();
 
-router.post(
-  "/update-profile-image",
+router.post("/update/:username",
   tokenMiddleware.requireUser,
-  processFile.single("file"),
+  processFile.single("file")
   async function (req, res, next) {
-    try {
-      const user = await UploadService.UserProfileImageUpload(
-        req.file, 
-        req.userId, 
-        { resize: { width: 1000, height: 1000 }});
-      res.status(201).send(user);
-    } catch(e) {
-      console.error(e);
+  const userObject = {};
+  const userFilter = Object.fromEntries(Object.entries(req.body)).filter(([key, val]) => key =! "links");
+  try {
+    if (req.body) {
+      const userFilter = Object.fromEntries(
+        Object.entries(req.body))
+          .filter(([key, val]) => key =! "links");
+      userObject = {...userObject, ...userFilter};
     }
+
+    if (req.file) {
+      const imagePath = await UploadService.UserProfileImageUpload(
+        req.file,
+        req.userId,
+        { resize: { width: 1000, height: 1000 }});
+      userObject = {...userObject, ...{"imagePath": imagePath}};
+    }
+
+    if (userObject) {
+     await User.updateUser(req.userId, userObject);    
+    }
+
+    if (req.body.links) {
+      const links = await Links.bulkCreate(req.body.links);
+    }
+
+    res.status(201).send(`updated user: ${req.params.username} with userObject: ${userObject}`);
+
+  } catch(e) {
+    console.error(e);
   }
-);
+});
+
+// router.post(
+//   "/update-profile-image",
+//   tokenMiddleware.requireUser,
+//   processFile.single("file"),
+//   async function (req, res, next) {
+//     try {
+//       const user = await UploadService.UserProfileImageUpload(
+//         req.file, 
+//         req.userId, 
+//         { resize: { width: 1000, height: 1000 }});
+//       res.status(201).send(user);
+//     } catch(e) {
+//       console.error(e);
+//     }
+//   }
+// );
 
 router.get("/profile-stats/:username", async function (req, res, next) {
   try {

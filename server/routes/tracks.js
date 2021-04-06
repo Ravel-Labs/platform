@@ -98,7 +98,7 @@ router.post(
   }
 );
 
-router.delete("/delete/:slug", async function (req, res, next) {
+router.delete("/:slug", async function (req, res, next) {
   try {
     const deletedTrack = await DeleteService.Delete(req.params.slug);
     res.status(200).send(`deleted track with slug ${req.params.slug}`);
