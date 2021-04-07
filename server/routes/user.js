@@ -19,7 +19,13 @@ router.get("/:username", async function (req, res, next) {
     "country",
     "imagePath",
   ]);
-  const links = await Links.getLinksByUsername(req.params.username);
+  const linkFields = [
+    "links.id AS linkId",
+    "url",
+    "links.name AS linkName",
+    "userId",
+  ];
+  const links = await Links.getByUsername(req.params.username, linkFields);
   const profileUser = {
     ...user,
     ...links,

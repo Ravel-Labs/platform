@@ -1,26 +1,14 @@
 var db = require("../knex");
 
 const tableName = "links";
-const defaultReturnColumns = [
-  "id",
-  "url",
-  "name",
-  "type",
-  "userId"
-];
+const defaultReturnColumns = ["id", "url", "name", "type", "userId"];
 
-async function getByUsername(username, fields=defaultReturnColumns) {
-  const fields = [
-    "links.id AS linkId",
-    "url",
-    "links.name AS linkName",
-    "userId"
-  ];
+async function getByUsername(username, fields = defaultReturnColumns) {
   try {
     const links = await db(tableName)
       .select(fields)
-      .join("users", {"users.id": `${tableName}.userId`})
-      .where({"users.username": username});
+      .join("users", { "users.id": `${tableName}.userId` })
+      .where({ "users.username": username });
     console.log(links);
     return links;
   } catch (e) {
@@ -30,10 +18,7 @@ async function getByUsername(username, fields=defaultReturnColumns) {
 
 async function bulkCreate(toCreate) {
   try {
-    const links = await db(tableName).insert(
-      toCreate,
-      defaultReturnColumns
-    );
+    const links = await db(tableName).insert(toCreate, defaultReturnColumns);
     return links;
   } catch (e) {
     console.error(e);
