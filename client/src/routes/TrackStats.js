@@ -121,7 +121,6 @@ function TrackStats() {
           Back
         </Button>
       </Typography>
-      {/* TODO: Display playback stats once query is resolved. */}
         <StatGroupDisplay stats={stats?.playbackStats} title="Playback stats" />
     </PageWrapper>
   );

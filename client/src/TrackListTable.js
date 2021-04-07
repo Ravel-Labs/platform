@@ -62,7 +62,7 @@ export default function TrackListTable({
   const confirmDeleteTrack = async (slug) => {
     console.log("confirm delete track title:", title);
     try {
-      const res = await axios.delete(`api/tracks/delete/${slug}`);
+      const res = await axios.delete(`api/tracks/${slug}`);
       if (res.status === 200) {
         const updatedProfileTracks = tracks.filter((track) => slug !== track.slug);
         setProfileTracks(updatedProfileTracks);        
