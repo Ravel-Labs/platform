@@ -1,10 +1,7 @@
-import react from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
-import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import EditProfile from "./EditProfile";
 
@@ -34,6 +31,8 @@ const useStyles = makeStyles((theme) => ({
 
 function ProfileHeader({ profileUser, tracks, profileStats }) {
   const classes = useStyles();
+  const hasStats =
+    profileStats.feedbackCount > 0 || !isNaN(profileStats.avgRating);
   return (
     <Box mx={30}>
       <Grid container spacing={2} alignItems="stretch">
@@ -44,29 +43,33 @@ function ProfileHeader({ profileUser, tracks, profileStats }) {
             className={classes.profileImage}
           ></Avatar>
         </Grid>
-        <Grid item xs={3} className={classes.gridTextDisplay}>
-          <Typography component="h2" variant="h5" className={classes.text}>
-            {tracks.length} tracks
-          </Typography>
-        </Grid>
-        <Grid item xs={3} className={classes.gridTextDisplay}>
-          <Typography component="h2" variant="h5" className={classes.text}>
-            {profileStats.feedbackCount} ratings
-          </Typography>
-        </Grid>
-        <Grid item xs={3} className={classes.gridTextDisplay}>
-          {profileStats.feedbackCount > 0 ? (
-            <Typography component="h2" variant="h5" className={classes.text}>
-              {profileStats.avgRating} rating
-            </Typography>
-          ) : (
-            <>
-              <Typography component="h2" variant="h5" className={classes.text}>
-                no rating, yet
+        {hasStats && (
+          <>
+            <Grid item xs={3} className={classes.gridTextDisplay}>
+              <Typography variant="h5" className={classes.text}>
+                {tracks.length} {tracks > 1 ? "tracks" : "track"}
               </Typography>
-            </>
-          )}
-        </Grid>
+            </Grid>
+            <Grid item xs={3} className={classes.gridTextDisplay}>
+              <Typography variant="h5" className={classes.text}>
+                {profileStats.feedbackCount} ratings
+              </Typography>
+            </Grid>
+            <Grid item xs={3} className={classes.gridTextDisplay}>
+              {profileStats.feedbackCount > 0 ? (
+                <Typography variant="h5" className={classes.text}>
+                  {profileStats.avgRating} rating
+                </Typography>
+              ) : (
+                <>
+                  <Typography variant="h5" className={classes.text}>
+                    no rating, yet
+                  </Typography>
+                </>
+              )}
+            </Grid>
+          </>
+        )}
         <Grid item xs={12}>
           <Typography component="h2" variant="h4" align="left">
             {profileUser.displayName}
