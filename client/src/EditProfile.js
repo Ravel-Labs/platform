@@ -1,26 +1,37 @@
-import react, { useState } from "react";
-import { 
+import { useState } from "react";
+import {
   Avatar,
+  Box,
   Button,
   Dialog,
-  DialogActions, 
+  DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Grid,
-  TextField
+  TextField,
 } from "@material-ui/core";
+import { Edit } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
+
+import placeholderProfileImage from "./placeholder_profile.png";
 
 const useStyles = makeStyles((theme) => ({
   profileImage: {
     height: theme.spacing(20),
-    width: theme.spacing(20)
+    width: theme.spacing(20),
   },
   input: {
-    display: "none"
-  }
-
+    display: "none",
+  },
+  editContainer: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  profileImageFormGroup: {
+    paddingBottom: "24px",
+  },
 }));
 
 const formFields = {
@@ -28,47 +39,39 @@ const formFields = {
   bio: "bio",
   city: "city",
   country: "country",
-  url: "url",
-  urlName: "urlName"
-}
+  link: "link",
+};
 
-
-
-function EditProfile({profileUser}) {
+function EditProfile({
+  errorMessage,
+  isDisabled,
+  isOpen,
+  onClose,
+  onSubmit,
+  profileUser,
+}) {
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [newImageDataUrl, setNewImageDataUrl] = useState(null);
   const [fieldVals, setFieldVals] = useState({
-    bio: profileUser.bio,
-    city: profileUser.city,
-    country: profileUser.country,
-    links: [profileUser.links]
+    bio: profileUser.bio || "",
+    city: profileUser.city || "",
+    country: profileUser.country || "",
+    link: profileUser.link?.url || "",
   });
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
     const formData = new FormData();
 
     Object.entries(formFields).forEach(([_, fieldName]) => {
       const val = fieldVals[fieldName];
       formData.append(fieldName, val);
     });
-    console.log(formData.get("bio"), formData.get("city"));
-    setOpen(false);
-  }
+
+    onSubmit(formData);
+  };
 
   const onChangeField = (fieldName, value) => {
-    // setErrorMessage("");
     setFieldVals((vals) => {
       return {
         ...vals,
@@ -84,26 +87,26 @@ function EditProfile({profileUser}) {
       return;
     }
 
+    // Read the file so we can show the preview url.
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      setNewImageDataUrl(e.target.result);
+    };
+    reader.readAsDataURL(file);
+
     setFieldVals((vals) => {
       return {
         ...vals,
-      file: file
-    };
+        file: file,
+      };
     });
   };
 
   return (
-    <div>
-      <Button 
-        variant="outlined" 
-        onClick={handleClickOpen}
-        size="small"
-      >
-        Edit Profile
-      </Button>
-      <Dialog 
-        open={open} 
-        onClose={handleClose} 
+    <Box className={classes.editContainer}>
+      <Dialog
+        open={isOpen}
+        onClose={onClose}
         aria-labelledby="form-dialog-title"
         fullWidth
         maxWidth="md"
@@ -113,86 +116,87 @@ function EditProfile({profileUser}) {
           <DialogContentText>
             Please take a couple seconds to fill out your profile details.
           </DialogContentText>
-          <form
-            encType="multipart/form-data"
-            disabled={isLoading}
-          >
-          <Avatar
-            alt="random"
-            src={"https://picsum.photos/250/250"}
-            className={classes.profileImage}
-          >
-          </Avatar>
-          <input
-            accept="image/*"
-            className={classes.input}
-            id="contained-button-file"
-            type="file"
-            name="file"
-            onChange={onProfileImageChange}
-          />
-          <label htmlFor="contained-button-file">
-            <Button
-              color="primary"
-              component="span"
-            >
-              Change Profile Photo
-            </Button>
-          </label>
-          <Grid container direction="column" spacing={2}>
-          <Grid item>
-            <TextField 
-              id="bio" 
-              label="Bio" 
-              type="text" 
-              multiline 
-              fullWidth
-              value={fieldVals.bio}
-              onChange={(e) => onChangeField(formFields.bio, e.target.value)}
-              variant="outlined" 
-              rows="5" 
-              rowsMax="10"
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              id="city"
-              label="City"
-              type="text"
-              value={fieldVals.city}
-              onChange={(e) => onChangeField(formFields.city, e.target.value)}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              id="country"
-              label="Country"
-              type="text"
-              value={fieldVals.country}
-              onChange={(e) => onChangeField(formFields.country, e.target.value)}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              id="website"
-              label="Website"
-              type="url"
-              value={fieldVals.links.url}
-              onChange={(e) => onChangeField(formFields.url, e.target.value)}
-            />
-            <TextField
-              id="website-name"
-              label="Website Name"
-              type="text"
-              value={fieldVals.urlName}
-              onChange={(e) => onChangeField(formFields.urlName, e.target.value)}
-            />
-          </Grid>
-        </Grid>
-        </form>
+          <form encType="multipart/form-data" disabled={isDisabled}>
+            <div className={classes.profileImageFormGroup}>
+              <Avatar
+                alt="random"
+                src={
+                  newImageDataUrl ||
+                  profileUser.imagePath ||
+                  placeholderProfileImage
+                }
+                className={classes.profileImage}
+              ></Avatar>
+              <input
+                accept="image/*"
+                className={classes.input}
+                id="contained-button-file"
+                type="file"
+                name="file"
+                onChange={onProfileImageChange}
+              />
+              <label htmlFor="contained-button-file">
+                <Button color="primary" component="span" startIcon={<Edit />}>
+                  Change Photo
+                </Button>
+              </label>
+            </div>
+            <Grid container direction="column" spacing={2}>
+              <Grid item>
+                <TextField
+                  id="bio"
+                  label="Bio"
+                  type="text"
+                  multiline
+                  fullWidth
+                  value={fieldVals.bio || ""}
+                  onChange={(e) =>
+                    onChangeField(formFields.bio, e.target.value)
+                  }
+                  variant="outlined"
+                  rows="5"
+                  rowsMax="10"
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  id="city"
+                  label="City"
+                  type="text"
+                  value={fieldVals.city || ""}
+                  onChange={(e) =>
+                    onChangeField(formFields.city, e.target.value)
+                  }
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  id="country"
+                  label="Country"
+                  type="text"
+                  value={fieldVals.country || ""}
+                  onChange={(e) =>
+                    onChangeField(formFields.country, e.target.value)
+                  }
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  id="link"
+                  label="Link"
+                  type="url"
+                  value={fieldVals.link}
+                  onChange={(e) =>
+                    onChangeField(formFields.link, e.target.value)
+                  }
+                />
+              </Grid>
+            </Grid>
+          </form>
+          {errorMessage && <Box color="error.main">{errorMessage}</Box>}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={onClose} color="primary">
             Cancel
           </Button>
           <Button onClick={handleSubmit} color="primary" type="submit">
@@ -200,7 +204,7 @@ function EditProfile({profileUser}) {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 }
 

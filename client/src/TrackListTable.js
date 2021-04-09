@@ -72,6 +72,7 @@ export default function TrackListTable({
               <TableCell>Title</TableCell>
               <TableCell>Artist</TableCell>
               <TableCell>Genre</TableCell>
+              {shouldShowDelete && <TableCell></TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>

@@ -1,17 +1,29 @@
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
+import { Avatar, Button, Link } from "@material-ui/core";
+import { Edit, Link as LinkIcon } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
-import EditProfile from "./EditProfile";
+
+import placeholderProfileImage from "./placeholder_profile.png";
 
 const useStyles = makeStyles((theme) => ({
+  container: {
+    maxWidth: "750px",
+    margin: "0 auto",
+  },
   userInfoPaper: {
     height: "250px",
+  },
+  bio: {
+    margin: "12px 0",
   },
   profileImage: {
     height: theme.spacing(15),
     width: theme.spacing(15),
+  },
+  profileFieldContainer: {
+    textAlign: "left",
   },
   gridTextDisplay: {
     display: "flex",
@@ -22,24 +34,36 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "flex-start",
   },
-  Box: {
+  link: {
     display: "flex",
-    justifyContent: "flex-start",
     alignItems: "center",
+  },
+  linkText: {
+    marginLeft: "6px",
+  },
+  editButton: {
+    marginTop: "20px",
   },
 }));
 
-function ProfileHeader({ profileUser, tracks, profileStats }) {
+function ProfileHeader({ profileUser, tracks, profileStats, onClickEdit }) {
   const classes = useStyles();
   const hasStats =
     profileStats.feedbackCount > 0 || !isNaN(profileStats.avgRating);
+  let locationDisplay = profileUser?.city || "";
+  if (locationDisplay.length && profileUser?.country) {
+    locationDisplay += `, ${profileUser.country}`;
+  } else if (profileUser?.country) {
+    locationDisplay = profileUser?.country;
+  }
+
   return (
-    <Box mx={30}>
+    <Box className={classes.container}>
       <Grid container spacing={2} alignItems="stretch">
         <Grid item xs={3}>
           <Avatar
             alt="random"
-            src="https://picsum.photos/250/250"
+            src={profileUser.imagePath || placeholderProfileImage}
             className={classes.profileImage}
           ></Avatar>
         </Grid>
@@ -70,35 +94,42 @@ function ProfileHeader({ profileUser, tracks, profileStats }) {
             </Grid>
           </>
         )}
-        <Grid item xs={12}>
-          <Typography component="h2" variant="h4" align="left">
+        <Grid item xs={12} className={classes.profileFieldContainer}>
+          <Typography component="h2" variant="h4">
             {profileUser.displayName}
           </Typography>
-          <Typography component="h3" variant="h5" align="left">
-            {profileUser.username}
+          <Typography variant="body2">
+            Joined {new Date(profileUser.createdAt).toLocaleDateString()}
           </Typography>
-          <Typography component="h3" variant="h5" align="left">
-            Location
-          </Typography>
-          {profileUser.bio ? (
-            <>{profileUser.bio}</>
-          ) : (
-            <>
-              <Typography component="h1" variant="body2" align="left">
-                I'm a real one and an early supporter of Ravel, but I don't have
-                a bio, yet. It's on the way!
-              </Typography>
-            </>
+          {locationDisplay && (
+            <Typography variant="body2">
+              {profileUser.city}, {profileUser.country}
+            </Typography>
           )}
-          <Typography component="h1" variant="body1" align="left">
-            Links
-          </Typography>
-          <Box component="span" className={classes.Box}>
-            {/*<Button variant="outlined">Edit Profile</Button>*/}
-            <EditProfile profileUser={profileUser} />
-          </Box>
+          {profileUser.bio && (
+            <Typography variant="body1" className={classes.bio}>
+              {profileUser.bio}
+            </Typography>
+          )}
+          {profileUser.link && (
+            <Grid container direction="row" alignItems="center">
+              <Link href={profileUser.link.url} className={classes.link}>
+                <LinkIcon />
+                <span className={classes.linkText}>{profileUser.link.url}</span>
+              </Link>
+            </Grid>
+          )}
         </Grid>
       </Grid>
+      <Button
+        className={classes.editButton}
+        variant="outlined"
+        onClick={onClickEdit}
+        size="small"
+        startIcon={<Edit />}
+      >
+        Edit Profile
+      </Button>
     </Box>
   );
 }

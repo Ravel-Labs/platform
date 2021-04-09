@@ -5,9 +5,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useRouteMatch, Link as RouterLink } from "react-router-dom";
 
 import { UserContext } from "../Context";
-import TrackListTable from "../TrackListTable";
+import EditProfile from "../EditProfile";
 import PageWrapper from "../PageWrapper";
 import ProfileHeader from "../ProfileHeader";
+import TrackListTable from "../TrackListTable";
 
 const useStyles = makeStyles({
   bodyText: {
@@ -16,11 +17,46 @@ const useStyles = makeStyles({
   },
 });
 
-function Profile() {
+// EmptyWelcome handles display needs when the user has no tracks in their profile.
+function EmptyWelcome({ hasUploadPrivilege }) {
   const classes = useStyles();
+  return (
+    <Typography variant="body1" className={classes.bodyText}>
+      {hasUploadPrivilege ? (
+        <>
+          You don't have any tracks yet.{" "}
+          <Link to="/upload" component={RouterLink}>
+            Upload
+          </Link>{" "}
+          to start sharing your music.
+        </>
+      ) : (
+        <>
+          Get started by checking out{" "}
+          <Link to="/" component={RouterLink}>
+            featured tracks
+          </Link>
+          {"."}
+        </>
+      )}
+    </Typography>
+  );
+}
+
+const useProfileStyles = makeStyles({
+  profileInfoContainer: {
+    textAlign: "left",
+  },
+});
+
+function Profile() {
+  const classes = useProfileStyles();
   const [profileTracks, setProfileTracks] = useState([]);
   const [profileUser, setProfileUser] = useState(null);
   const [profileStats, setProfileStats] = useState(null);
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
+  const [isSubmittingProfileEdit, setIsSubmittingProfileEdit] = useState(false);
+  const [profileEditError, setProfileEditError] = useState("");
   const { user } = useContext(UserContext);
   let match = useRouteMatch();
 
@@ -75,6 +111,37 @@ function Profile() {
     }
   };
 
+  const onProfileEditSubmit = async (payload) => {
+    setIsSubmittingProfileEdit(true);
+    try {
+      const res = await axios.patch(
+        `/api/user/${profileUser.username}`,
+        payload
+      );
+      if (res.status === 200) {
+        setProfileUser((prevUser) => ({
+          ...prevUser,
+          ...res.data,
+        }));
+        setIsProfileEditOpen(false);
+      } else {
+        setProfileEditError(res.data.errorMessage);
+      }
+    } catch (e) {
+      console.error(e);
+      setProfileEditError(e.message);
+    }
+    setIsSubmittingProfileEdit(false);
+  };
+
+  const handleClickEdit = () => {
+    setIsProfileEditOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsProfileEditOpen(false);
+  };
+
   // Only show public tracks, unless the logged-in user was referred by this user
   // or is an admin.
   const userPrivileges = user?.privileges || [];
@@ -97,44 +164,31 @@ function Profile() {
         user?.id === track.userId)
     );
   });
-  console.log("Profile", profileUser);
+
   return (
     <PageWrapper>
       {profileUser && profileTracks && profileStats && (
-        <ProfileHeader
-          profileUser={profileUser}
-          tracks={profileTracks}
-          profileStats={profileStats}
-        />
+        <Box className={classes.profileInfoContainer}>
+          <ProfileHeader
+            profileUser={profileUser}
+            tracks={profileTracks}
+            profileStats={profileStats}
+            onClickEdit={handleClickEdit}
+          />
+          <EditProfile
+            errorMessage={profileEditError}
+            profileUser={profileUser}
+            isOpen={isProfileEditOpen}
+            isDisabled={isSubmittingProfileEdit}
+            onSubmit={onProfileEditSubmit}
+            onClose={handleClose}
+          />
+        </Box>
       )}
       {profileUser && (
         <Box>
-          <Typography component="h1" variant="h2">
-            {profileUser.displayName}
-          </Typography>
-          <Typography variant="body1">
-            Joined {new Date(profileUser.createdAt).toLocaleDateString()}
-          </Typography>
           {filteredTracks.length === 0 ? (
-            <Typography variant="body1" className={classes.bodyText}>
-              {hasUploadPrivilege ? (
-                <>
-                  You don't have any tracks yet.{" "}
-                  <Link to="/upload" component={RouterLink}>
-                    Upload
-                  </Link>{" "}
-                  to start sharing your music.
-                </>
-              ) : (
-                <>
-                  Get started by checking out{" "}
-                  <Link to="/" component={RouterLink}>
-                    featured tracks
-                  </Link>
-                  {"."}
-                </>
-              )}
-            </Typography>
+            <EmptyWelcome hasUploadPrivilege={hasUploadPrivilege} />
           ) : (
             <TrackListTable
               shouldShowPrivacy
