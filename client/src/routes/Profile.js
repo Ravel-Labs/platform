@@ -50,9 +50,11 @@ function Profile() {
 
     async function fetchProfileStats() {
       try {
-        const res = await axios.get(`/api/user/profile-stats/${match.params.username}`);
+        const res = await axios.get(
+          `/api/user/profile-stats/${match.params.username}`
+        );
         setProfileStats(res.data);
-      } catch(e) {
+      } catch (e) {
         console.error(e);
         setProfileStats(null);
       }
@@ -61,6 +63,17 @@ function Profile() {
     fetchProfileTracks();
     fetchProfileStats();
   }, [match.params.username]);
+
+  const onDeleteTrack = async (slug) => {
+    try {
+      const res = await axios.delete(`api/tracks/${slug}`);
+      if (res.status === 200) {
+        setProfileTracks(profileTracks.filter((track) => slug !== track.slug));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Only show public tracks, unless the logged-in user was referred by this user
   // or is an admin.
@@ -87,11 +100,13 @@ function Profile() {
   console.log("Profile", profileUser);
   return (
     <PageWrapper>
-    {(profileUser && profileTracks && profileStats) && 
-      <ProfileHeader 
-        profileUser={profileUser} 
-        tracks={profileTracks} 
-        profileStats={profileStats} />}
+      {profileUser && profileTracks && profileStats && (
+        <ProfileHeader
+          profileUser={profileUser}
+          tracks={profileTracks}
+          profileStats={profileStats}
+        />
+      )}
       {profileUser && (
         <Box>
           <Typography component="h1" variant="h2">
@@ -123,7 +138,8 @@ function Profile() {
           ) : (
             <TrackListTable
               shouldShowPrivacy
-              shouldShowDelete={true}
+              shouldShowDelete
+              onDeleteTrack={onDeleteTrack}
               tracks={filteredTracks}
               user={profileUser}
               setProfileUser={setProfileUser}

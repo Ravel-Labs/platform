@@ -1,42 +1,31 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 import {
-    Button, 
-    Dialog, 
-    DialogActions, 
-    DialogContent, 
-    DialogTitle
-  } from "@material-ui/core";
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@material-ui/core";
 
-function ConfirmDialog({ title, children, open, setOpen, onClose, onConfirm }) {
+function ConfirmDialog({ title, children, isOpen, onClose, onConfirm }) {
   const dialogRef = useRef(null);
   return (
     <Dialog
       ref={dialogRef}
-      open={open}
+      open={isOpen}
       onClose={onClose}
       aria-labelledby="form-dialog-title"
     >
-    <DialogTitle id="confirm-dialog">{title}</DialogTitle>
-    <DialogContent>{children}</DialogContent>
-    <DialogActions>
-      <Button
-        variant="contained"
-        onClick={() => setOpen(false)}
-        color="secondary"
-      >
-        No
-      </Button>
-      <Button
-        variant="contained"
-        onClick={() => {
-          setOpen(false);
-          onConfirm();
-        }}
-        color="default"
-      >
-        Yes
-      </Button>
-    </DialogActions>
+      <DialogTitle id="confirm-dialog">{title}</DialogTitle>
+      <DialogContent>{children}</DialogContent>
+      <DialogActions>
+        <Button variant="contained" onClick={onClose} color="secondary">
+          No
+        </Button>
+        <Button variant="contained" onClick={onConfirm} color="default">
+          Yes
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
