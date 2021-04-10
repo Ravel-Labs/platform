@@ -22,7 +22,7 @@ const defaultReturnColumns = [
   "imagePath",
   "bio",
   "city",
-  "country"
+  "country",
 ];
 
 async function getUserPrivileges(roleId) {
@@ -167,11 +167,12 @@ async function getUserInvitesRemaining(userId) {
 }
 
 async function updateUser(userId, userObject) {
+  const returnFields = ["id", ...Object.keys(userObject)];
   try {
-    const user = await db(tableName)
-      .where({id: userId})
-      .update(userObject);
-    return user;
+    const users = await db(tableName)
+      .where({ id: userId })
+      .update(userObject, returnFields);
+    return users.pop();
   } catch (e) {
     console.error(e);
   }

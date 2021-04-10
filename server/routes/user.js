@@ -19,16 +19,12 @@ router.get("/:username", async function (req, res, next) {
     "country",
     "imagePath",
   ]);
-  const linkFields = [
-    "links.id AS linkId",
-    "url",
-    "links.name AS linkName",
-    "userId",
-  ];
+  const linkFields = ["links.id AS linkId", "url", "type", "userId"];
   const links = await Links.getByUsername(req.params.username, linkFields);
   const profileUser = {
     ...user,
-    ...links,
+    // TODO: support multiple links.
+    link: links.pop(),
   };
   console.log(profileUser);
   res.status(200).send(profileUser);
@@ -36,45 +32,62 @@ router.get("/:username", async function (req, res, next) {
 
 var processFile = multer();
 
-router.post(
-  "/update/:username",
+router.patch(
+  "/:username",
   tokenMiddleware.requireUser,
   processFile.single("file"),
   async function (req, res, next) {
-    const userObject = {};
-    const userFilter = Object.fromEntries(Object.entries(req.body)).filter(
-      ([key, val]) => (key = !"links")
-    );
-    try {
-      if (req.body) {
-        const userFilter = Object.fromEntries(Object.entries(req.body)).filter(
-          ([key, val]) => (key = !"links")
-        );
-        userObject = { ...userObject, ...userFilter };
-      }
+    // If we have no payload, return an error.
+    if (!req.body) {
+      return res.status(400).send();
+    }
 
+    // Link and file (image) require special handling.
+    const { link, file, ...userFields } = req.body;
+    let userObject = { ...userFields };
+
+    try {
       if (req.file) {
         const imagePath = await UploadService.UserProfileImageUpload(
           req.file,
           req.userId,
           { resize: { width: 1000, height: 1000 } }
         );
-        userObject = { ...userObject, ...{ imagePath: imagePath } };
+        userObject = { ...userObject, imagePath: imagePath };
       }
 
-      if (userObject) {
-        await User.updateUser(req.userId, userObject);
-      }
-
-      if (req.body.links) {
-        const links = await Links.bulkCreate(req.body.links);
-      }
-
-      res
-        .status(201)
-        .send(
-          `updated user: ${req.params.username} with userObject: ${userObject}`
+      // TODO: Eventually we want to support multiple links.
+      let links = [];
+      if (link) {
+        // TODO eliminate duplication here
+        const linkFields = ["links.id AS linkId", "url", "type", "userId"];
+        const userLinks = await Links.getByUsername(
+          req.params.username,
+          linkFields
         );
+
+        let linkExists = false;
+        userLinks.forEach((userLink) => {
+          if (userLink.url === link) {
+            linkExists = true;
+            links.push(userLink);
+          }
+        });
+
+        if (!linkExists) {
+          links = await Links.bulkCreate([
+            { url: link, type: Links.LINK_TYPES.website, userId: req.userId },
+          ]);
+        }
+      }
+
+      const updatedUser = await User.updateUser(req.userId, userObject);
+
+      res.status(200).send({
+        ...updatedUser,
+        // TODO: support multiple links
+        link: links.pop(),
+      });
     } catch (e) {
       console.error(e);
     }
