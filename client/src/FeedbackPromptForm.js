@@ -1,10 +1,12 @@
 import axios from "axios";
-import { useState } from "react";
-import { Box, Button, Grid, Typography } from "@material-ui/core";
+import { useContext, useState } from "react";
+import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Box, Button, Grid, Link, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Edit } from "@material-ui/icons";
 import classNames from "classnames";
 
+import { UserContext } from "./Context";
 import styles from "./FeedbackPromptForm.module.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -15,6 +17,8 @@ const useStyles = makeStyles((theme) => ({
 
 function FeedbackPromptForm({ prompt, previousResponse, onFeedbackSubmitted }) {
   const classes = useStyles();
+  const { user } = useContext(UserContext);
+  let location = useLocation();
   const values = Array.from(Array(prompt.scale).keys());
   const [selectedVal, setSelectedVal] = useState(null);
   const [isEditingResponse, setIsEditingResponse] = useState(false);
@@ -79,12 +83,23 @@ function FeedbackPromptForm({ prompt, previousResponse, onFeedbackSubmitted }) {
           </Grid>
           <Button
             onClick={onSubmitRating}
-            disabled={selectedVal === null}
+            disabled={!user || selectedVal === null}
             variant="contained"
             color="primary"
           >
             Submit
           </Button>
+          {!user && (
+            <Typography variant="body1">
+              Want to share your thoughts on this track?{" "}
+              <Link
+                to={`/signup?next=${location.pathname}`}
+                component={RouterLink}
+              >
+                Sign up.
+              </Link>
+            </Typography>
+          )}
         </Box>
       ) : (
         <Box>
