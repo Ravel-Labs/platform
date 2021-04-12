@@ -47,20 +47,19 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
               <Chip label={track.genre} />
             </Grid>
             <Grid item xs={12} md={7}>
-              {user ? (
-                <div>
-                  {track.prompts.map((prompt) => {
-                    return (
-                      <FeedbackPromptForm
-                        key={prompt.id}
-                        prompt={prompt}
-                        previousResponse={feedbackByPrompt[prompt.id]}
-                        onFeedbackSubmitted={onFeedbackSubmitted}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
+              <div>
+                {track.prompts.map((prompt) => {
+                  return (
+                    <FeedbackPromptForm
+                      key={prompt.id}
+                      prompt={prompt}
+                      previousResponse={feedbackByPrompt[prompt.id]}
+                      onFeedbackSubmitted={onFeedbackSubmitted}
+                    />
+                  );
+                })}
+              </div>
+              {!user && (
                 <Typography variant="body1">
                   Want to share your thoughts on this track?{" "}
                   <Link
