@@ -1,6 +1,10 @@
 import { useContext } from "react";
 import { Box, Chip, Grid, Link, Typography } from "@material-ui/core";
-import { Link as RouterLink, useRouteMatch } from "react-router-dom";
+import {
+  Link as RouterLink,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 import { TrendingUp } from "@material-ui/icons";
 
 import { UserContext } from "./Context";
@@ -12,6 +16,7 @@ import styles from "./TrackDisplay.module.css";
 function TrackDisplay({ track, onFeedbackSubmitted }) {
   const { user } = useContext(UserContext);
   let match = useRouteMatch();
+  let location = useLocation();
 
   const feedbackByPrompt = {};
   const feedback = track?.userFeedback || [];
@@ -54,6 +59,17 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
                   );
                 })}
               </div>
+              {!user && (
+                <Typography variant="body1">
+                  Want to share your thoughts on this track?{" "}
+                  <Link
+                    to={`/signup?next=${location.pathname}`}
+                    component={RouterLink}
+                  >
+                    Sign up.
+                  </Link>
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} md={3} className={styles.ArtistGridItem}>
               <Typography variant="overline" display="block" gutterBottom>

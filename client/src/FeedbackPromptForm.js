@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import { Link as RouterLink, useLocation } from "react-router-dom";
-import { Box, Button, Grid, Link, Typography } from "@material-ui/core";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Edit } from "@material-ui/icons";
 import classNames from "classnames";
@@ -18,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
 function FeedbackPromptForm({ prompt, previousResponse, onFeedbackSubmitted }) {
   const classes = useStyles();
   const { user } = useContext(UserContext);
-  let location = useLocation();
+
   const values = Array.from(Array(prompt.scale).keys());
   const [selectedVal, setSelectedVal] = useState(null);
   const [isEditingResponse, setIsEditingResponse] = useState(false);
@@ -89,17 +88,6 @@ function FeedbackPromptForm({ prompt, previousResponse, onFeedbackSubmitted }) {
           >
             Submit
           </Button>
-          {!user && (
-            <Typography variant="body1">
-              Want to share your thoughts on this track?{" "}
-              <Link
-                to={`/signup?next=${location.pathname}`}
-                component={RouterLink}
-              >
-                Sign up.
-              </Link>
-            </Typography>
-          )}
         </Box>
       ) : (
         <Box>
