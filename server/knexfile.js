@@ -1,3 +1,5 @@
+var config = require("./config");
+
 const defaultConfig = {
   client: "pg",
   migrations: {
@@ -10,16 +12,28 @@ const defaultConfig = {
 };
 
 module.exports = {
-  test: {
-    ...defaultConfig,
-    connection: process.env.DATABASE_URL_TEST,
-  },
   development: {
     ...defaultConfig,
-    connection: process.env.DATABASE_URL_DEV,
+    connection: config.databaseURLDev,
+  },
+  // test runs in local test runs.
+  test: {
+    ...defaultConfig,
+    connection: config.databaseURLTest,
+  },
+  // testCI runs test suite in CI.
+  testCI: {
+    ...defaultConfig,
+    connection: {
+      host: "postgres",
+      port: 5432,
+      user: "postgres",
+      password: "postgres",
+      database: "ravel_test",
+    },
   },
   production: {
     ...defaultConfig,
-    connection: process.env.DATABASE_URL,
+    connection: config.databaseURLProd,
   },
 };

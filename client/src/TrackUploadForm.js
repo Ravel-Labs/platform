@@ -145,7 +145,7 @@ export default function TrackUploadForm() {
     });
   };
 
-  const onChangeSelectedPompts = (event) => {
+  const onChangeSelectedPrompts = (event) => {
     setFieldVals((vals) => {
       return {
         ...vals,
@@ -299,7 +299,7 @@ export default function TrackUploadForm() {
             id="demo-mutiple-checkbox"
             multiple
             value={fieldVals.prompts}
-            onChange={onChangeSelectedPompts}
+            onChange={onChangeSelectedPrompts}
             input={<Input />}
             renderValue={(selected) => {
               if (selected.length > 0) {

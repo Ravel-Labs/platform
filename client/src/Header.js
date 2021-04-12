@@ -129,7 +129,7 @@ export default function Header() {
   return (
     <div className={classes.root}>
       <AppBar position="static" className={classes.appBar}>
-        <Toolbar>
+        <Toolbar className={classes.toolBar}>
           <Box className={classes.titleWrapper}>
             <Button
               color="inherit"

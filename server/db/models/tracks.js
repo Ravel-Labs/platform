@@ -10,6 +10,7 @@ const defaultReturnColumns = [
   "path",
   "slug",
   "isPrivate",
+  "imagePath",
 ];
 
 async function create(title, path, genre, additionalFields = {}) {
@@ -26,6 +27,19 @@ async function create(title, path, genre, additionalFields = {}) {
     const newTrack = tracks.pop();
     console.log(newTrack);
     return newTrack;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function deleteById(trackId) {
+  try {
+    await db("trackCredits").where({ trackId: trackId }).del();
+    await db("trackFeedbackPrompts").where({ trackId: trackId }).del();
+    await db("events").where({ trackId: trackId }).del();
+    await db("sessions").where({ trackId: trackId }).del();
+    const deletedTrack = await db(tableName).where({ id: trackId }).del();
+    return deletedTrack;
   } catch (e) {
     console.error(e);
   }
@@ -148,13 +162,26 @@ async function filterByUsername(username) {
   }
 }
 
+async function updateTrackImage(trackSlug, trackImagePath) {
+  try {
+    const tracks = await db(tableName)
+      .where({ slug: trackSlug })
+      .update({ imagePath: trackImagePath });
+    return tracks;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 module.exports = {
   create,
+  deleteById,
   filterByUsername,
   getFeaturedTracks,
   getIdBySlug,
   getPrivacyBySlug,
   getTrackBySlug,
   getUserIdBySlug,
+  updateTrackImage,
   updateTrackPrivacy,
 };

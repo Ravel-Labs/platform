@@ -3,6 +3,7 @@ var multer = require("multer");
 
 var AuthService = require("../services/auth");
 var UploadService = require("../services/upload");
+var DeleteService = require("../services/delete");
 var Feedback = require("../db/models").Feedback;
 var TrackCredits = require("../db/models").TrackCredits;
 var Tracks = require("../db/models").Tracks;
@@ -96,6 +97,16 @@ router.post(
     }
   }
 );
+
+router.delete("/:slug", async function (req, res, next) {
+  try {
+    const deletedTrack = await DeleteService.Delete(req.params.slug);
+    res.status(200).send(`deleted track with slug ${req.params.slug}`);
+  } catch (e) {
+    console.log("error", e);
+    res.status(400).send(e);
+  }
+})
 
 router.post("/privacy/:slug", async function (req, res, next) {
   try {

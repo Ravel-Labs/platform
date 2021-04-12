@@ -19,6 +19,7 @@ import { AddCircle, CheckBox, CheckBoxOutlineBlank } from "@material-ui/icons";
 
 import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
+// import ImageUploadForm from "../ImageUploadForm";
 
 const profileFields = [
   ["name", "Name"],

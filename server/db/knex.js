@@ -1,14 +1,6 @@
-var environment = process.env.NODE_ENV || "development";
-console.log("knex.js environment: ", environment);
-var config = require("../knexfile.js")[environment];
-var knex = require("knex")(config);
-
-try {
-  knex("eventTypes")
-    .columnInfo()
-    .then(() => console.log("DB connected."));
-} catch (e) {
-  console.error(e);
-}
+const config = require("../config");
+var environment = config.nodeEnv || "development";
+var knexConfig = require("../knexfile.js")[environment];
+var knex = require("knex")(knexConfig);
 
 module.exports = knex;

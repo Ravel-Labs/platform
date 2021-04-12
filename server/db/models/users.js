@@ -1,6 +1,7 @@
 var bcrypt = require("bcrypt");
 
 var db = require("../knex");
+var Links = require("./links");
 
 const tableName = "users";
 const ROLES = {
@@ -18,6 +19,10 @@ const defaultReturnColumns = [
   "roleId",
   "referrerId",
   "invitesRemaining",
+  "imagePath",
+  "bio",
+  "city",
+  "country",
 ];
 
 async function getUserPrivileges(roleId) {
@@ -161,6 +166,29 @@ async function getUserInvitesRemaining(userId) {
   }
 }
 
+async function updateUser(userId, userObject) {
+  const returnFields = ["id", ...Object.keys(userObject)];
+  try {
+    const users = await db(tableName)
+      .where({ id: userId })
+      .update(userObject, returnFields);
+    return users.pop();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// async function updateUserProfileField(userId, fieldName, fieldValue) {
+//   try {
+//     const user = await db(tableName)
+//       .where({id: userId})
+//       .update(fieldName, fieldValue);
+//     return user;
+//   } catch(e) {
+//     console.error(e);
+//   }
+// }
+
 module.exports = {
   create,
   decrementInvitesRemaining,
@@ -169,6 +197,7 @@ module.exports = {
   getByUsername,
   getRoleIdbyUserId,
   getUserInvitesRemaining,
+  updateUser,
   validateCredentials,
   ROLES,
 };
