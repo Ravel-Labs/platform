@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { Box, Chip, Grid, Link, Typography } from "@material-ui/core";
 import {
   Link as RouterLink,
+  useHistory,
   useLocation,
   useRouteMatch,
 } from "react-router-dom";
@@ -14,10 +15,11 @@ import ConfirmDialog from "./ConfirmDialog";
 
 import styles from "./TrackDisplay.module.css";
 
-function TrackDisplay({ track, onFeedbackSubmitted, onArtistNameClick, onDeleteTrack }) {
+function TrackDisplay({ track, onFeedbackSubmitted, onDeleteTrack }) {
   const { user } = useContext(UserContext);
   let match = useRouteMatch();
   let location = useLocation();
+  const history = useHistory();
   const [trackToDelete, setTrackToDelete] = useState(null);
 
   const feedbackByPrompt = {};
@@ -25,9 +27,6 @@ function TrackDisplay({ track, onFeedbackSubmitted, onArtistNameClick, onDeleteT
   feedback.forEach(
     (feedback) => (feedbackByPrompt[feedback.promptId] = feedback)
   );
-  console.log("user context: ", user);
-  // const shouldShowDelete = user.username === track.username ? true : false;
-  // console.log(shouldShowDelete);
 
   const handleDeleteClickOpen = (e, track) => {
     e.stopPropagation();
@@ -96,7 +95,11 @@ function TrackDisplay({ track, onFeedbackSubmitted, onArtistNameClick, onDeleteT
               <Typography variant="overline" display="block" gutterBottom>
                 From the artist
               </Typography>
-              <Typography variant="h2" onClick={() => onArtistNameClick(track.username)}>{track.artist}</Typography>
+              <Typography variant="h2">
+                <Link to={`/${user?.username}`} component={RouterLink} color="inherit">
+                  {track.artist}
+                </Link>
+              </Typography>
               <Typography variant="body1">{track.description}</Typography>
               {user?.username === track?.username && (
                 <Box paddingTop={2}>

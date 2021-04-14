@@ -100,16 +100,16 @@ function Profile() {
     fetchProfileStats();
   }, [match.params.username]);
 
-  const onDeleteTrack = async (slug) => {
-    try {
-      const res = await axios.delete(`api/tracks/${slug}`);
-      if (res.status === 200) {
-        setProfileTracks(profileTracks.filter((track) => slug !== track.slug));
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const onDeleteTrack = async (slug) => {
+  //   try {
+  //     const res = await axios.delete(`api/tracks/${slug}`);
+  //     if (res.status === 200) {
+  //       setProfileTracks(profileTracks.filter((track) => slug !== track.slug));
+  //     }
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   const onProfileEditSubmit = async (payload) => {
     setIsSubmittingProfileEdit(true);
@@ -192,8 +192,6 @@ function Profile() {
           ) : (
             <TrackListTable
               shouldShowPrivacy
-              shouldShowDelete
-              onDeleteTrack={onDeleteTrack}
               tracks={filteredTracks}
               user={profileUser}
               setProfileUser={setProfileUser}

@@ -6,7 +6,6 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import PageWrapper from "../PageWrapper";
 import TrackDisplay from "../TrackDisplay";
-// import { UserContext } from "../Context";
 
 const useStyles = makeStyles({
   copy: {
@@ -18,7 +17,6 @@ function Track() {
   const classes = useStyles();
   let match = useRouteMatch();
   const history = useHistory();
-  // const { user } = useContext(UserContext);
   const { trackSlug } = match.params;
   const [track, setTrack] = useState(null);
 
@@ -27,7 +25,6 @@ function Track() {
       try {
         const res = await axios.get(`/api/tracks/${trackSlug}`);
         setTrack(res.data);
-        console.log("track: ", res.data);
       } catch (err) {
         console.error("failed fetching track", err);
       }
@@ -58,25 +55,16 @@ function Track() {
     });
   };
 
-  const onArtistNameClick = (username) => {
-    console.log(username);
-    history.push(`/${username}`);
-  };
-
   const onDeleteTrack = async (slug, username) => {
     try {
       const res = await axios.delete(`/api/tracks/${slug}`);
       if (res.status === 200) {
-        // setProfileTracks(profileTracks.filter((track) => slug !== track.slug));
         history.push(`/${username}`);
-        // console.log()
       }
     } catch (e) {
       console.error(e);
     }
   };
-
-  // console.log("user context: ", user);
 
   return (
     <PageWrapper>
@@ -87,7 +75,6 @@ function Track() {
       <TrackDisplay 
         track={track} 
         onFeedbackSubmitted={onFeedbackSubmitted} 
-        onArtistNameClick={onArtistNameClick}
         onDeleteTrack={onDeleteTrack}
       />
     </PageWrapper>
