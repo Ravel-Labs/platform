@@ -66,6 +66,7 @@ router.get("/:slug", async function (req, res, next) {
   ]);
   track.artist = artistUser.displayName;
   track.username = artistUser.username;
+  track.artistUserId = artistUserId;
 
   if (req.userId !== undefined) {
     const feedback = await Feedback.filterForTrackIdUserId(
