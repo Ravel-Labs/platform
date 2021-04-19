@@ -106,6 +106,8 @@ async function updateTrackPrivacy(trackSlug, privacyBool) {
 }
 
 async function getFeaturedTracks(privateTracksAllowedUserIds) {
+  // TODO: We should return a nested 'artist' object within each track with these
+  // properties rather than adding these fields at the top-level.
   const fields = {
     artist: "users.displayName",
     username: "users.username",
