@@ -25,7 +25,7 @@ async function create(userId, trackId, text) {
     );
     console.log(comment);
     return comment;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 };
@@ -36,7 +36,7 @@ async function getByTrackSlug(trackSlug) {
     const comments = await db(tableName).where({ trackId: trackId });
     console.log(comments);
     return comments;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 };
@@ -48,7 +48,7 @@ async function updateById(commentId, commentObject) {
       .where({ id: commentId })
       .update(commentObject, returnFields);
     return comments.pop()
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 };
@@ -57,7 +57,7 @@ async function deleteById(commentId) {
   try {
     const deletedComment = await db(tableName).where({ id: commentId }).del();
     return deletedComment;
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 };
