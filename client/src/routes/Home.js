@@ -1,14 +1,17 @@
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { useState, useEffect } from "react";
 
 import { UserContext } from "../Context";
 import PageWrapper from "../PageWrapper";
-import TrackListTable from "../TrackListTable";
+import TrackListGrid from "../TrackListGrid";
 
 const useStyles = makeStyles((theme) => ({
+  subtitle: {
+    paddingTop: theme.spacing(6),
+    paddingBottom: theme.spacing(6),
+  },
   welcomeBody: {
     textAlign: "left",
     maxWidth: "500px",
@@ -18,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
   },
   welcomeBodySection: {
-    paddingTop: "2vw",
+    paddingBottom: theme.spacing(4),
   },
 }));
 
@@ -41,6 +44,20 @@ function Home() {
     // Ensure we re-fetch tracks when the user logs out.
   }, [user]);
 
+  const onDeleteTrack = async (slug) => {
+    try {
+      const res = await axios.delete(`api/tracks/${slug}`);
+      if (res.status === 200) {
+        const updatedProfileTracks = featuredTracks.filter(
+          (track) => slug !== track.slug
+        );
+        setFeaturedTracks(updatedProfileTracks);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <PageWrapper>
       <Typography variant="h2" component="h1">
@@ -50,7 +67,7 @@ function Home() {
         <Typography
           variant="h4"
           component="h2"
-          className={classes.welcomeBodySection}
+          className={classes.subtitle}
           color="primary"
         >
           We’re glad you’re here.
@@ -67,11 +84,12 @@ function Home() {
           . Check out the music below and let your voice be heard.
         </Typography>
       </div>
-      <TrackListTable
+      <TrackListGrid
         shouldShowPrivacy
         shouldShowDelete={false}
         tracks={featuredTracks}
         title="Today's tracks"
+        onDeleteTrack={onDeleteTrack}
       />
     </PageWrapper>
   );
