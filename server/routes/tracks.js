@@ -4,6 +4,7 @@ var multer = require("multer");
 var AuthService = require("../services/auth");
 var UploadService = require("../services/upload");
 var DeleteService = require("../services/delete");
+var Comments  = require("../db/models").Comments;
 var Feedback = require("../db/models").Feedback;
 var TrackCredits = require("../db/models").TrackCredits;
 var Tracks = require("../db/models").Tracks;
@@ -76,6 +77,16 @@ router.get("/:slug", async function (req, res, next) {
   }
 
   res.status(200).send(track);
+});
+
+router.get("/:slug/comments", async function (req, res, next) {
+  try {
+    const comments = await Comments.getByTrackSlug(req.params.slug);
+    res.status(200).send(comments);
+  } catch (e) {
+    console.error("error", e);
+    res.status(400).send(e);
+  }
 });
 
 // In-memory handling for form data from incoming multipart/form-data request
