@@ -14,7 +14,7 @@ const trackUploadFolder = "track-uploads";
 const trackImageFolder = "track-images";
 const userProfileImageFolder = "user-profile-images";
 const mimetypeToExtension = {
-  "audio": {
+  audio: {
     "audio/aac": "aac",
     "audio/adpcm": "adp",
     "audio/aiff": "aif",
@@ -52,10 +52,10 @@ const mimetypeToExtension = {
     "audio/x-pn-realaudio": "ram",
     "audio/x-wav": "wav",
   },
-  "image": {
+  image: {
     "image/jpeg": "jpg",
     "image/png": "png",
-  }
+  },
 };
 
 /**
@@ -82,27 +82,39 @@ const createBucket = async (s3, bucketName) => {
   }
 };
 
-const createUploadParams = async (fileContent, uploadFolder, filetype, filePrefix) => {
+const ensureS3Bucket = async (s3, bucketName) => {
+  const allBucketData = await s3.listBuckets().promise();
+  const hasUploadBucket = allBucketData.Buckets.reduce(
+    (accum, { Name: name }) => {
+      return accum || name === bucketName;
+    },
+    false
+  );
+
+  if (!hasUploadBucket) {
+    console.info("Creating bucket with name ", bucketName);
+    await createBucket(s3, bucketName);
+  }
+};
+
+const getS3Service = async () => {
+  const s3 = new S3({
+    accessKeyId: config.awsAccessKeyId,
+    secretAccessKey: config.awsAccessKeySecret,
+    region: config.awsRegion,
+  });
+
+  await ensureS3Bucket(s3, config.awsS3BucketName);
+  return s3;
+};
+
+const createUploadParams = async (
+  fileContent,
+  uploadFolder,
+  filetype,
+  filePrefix
+) => {
   try {
-    const s3 = new S3({
-      accessKeyId: config.awsAccessKeyId,
-      secretAccessKey: config.awsAccessKeySecret,
-      region: config.awsRegion,
-    });
-
-    const allBucketData = await s3.listBuckets().promise();
-    const hasUploadBucket = allBucketData.Buckets.reduce(
-      (accum, { Name: name }) => {
-        return accum || name === config.awsS3BucketName;
-      },
-      false
-    );
-
-    if (!hasUploadBucket) {
-      console.info("Creating bucket with name ", config.awsS3BucketName);
-      await createBucket(s3, config.awsS3BucketName);
-    }
-
     const extension = mimetypeToExtension[filetype][fileContent.mimetype];
     console.log(extension);
     if (!extension) {
@@ -122,70 +134,101 @@ const createUploadParams = async (fileContent, uploadFolder, filetype, filePrefi
       Bucket: config.awsS3BucketName,
       Key: key,
     };
-    return {s3:s3, params:params};
-  } catch(e) {
+    return params;
+  } catch (e) {
     console.error("error during upload configuration: ", e);
   }
 };
 
-async function Upload(track, fileContent, userId) {
-  const { title, description, genre, isPrivate, prompts } = track;
+async function Upload(trackFields, audio, artwork, userId) {
+  const { title, description, genre, isPrivate, prompts } = trackFields;
 
-  const {s3, params} = await createUploadParams(fileContent, trackUploadFolder, "audio", title);
+  // Audio params
+  const audioParams = await createUploadParams(
+    audio,
+    trackUploadFolder,
+    "audio",
+    title
+  );
 
-  try {
-    var hrstart = process.hrtime();
-    const res = await s3.upload(params).promise();
-    var hrend = process.hrtime(hrstart);
-
-    // TODO: This upload is taking quite a long time (40-80s) every so often. Why?
-    console.info(
-      "END Upload time (hr): %ds %dms",
-      hrend[0],
-      hrend[1] / 1000000
+  // Artwork params
+  let artworkParams = null;
+  const shouldUploadArtwork = Boolean(artwork);
+  if (shouldUploadArtwork) {
+    artworkParams = await createUploadParams(
+      artwork,
+      trackImageFolder,
+      "image",
+      `${title}-artwork`
     );
+  }
 
-    const slug = util.slugify(`${title}-${new Date().getTime()}`);
-    const track = await Tracks.create(title, res.Location, genre, {
-      slug,
-      isPrivate,
-      description,
+  const s3 = await getS3Service();
+
+  var hrstart = process.hrtime();
+  const requests = [];
+  requests.push(s3.upload(audioParams).promise());
+  if (shouldUploadArtwork) {
+    requests.push(s3.upload(artworkParams).promise());
+  }
+  const results = await Promise.all(requests);
+  var hrend = process.hrtime(hrstart);
+
+  // TODO: This upload is taking quite a long time (40-80s) every so often. Why?
+  console.info("END Upload time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
+
+  if (!results.length) {
+    throw new Error("No results from S3 upload.");
+  }
+
+  const audioFile = results[0];
+  let imagePath = "";
+  if (shouldUploadArtwork && results.length === 2) {
+    imagePath = results[1].Location;
+  }
+
+  const slug = util.slugify(`${title}-${new Date().getTime()}`);
+  const track = await Tracks.create(title, audioFile.Location, genre, {
+    slug,
+    isPrivate,
+    description,
+    imagePath,
+  });
+
+  // TODO: maybe move this into track creation?
+  if (!track.id) {
+    throw new Error("Track not created successfully.");
+  }
+
+  await TrackCredits.create(track.id, userId);
+
+  // If the user didn't add any prompts, that's ok!
+  if (prompts && Array.isArray(prompts)) {
+    const trackPrompts = prompts.map((promptId) => {
+      return {
+        trackId: track.id,
+        promptId,
+      };
     });
 
-    // TODO: maybe move this into track creation?
-    if (!track.id) {
-      throw "Track not created successfully.";
-    }
-
-    await TrackCredits.create(track.id, userId);
-
-    // If the user didn't add any prompts, that's ok!
-    if (prompts && Array.isArray(prompts)) {
-      const trackPrompts = prompts.map((promptId) => {
-        return {
-          trackId: track.id,
-          promptId,
-        };
-      });
-
-      await TrackFeedbackPrompts.bulkCreate(trackPrompts);
-    }
-
-    return track;
-  } catch (e) {
-    console.error("error upload", e);
-    throw e;
+    await TrackFeedbackPrompts.bulkCreate(trackPrompts);
   }
+
+  return track;
 }
 
 // options is json object ex: options { resize: { width: 300, height: 400 } }
 async function UserProfileImageUpload(imageContent, userId, options) {
-  console.log(userId);
   const user = await User.getById(userId, ["username"]);
-  console.log(user.username);
   const userFilePrefix = `${user.username}${userId}`;
-  const {s3, params} = await createUploadParams(imageContent, userProfileImageFolder, "image", userFilePrefix);
-  
+  const s3 = await getS3Service();
+  const params = await createUploadParams(
+    imageContent,
+    userProfileImageFolder,
+    "image",
+    userFilePrefix
+  );
+
   if (
     typeof options !== "undefined" &&
     typeof options.resize !== "undefined" &&
@@ -195,7 +238,9 @@ async function UserProfileImageUpload(imageContent, userId, options) {
     let width = options.resize.width;
     let height = options.resize.height;
 
-    const newParamBody = await Sharp(params.Body).resize(width, height).toBuffer();
+    const newParamBody = await Sharp(params.Body)
+      .resize(width, height)
+      .toBuffer();
     params.Body = newParamBody;
   }
 
@@ -214,7 +259,7 @@ async function UserProfileImageUpload(imageContent, userId, options) {
     // const user = await User.getById(userId);
     // console.log(user);
     return res.Location;
-  } catch(e) {
+  } catch (e) {
     console.error("error upload", e);
     throw e;
   }
@@ -222,5 +267,5 @@ async function UserProfileImageUpload(imageContent, userId, options) {
 
 module.exports = {
   Upload,
-  UserProfileImageUpload
+  UserProfileImageUpload,
 };
