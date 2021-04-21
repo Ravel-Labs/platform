@@ -85,8 +85,6 @@ function Home() {
         </Typography>
       </div>
       <TrackListGrid
-        shouldShowPrivacy
-        shouldShowDelete={false}
         tracks={featuredTracks}
         title="Today's tracks"
         onDeleteTrack={onDeleteTrack}
