@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Box, Grid, Avatar } from "@material-ui/core";
-import { Lock, Delete, PlayCircleOutline } from "@material-ui/icons";
+import { Lock, Delete, PlayCircleFilled } from "@material-ui/icons";
 
 import { UserContext } from "./Context";
 
@@ -37,15 +37,25 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
   },
-  overlaySquare: {
+  overlaySquareOuterWrapper: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     height: "100%",
     width: "100%",
   },
+  overlayCircleInnerWrapper: {
+    backgroundColor: "white",
+    width: "40px",
+    height: "40px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   overlayIcon: {
     display: "flex",
+    fontSize: "80px",
+    color: "#303f9f",
   },
   title: {
     fontWeight: 700,
@@ -65,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function TrackItem({ track, onClickDelete }) {
+function TrackItem({ track, shouldShowDelete, onClickDelete }) {
   const history = useHistory();
   const classes = useStyles();
   const { user } = useContext(UserContext);
@@ -93,11 +103,10 @@ function TrackItem({ track, onClickDelete }) {
           className={classes.trackImage}
         ></Avatar>
         <Box className={classes.trackImageOverlay}>
-          <div className={classes.overlaySquare}>
-            <PlayCircleOutline
-              className={classes.overlayIcon}
-              fontSize="large"
-            />
+          <div className={classes.overlaySquareOuterWrapper}>
+            <div className={classes.overlayCircleInnerWrapper}>
+              <PlayCircleFilled className={classes.overlayIcon} />
+            </div>
           </div>
         </Box>
       </Box>
@@ -127,7 +136,7 @@ function TrackItem({ track, onClickDelete }) {
               {track.artist}
             </Typography>
           </Grid>
-          {user && user.username === track.username && (
+          {shouldShowDelete && user && user.username === track.username && (
             <Grid item className={classes.delete} onClick={onClickDelete}>
               <Delete alt="Delete" fontSize="small" />
             </Grid>
