@@ -12,9 +12,20 @@
 }
 
 .PlayPause svg {
-  font-size: 80px;
+  font-size: 120px;
   color: #303f9f;
-  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .PlayPause svg {
+    font-size: 96px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .PlayPause svg {
+    font-size: 84px;
+  }
 }
 
 .TrackInfo {
@@ -45,7 +56,7 @@
 
 .TrackInfoArtist {
   order: -1;
-  color: #5e5e5e;
+  color: #5E5E5E;
   opacity: 80%;
   font-size: 24px;
   margin: 0;

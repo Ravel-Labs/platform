@@ -8,7 +8,7 @@ import { UserContext } from "../Context";
 import EditProfile from "../EditProfile";
 import PageWrapper from "../PageWrapper";
 import ProfileHeader from "../ProfileHeader";
-import TrackListGrid from "../TrackListGrid";
+import TrackListTable from "../TrackListTable";
 
 const useStyles = makeStyles({
   bodyText: {
@@ -190,11 +190,15 @@ function Profile() {
           {filteredTracks.length === 0 ? (
             <EmptyWelcome hasUploadPrivilege={hasUploadPrivilege} />
           ) : (
-            <TrackListGrid
+            <TrackListTable
+              shouldShowPrivacy
               shouldShowDelete
-              tracks={filteredTracks}
-              title="Tracks"
               onDeleteTrack={onDeleteTrack}
+              tracks={filteredTracks}
+              user={profileUser}
+              setProfileUser={setProfileUser}
+              title="Tracks"
+              size="medium"
             />
           )}
         </Box>

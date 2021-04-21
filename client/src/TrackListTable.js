@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { DeleteOutline, Lock, LockOpen } from "@material-ui/icons";
@@ -13,7 +13,6 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import { UserContext } from "./Context";
 import ConfirmDialog from "./ConfirmDialog";
 
 const useStyles = makeStyles({
@@ -37,7 +36,6 @@ export default function TrackListTable({
 }) {
   const history = useHistory();
   const classes = useStyles();
-  const { user } = useContext(UserContext);
 
   const [trackToDelete, setTrackToDelete] = useState(null);
 
@@ -99,23 +97,19 @@ export default function TrackListTable({
                 <TableCell>{track.genre}</TableCell>
                 {shouldShowDelete && (
                   <TableCell padding="checkbox">
-                    {user.username === track.username && (
-                      <>
-                        <DeleteOutline
-                          onClick={(e) => {
-                            handleDeleteClickOpen(e, track);
-                          }}
-                        />
-                        <ConfirmDialog
-                          title="Delete Track"
-                          isOpen={Boolean(trackToDelete)}
-                          onClose={onDeleteClose}
-                          onConfirm={confirmDeleteTrack}
-                        >
-                          Are you sure that you want to delete this track?
-                        </ConfirmDialog>
-                      </>
-                    )}
+                    <DeleteOutline
+                      onClick={(e) => {
+                        handleDeleteClickOpen(e, track);
+                      }}
+                    />
+                    <ConfirmDialog
+                      title="Delete Track"
+                      isOpen={Boolean(trackToDelete)}
+                      onClose={onDeleteClose}
+                      onConfirm={confirmDeleteTrack}
+                    >
+                      Are you sure that you want to delete this track?
+                    </ConfirmDialog>
                   </TableCell>
                 )}
               </TableRow>

@@ -75,9 +75,7 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
               <Typography variant="overline" display="block" gutterBottom>
                 From the artist
               </Typography>
-              <Link to={`/${track.username}`} component={RouterLink}>
-                <Typography variant="h2">{track.artist}</Typography>
-              </Link>
+              <Typography variant="h2">{track.artist}</Typography>
               <Typography variant="body1">{track.description}</Typography>
               {user?.username === track?.username && (
                 <Box paddingTop={2}>
