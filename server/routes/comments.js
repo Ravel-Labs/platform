@@ -15,7 +15,7 @@ router.post("/", async function (req, res, next) {
   }
 });
 
-router.patch("/comment/:id", async function (req, res, next) {
+router.patch("/:id", async function (req, res, next) {
   try {
     const updatedComment = await Comments.updateById(req.params.id, req.body);
     res.status(201).send(updatedComment);
@@ -25,9 +25,9 @@ router.patch("/comment/:id", async function (req, res, next) {
   }
 });
 
-router.delete("/comment/:id", async function (req, res, next) {
+router.delete("/:id", async function (req, res, next) {
   try {
-    const deletedComment = await Comments.deleteById(req.params.id);
+    await Comments.deleteById(req.params.id);
     res.status(200).send(`deleted comment with id ${req.params.id}`);
   } catch (e) {
     console.error("error", e);
