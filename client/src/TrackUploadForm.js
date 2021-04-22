@@ -59,6 +59,7 @@ const genres = [
 
 const formFields = {
   audio: "audio",
+  artwork: "artwork",
   description: "description",
   genre: "genre",
   isPrivate: "isPrivate",
@@ -66,15 +67,65 @@ const formFields = {
   title: "title",
 };
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
+const imageHeight = 48;
+const itemPaddingTop = 8;
 const MenuProps = {
   PaperProps: {
     style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      maxHeight: imageHeight * 4.5 + itemPaddingTop,
       width: 250,
     },
   },
+};
+
+// TODO: move this into its own file.
+const FileInputFormControl = ({
+  accept,
+  buttonText,
+  inputFieldName,
+  fileName,
+  inputId,
+  label,
+  onChange,
+}) => {
+  const classes = useFormStyles();
+  return (
+    <FormControl className={classes.formControl} margin="normal">
+      <FormGroup>
+        <input
+          hidden
+          onChange={onChange}
+          accept={accept}
+          id={inputId}
+          name={inputFieldName}
+          style={{ display: "none" }}
+          type="file"
+        />
+        <TextField
+          required
+          placeholder="No file chosen"
+          label={label}
+          value={fileName}
+          InputProps={{
+            readOnly: true,
+          }}
+          name="filename"
+          type="text"
+        />
+        <label htmlFor={inputId} className={classes.fileInputTrigger}>
+          <Button
+            fullWidth
+            component="span"
+            variant="outlined"
+            color="primary"
+            startIcon={<CloudUpload />}
+          >
+            {buttonText}
+          </Button>
+        </label>
+      </FormGroup>
+    </FormControl>
+  );
 };
 
 export default function TrackUploadForm() {
@@ -86,7 +137,8 @@ export default function TrackUploadForm() {
     prompts: [],
     title: "",
   });
-  const [fileName, setFileName] = useState("");
+  const [audioFileName, setAudioFileName] = useState("");
+  const [artworkFileName, setArtworkFileName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [newTrack, setNewTrack] = useState("");
@@ -154,8 +206,7 @@ export default function TrackUploadForm() {
     });
   };
 
-  const onAudioFileChange = async (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (file, setFileName, fileFieldName) => {
     if (!file) {
       console.warn("no file selected");
       return;
@@ -165,9 +216,17 @@ export default function TrackUploadForm() {
     setFieldVals((vals) => {
       return {
         ...vals,
-        audio: file,
+        [fileFieldName]: file,
       };
     });
+  };
+
+  const onAudioFileChange = async (e) => {
+    handleFileChange(e.target.files[0], setAudioFileName, formFields.audio);
+  };
+
+  const onArtworkFileChange = async (e) => {
+    handleFileChange(e.target.files[0], setArtworkFileName, formFields.artwork);
   };
 
   return (
@@ -196,41 +255,26 @@ export default function TrackUploadForm() {
         />
 
         {/* Audio file */}
-        <FormControl className={classes.formControl} margin="normal">
-          <FormGroup>
-            <input
-              hidden
-              onChange={onAudioFileChange}
-              accept="audio/*"
-              id="audio-file"
-              name={formFields.audio}
-              style={{ display: "none" }}
-              type="file"
-            />
-            <TextField
-              required
-              placeholder="No file chosen"
-              label="File"
-              value={fileName}
-              InputProps={{
-                readOnly: true,
-              }}
-              name="filename"
-              type="text"
-            />
-            <label htmlFor="audio-file" className={classes.fileInputTrigger}>
-              <Button
-                fullWidth
-                component="span"
-                variant="outlined"
-                color="primary"
-                startIcon={<CloudUpload />}
-              >
-                Choose file
-              </Button>
-            </label>
-          </FormGroup>
-        </FormControl>
+        <FileInputFormControl
+          accept="audio/*"
+          buttonText="Choose audio file"
+          inputFieldName={formFields.audio}
+          fileName={audioFileName}
+          inputId="audio-file"
+          label="Audio file"
+          onChange={onAudioFileChange}
+        />
+
+        {/* Track artwork */}
+        <FileInputFormControl
+          accept="image/*"
+          buttonText="Choose image"
+          inputFieldName={formFields.artwork}
+          fileName={artworkFileName}
+          inputId="artwork-file"
+          label="Track artwork"
+          onChange={onArtworkFileChange}
+        />
 
         {/* Genre */}
         <FormControl className={classes.formControl} margin="normal">

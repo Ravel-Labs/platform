@@ -85,11 +85,28 @@ var processFile = multer();
 router.post(
   "/",
   tokenMiddleware.requireUser,
-  processFile.single("audio"),
+  processFile.fields([
+    { name: "audio", maxCount: 1 },
+    { name: "artwork", maxCount: 1 },
+  ]),
   async function (req, res, next) {
+    if (!req.files.audio.length) {
+      res.status(400).send("Must provide an audio file to upload.");
+    }
+    const audio = req.files.audio[0];
+    let artwork = null;
+    if (req.files.artwork && req.files.artwork.length) {
+      artwork = req.files.artwork[0];
+    }
+
     try {
       // TODO: Separate separate track upload from track creation
-      const track = await UploadService.Upload(req.body, req.file, req.userId);
+      const track = await UploadService.Upload(
+        req.body,
+        audio,
+        artwork,
+        req.userId
+      );
       res.status(201).send(track);
     } catch (e) {
       console.log("error", e);
@@ -106,7 +123,7 @@ router.delete("/:slug", async function (req, res, next) {
     console.log("error", e);
     res.status(400).send(e);
   }
-})
+});
 
 router.post("/privacy/:slug", async function (req, res, next) {
   try {
