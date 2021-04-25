@@ -2,16 +2,9 @@ var db = require("../knex");
 
 var Tracks = require("./tracks");
 
-
 const tableName = "comments";
 
-const defaultReturnColumns = [
-  "id",
-  "userId",
-  "trackId",
-  "createdAt",
-  "text",
-];
+const defaultReturnColumns = ["id", "userId", "trackId", "createdAt", "text"];
 
 async function create(userId, trackId, text) {
   try {
@@ -28,7 +21,7 @@ async function create(userId, trackId, text) {
   } catch (e) {
     console.error(e);
   }
-};
+}
 
 async function getByTrackSlug(trackSlug) {
   try {
@@ -39,7 +32,7 @@ async function getByTrackSlug(trackSlug) {
   } catch (e) {
     console.error(e);
   }
-};
+}
 
 async function updateById(commentId, commentObject) {
   const returnFields = ["id", ...Object.keys(commentObject)];
@@ -47,11 +40,11 @@ async function updateById(commentId, commentObject) {
     const comments = await db(tableName)
       .where({ id: commentId })
       .update(commentObject, returnFields);
-    return comments.pop()
+    return comments.pop();
   } catch (e) {
     console.error(e);
   }
-};
+}
 
 async function deleteById(commentId) {
   try {
@@ -60,11 +53,11 @@ async function deleteById(commentId) {
   } catch (e) {
     console.error(e);
   }
-};
+}
 
 module.exports = {
   create,
+  deleteById,
   getByTrackSlug,
   updateById,
-  deleteById,
 };
