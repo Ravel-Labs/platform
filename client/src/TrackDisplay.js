@@ -1,5 +1,14 @@
-import { useContext } from "react";
-import { Box, Chip, Grid, Link, Typography } from "@material-ui/core";
+import { useContext, useState } from "react";
+import {
+  Box,
+  Chip,
+  Grid,
+  Link,
+  Tab,
+  Tabs,
+  Typography,
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import {
   Link as RouterLink,
   useLocation,
@@ -10,11 +19,24 @@ import { TrendingUp } from "@material-ui/icons";
 import { UserContext } from "./Context";
 import AudioPlayer from "./AudioPlayer";
 import FeedbackPromptForm from "./FeedbackPromptForm";
+import TabPanel from "./TabPanel";
 
 import styles from "./TrackDisplay.module.css";
 
-function TrackInteractionColumn({ track, onFeedbackSubmitted, user }) {
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
+function TrackInteractionTabs({ track, onFeedbackSubmitted, user }) {
   let location = useLocation();
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const handleChangeTab = (e, newTab) => {
+    setSelectedTab(newTab);
+  };
 
   const feedbackByPrompt = {};
   const feedback = track?.userFeedback || [];
@@ -23,26 +45,46 @@ function TrackInteractionColumn({ track, onFeedbackSubmitted, user }) {
   );
   return (
     <div>
-      <div>
-        {track.prompts.map((prompt) => {
-          return (
-            <FeedbackPromptForm
-              key={prompt.id}
-              prompt={prompt}
-              previousResponse={feedbackByPrompt[prompt.id]}
-              onFeedbackSubmitted={onFeedbackSubmitted}
-            />
-          );
-        })}
-      </div>
-      {!user && (
-        <Typography variant="body1">
-          Want to share your thoughts on this track?{" "}
-          <Link to={`/signup?next=${location.pathname}`} component={RouterLink}>
-            Sign up.
-          </Link>
-        </Typography>
-      )}
+      <Tabs
+        value={selectedTab}
+        indicatorColor="primary"
+        textColor="primary"
+        onChange={handleChangeTab}
+        aria-label="disabled tabs example"
+      >
+        <Tab label="Feedback" {...a11yProps(0)} />
+        <Tab label="Comments" {...a11yProps(1)} />
+      </Tabs>
+      {/* Feedback */}
+      <TabPanel value={selectedTab} index={0}>
+        <div>
+          {track.prompts.map((prompt) => {
+            return (
+              <FeedbackPromptForm
+                key={prompt.id}
+                prompt={prompt}
+                previousResponse={feedbackByPrompt[prompt.id]}
+                onFeedbackSubmitted={onFeedbackSubmitted}
+              />
+            );
+          })}
+        </div>
+        {!user && (
+          <Typography variant="body1">
+            Want to share your thoughts on this track?{" "}
+            <Link
+              to={`/signup?next=${location.pathname}`}
+              component={RouterLink}
+            >
+              Sign up.
+            </Link>
+          </Typography>
+        )}
+      </TabPanel>
+      {/* Comments */}
+      <TabPanel value={selectedTab} index={1}>
+        Comments
+      </TabPanel>
     </div>
   );
 }
@@ -74,7 +116,7 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
               <Chip label={track.genre} />
             </Grid>
             <Grid item xs={12} md={7}>
-              <TrackInteractionColumn
+              <TrackInteractionTabs
                 track={track}
                 onFeedbackSubmitted={onFeedbackSubmitted}
                 user={user}
