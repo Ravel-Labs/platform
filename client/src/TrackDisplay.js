@@ -13,9 +13,7 @@ import FeedbackPromptForm from "./FeedbackPromptForm";
 
 import styles from "./TrackDisplay.module.css";
 
-function TrackDisplay({ track, onFeedbackSubmitted }) {
-  const { user } = useContext(UserContext);
-  let match = useRouteMatch();
+function TrackInteractionColumn({ track, onFeedbackSubmitted, user }) {
   let location = useLocation();
 
   const feedbackByPrompt = {};
@@ -23,6 +21,35 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
   feedback.forEach(
     (feedback) => (feedbackByPrompt[feedback.promptId] = feedback)
   );
+  return (
+    <div>
+      <div>
+        {track.prompts.map((prompt) => {
+          return (
+            <FeedbackPromptForm
+              key={prompt.id}
+              prompt={prompt}
+              previousResponse={feedbackByPrompt[prompt.id]}
+              onFeedbackSubmitted={onFeedbackSubmitted}
+            />
+          );
+        })}
+      </div>
+      {!user && (
+        <Typography variant="body1">
+          Want to share your thoughts on this track?{" "}
+          <Link to={`/signup?next=${location.pathname}`} component={RouterLink}>
+            Sign up.
+          </Link>
+        </Typography>
+      )}
+    </div>
+  );
+}
+
+function TrackDisplay({ track, onFeedbackSubmitted }) {
+  const { user } = useContext(UserContext);
+  let match = useRouteMatch();
 
   return (
     <div className={styles.TrackDisplayGridContainer}>
@@ -47,29 +74,11 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
               <Chip label={track.genre} />
             </Grid>
             <Grid item xs={12} md={7}>
-              <div>
-                {track.prompts.map((prompt) => {
-                  return (
-                    <FeedbackPromptForm
-                      key={prompt.id}
-                      prompt={prompt}
-                      previousResponse={feedbackByPrompt[prompt.id]}
-                      onFeedbackSubmitted={onFeedbackSubmitted}
-                    />
-                  );
-                })}
-              </div>
-              {!user && (
-                <Typography variant="body1">
-                  Want to share your thoughts on this track?{" "}
-                  <Link
-                    to={`/signup?next=${location.pathname}`}
-                    component={RouterLink}
-                  >
-                    Sign up.
-                  </Link>
-                </Typography>
-              )}
+              <TrackInteractionColumn
+                track={track}
+                onFeedbackSubmitted={onFeedbackSubmitted}
+                user={user}
+              />
             </Grid>
             <Grid item xs={12} md={3} className={styles.ArtistGridItem}>
               <Typography variant="overline" display="block" gutterBottom>
