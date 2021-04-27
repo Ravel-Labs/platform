@@ -48,7 +48,6 @@ async function deleteById(trackId) {
 async function getTrackBySlug(trackSlug) {
   try {
     const track = await db(tableName).where({ slug: trackSlug }).first();
-    console.log(track);
     return track;
   } catch (e) {
     console.error(e);

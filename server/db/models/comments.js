@@ -4,20 +4,25 @@ var Tracks = require("./tracks");
 
 const tableName = "comments";
 
-const defaultReturnColumns = ["id", "userId", "trackId", "createdAt", "text"];
+const defaultReturnColumns = [
+  "id",
+  "userId",
+  "trackId",
+  "createdAt",
+  "message",
+];
 
-async function create(userId, trackId, text) {
+async function create(userId, trackId, message) {
   try {
-    const comment = await db(tableName).insert(
+    const comments = await db(tableName).insert(
       {
         userId,
         trackId,
-        text,
+        message,
       },
       defaultReturnColumns
     );
-    console.log(comment);
-    return comment;
+    return comments.pop();
   } catch (e) {
     console.error(e);
   }
@@ -26,9 +31,25 @@ async function create(userId, trackId, text) {
 async function getByTrackSlug(trackSlug) {
   try {
     const trackId = await Tracks.getIdBySlug(trackSlug);
-    const comments = await db(tableName).where({ trackId: trackId });
-    console.log(comments);
-    return comments;
+    const comments = await db(tableName)
+      .join("users", { "users.id": "comments.userId" })
+      .where({ trackId: trackId })
+      .select([
+        "comments.*",
+        "users.username",
+        "users.imagePath",
+        "users.displayName",
+      ])
+      .orderBy("createdAt", "desc");
+    return comments.map((comment) => {
+      comment.user = {
+        id: comment.userId,
+        username: comment.username,
+        imagePath: comment.imagePath,
+        displayName: comment.displayName,
+      };
+      return comment;
+    });
   } catch (e) {
     console.error(e);
   }
