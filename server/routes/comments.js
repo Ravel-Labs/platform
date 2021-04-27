@@ -2,12 +2,16 @@ var express = require("express");
 var router = express.Router();
 
 var Comments = require("../db/models").Comments;
+var User = require("../db/models").User;
 
 router.post("/", async function (req, res, next) {
-  const { trackId, text } = req.body;
+  const { trackId, message } = req.body;
+
   const userId = req.userId;
   try {
-    const comment = await Comments.create(userId, trackId, text);
+    const comment = await Comments.create(userId, trackId, message);
+    const user = await User.getById(userId);
+    comment.user = user;
     res.status(201).send(comment);
   } catch (e) {
     console.error("error", e);

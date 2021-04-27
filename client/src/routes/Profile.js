@@ -164,6 +164,8 @@ function Profile() {
         user?.id === track.userId)
     );
   });
+  const hasEditPriviledges =
+    user && profileUser && user.username === profileUser.username;
 
   return (
     <PageWrapper>
@@ -174,6 +176,7 @@ function Profile() {
             tracks={profileTracks}
             profileStats={profileStats}
             onClickEdit={handleClickEdit}
+            hasEditPriviledges={hasEditPriviledges}
           />
           <EditProfile
             errorMessage={profileEditError}

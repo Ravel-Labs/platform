@@ -33,6 +33,12 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
+    fontSize: "1.1rem",
+    textAlign: "center",
+    [theme.breakpoints.up("sm")]: {
+      fontSize: "1.5rem",
+      textAlign: "left",
+    },
   },
   link: {
     display: "flex",
@@ -46,7 +52,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ProfileHeader({ profileUser, tracks, profileStats, onClickEdit }) {
+function ProfileHeader({
+  profileUser,
+  tracks,
+  profileStats,
+  onClickEdit,
+  hasEditPriviledges,
+}) {
   const classes = useStyles();
   const hasStats =
     profileStats.feedbackCount > 0 || !isNaN(profileStats.avgRating);
@@ -60,7 +72,7 @@ function ProfileHeader({ profileUser, tracks, profileStats, onClickEdit }) {
   return (
     <Box className={classes.container}>
       <Grid container spacing={2} alignItems="stretch">
-        <Grid item xs={3}>
+        <Grid item xs={5} sm={3}>
           <Avatar
             alt="random"
             src={profileUser.imagePath || placeholderProfileImage}
@@ -69,17 +81,17 @@ function ProfileHeader({ profileUser, tracks, profileStats, onClickEdit }) {
         </Grid>
         {hasStats && (
           <>
-            <Grid item xs={3} className={classes.gridTextDisplay}>
+            <Grid item xs={2} sm={3} className={classes.gridTextDisplay}>
               <Typography variant="h5" className={classes.text}>
-                {tracks.length} {tracks > 1 ? "tracks" : "track"}
+                {tracks.length} {tracks.length > 1 ? "tracks" : "track"}
               </Typography>
             </Grid>
-            <Grid item xs={3} className={classes.gridTextDisplay}>
+            <Grid item xs={2} sm={3} className={classes.gridTextDisplay}>
               <Typography variant="h5" className={classes.text}>
                 {profileStats.feedbackCount} ratings
               </Typography>
             </Grid>
-            <Grid item xs={3} className={classes.gridTextDisplay}>
+            <Grid item xs={2} sm={3} className={classes.gridTextDisplay}>
               {profileStats.feedbackCount > 0 ? (
                 <Typography variant="h5" className={classes.text}>
                   {profileStats.avgRating} rating
@@ -121,15 +133,17 @@ function ProfileHeader({ profileUser, tracks, profileStats, onClickEdit }) {
           )}
         </Grid>
       </Grid>
-      <Button
-        className={classes.editButton}
-        variant="outlined"
-        onClick={onClickEdit}
-        size="small"
-        startIcon={<Edit />}
-      >
-        Edit Profile
-      </Button>
+      {hasEditPriviledges && (
+        <Button
+          className={classes.editButton}
+          variant="outlined"
+          onClick={onClickEdit}
+          size="small"
+          startIcon={<Edit />}
+        >
+          Edit Profile
+        </Button>
+      )}
     </Box>
   );
 }
