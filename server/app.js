@@ -10,6 +10,7 @@ var config = require("./config");
 // API router handlers
 var analyticsRouter = require("./routes/analytics");
 var authRouter = require("./routes/auth");
+var commentsRouter = require("./routes/comments");
 var feedbackRouter = require("./routes/feedback");
 var inviteCodeRouter = require("./routes/inviteCodes");
 var indexRouter = require("./routes/index");
@@ -46,6 +47,7 @@ app.use("/", indexRouter);
 const apiPrefix = "/api";
 app.use(`${apiPrefix}/analytics`, tokenMiddleware.withUser, analyticsRouter);
 app.use(`${apiPrefix}/auth`, authRouter);
+app.use(`${apiPrefix}/comments`, tokenMiddleware.requireUser, commentsRouter);
 app.use(`${apiPrefix}/feedback`, tokenMiddleware.withUser, feedbackRouter);
 app.use(
   `${apiPrefix}/invite-codes`,
