@@ -46,7 +46,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ProfileHeader({ profileUser, tracks, profileStats, onClickEdit }) {
+function ProfileHeader({
+  profileUser,
+  tracks,
+  profileStats,
+  onClickEdit,
+  hasEditPriviledges,
+}) {
   const classes = useStyles();
   const hasStats =
     profileStats.feedbackCount > 0 || !isNaN(profileStats.avgRating);
@@ -121,15 +127,17 @@ function ProfileHeader({ profileUser, tracks, profileStats, onClickEdit }) {
           )}
         </Grid>
       </Grid>
-      <Button
-        className={classes.editButton}
-        variant="outlined"
-        onClick={onClickEdit}
-        size="small"
-        startIcon={<Edit />}
-      >
-        Edit Profile
-      </Button>
+      {hasEditPriviledges && (
+        <Button
+          className={classes.editButton}
+          variant="outlined"
+          onClick={onClickEdit}
+          size="small"
+          startIcon={<Edit />}
+        >
+          Edit Profile
+        </Button>
+      )}
     </Box>
   );
 }
