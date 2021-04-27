@@ -8,7 +8,6 @@ import {
   Tabs,
   Typography,
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Link as RouterLink,
   useLocation,
@@ -20,6 +19,7 @@ import { UserContext } from "./Context";
 import AudioPlayer from "./AudioPlayer";
 import FeedbackPromptForm from "./FeedbackPromptForm";
 import TabPanel from "./TabPanel";
+import TrackComments from "./TrackComments";
 
 import styles from "./TrackDisplay.module.css";
 
@@ -83,7 +83,7 @@ function TrackInteractionTabs({ track, onFeedbackSubmitted, user }) {
       </TabPanel>
       {/* Comments */}
       <TabPanel value={selectedTab} index={1}>
-        Comments
+        <TrackComments track={track} />
       </TabPanel>
     </div>
   );
