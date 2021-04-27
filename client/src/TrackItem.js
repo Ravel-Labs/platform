@@ -9,14 +9,12 @@ import { UserContext } from "./Context";
 import placeholderImage from "./images/placeholder_image.png";
 
 const useStyles = makeStyles((theme) => ({
-  item: {
-    marginRight: "24px",
-  },
   trackImageWrapper: {
     position: "relative",
     justifyContent: "center",
   },
   trackImage: {
+    // NOTE: These values need to be in sync with TrackListGrid.trackGridContainer column spacing.
     height: theme.spacing(20),
     width: theme.spacing(20),
     [theme.breakpoints.up("md")]: {

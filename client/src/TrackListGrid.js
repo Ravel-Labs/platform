@@ -5,12 +5,22 @@ import { makeStyles } from "@material-ui/core/styles";
 import TrackItem from "./TrackItem";
 import ConfirmDialog from "./ConfirmDialog";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   header: {
     textAlign: "left",
     paddingBottom: ".5em",
   },
-});
+  trackGridContainer: {
+    display: "grid",
+    // NOTE: These values need to be in sync with TrackItem.trackImage spacing.
+    gridTemplateColumns: `repeat(auto-fill, ${theme.spacing(20)}px)`,
+    [theme.breakpoints.up("md")]: {
+      gridTemplateColumns: `repeat(auto-fill, ${theme.spacing(25)}px)`,
+    },
+    justifyContent: "space-between",
+    gridGap: "20px",
+  },
+}));
 
 export default function TrackListGrid({
   tracks,
@@ -45,7 +55,7 @@ export default function TrackListGrid({
         {title}
       </Typography>
       <Box display="flex" alignItems="center">
-        <Grid container alignItems="center">
+        <Grid container className={classes.trackGridContainer}>
           {tracks.map((track) => {
             return (
               <TrackItem
