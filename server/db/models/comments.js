@@ -62,4 +62,9 @@ async function deleteById(commentId) {
   }
 };
 
-export default comments;
+module.exports = {
+  create,
+  getByTrackSlug,
+  updateById,
+  deleteById,
+};
