@@ -6,6 +6,7 @@ import { Box, Grid, Avatar } from "@material-ui/core";
 import { Lock, Delete, PlayCircleFilled } from "@material-ui/icons";
 
 import { UserContext } from "./Context";
+import placeholderImage from "./images/placeholder_image.png";
 
 const useStyles = makeStyles((theme) => ({
   item: {
@@ -80,7 +81,7 @@ function TrackItem({ track, shouldShowDelete, onClickDelete }) {
   const classes = useStyles();
   const { user } = useContext(UserContext);
   // TODO: Remove.
-  const trackImage = track.imagePath || "https://picsum.photos/250/250";
+  const trackImage = track.imagePath || placeholderImage;
 
   const onClickTrack = (slug) => {
     history.push(`/track/${slug}`);
