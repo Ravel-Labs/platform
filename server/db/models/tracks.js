@@ -48,7 +48,6 @@ async function deleteById(trackId) {
 async function getTrackBySlug(trackSlug) {
   try {
     const track = await db(tableName).where({ slug: trackSlug }).first();
-    console.log(track);
     return track;
   } catch (e) {
     console.error(e);
@@ -106,6 +105,8 @@ async function updateTrackPrivacy(trackSlug, privacyBool) {
 }
 
 async function getFeaturedTracks(privateTracksAllowedUserIds) {
+  // TODO: We should return a nested 'artist' object within each track with these
+  // properties rather than adding these fields at the top-level.
   const fields = {
     artist: "users.displayName",
     username: "users.username",

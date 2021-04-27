@@ -1,3 +1,4 @@
+var Comments = require("./comments");
 var Events = require("./events");
 var Feedback = require("./feedback");
 var FeedbackPrompts = require("./feedbackPrompts");
@@ -10,9 +11,8 @@ var Tracks = require("./tracks");
 var TrackCredits = require("./trackCredits");
 var User = require("./users");
 
-
-
 module.exports = {
+  Comments,
   Events,
   Feedback,
   FeedbackPrompts,

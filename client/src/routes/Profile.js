@@ -8,7 +8,7 @@ import { UserContext } from "../Context";
 import EditProfile from "../EditProfile";
 import PageWrapper from "../PageWrapper";
 import ProfileHeader from "../ProfileHeader";
-import TrackListTable from "../TrackListTable";
+import TrackListGrid from "../TrackListGrid";
 
 const useStyles = makeStyles({
   bodyText: {
@@ -164,6 +164,8 @@ function Profile() {
         user?.id === track.userId)
     );
   });
+  const hasEditPriviledges =
+    user && profileUser && user.username === profileUser.username;
 
   return (
     <PageWrapper>
@@ -174,6 +176,7 @@ function Profile() {
             tracks={profileTracks}
             profileStats={profileStats}
             onClickEdit={handleClickEdit}
+            hasEditPriviledges={hasEditPriviledges}
           />
           <EditProfile
             errorMessage={profileEditError}
@@ -190,15 +193,11 @@ function Profile() {
           {filteredTracks.length === 0 ? (
             <EmptyWelcome hasUploadPrivilege={hasUploadPrivilege} />
           ) : (
-            <TrackListTable
-              shouldShowPrivacy
+            <TrackListGrid
               shouldShowDelete
-              onDeleteTrack={onDeleteTrack}
               tracks={filteredTracks}
-              user={profileUser}
-              setProfileUser={setProfileUser}
               title="Tracks"
-              size="medium"
+              onDeleteTrack={onDeleteTrack}
             />
           )}
         </Box>

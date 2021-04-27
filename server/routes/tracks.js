@@ -4,6 +4,7 @@ var multer = require("multer");
 var AuthService = require("../services/auth");
 var UploadService = require("../services/upload");
 var DeleteService = require("../services/delete");
+var Comments  = require("../db/models").Comments;
 var Feedback = require("../db/models").Feedback;
 var TrackCredits = require("../db/models").TrackCredits;
 var Tracks = require("../db/models").Tracks;
@@ -78,6 +79,16 @@ router.get("/:slug", async function (req, res, next) {
   res.status(200).send(track);
 });
 
+router.get("/:slug/comments", async function (req, res, next) {
+  try {
+    const comments = await Comments.getByTrackSlug(req.params.slug);
+    res.status(200).send(comments);
+  } catch (e) {
+    console.error("error", e);
+    res.status(400).send(e);
+  }
+});
+
 // In-memory handling for form data from incoming multipart/form-data request
 var processFile = multer();
 
@@ -85,11 +96,28 @@ var processFile = multer();
 router.post(
   "/",
   tokenMiddleware.requireUser,
-  processFile.single("audio"),
+  processFile.fields([
+    { name: "audio", maxCount: 1 },
+    { name: "artwork", maxCount: 1 },
+  ]),
   async function (req, res, next) {
+    if (!req.files.audio.length) {
+      res.status(400).send("Must provide an audio file to upload.");
+    }
+    const audio = req.files.audio[0];
+    let artwork = null;
+    if (req.files.artwork && req.files.artwork.length) {
+      artwork = req.files.artwork[0];
+    }
+
     try {
       // TODO: Separate separate track upload from track creation
-      const track = await UploadService.Upload(req.body, req.file, req.userId);
+      const track = await UploadService.Upload(
+        req.body,
+        audio,
+        artwork,
+        req.userId
+      );
       res.status(201).send(track);
     } catch (e) {
       console.log("error", e);
@@ -106,7 +134,7 @@ router.delete("/:slug", async function (req, res, next) {
     console.log("error", e);
     res.status(400).send(e);
   }
-})
+});
 
 router.post("/privacy/:slug", async function (req, res, next) {
   try {
