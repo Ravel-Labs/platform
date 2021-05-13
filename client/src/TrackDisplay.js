@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 import { TrendingUp } from "@material-ui/icons";
 
+import Wave from "./Wave";
 import { UserContext } from "./Context";
 import AudioPlayer from "./AudioPlayer";
 import FeedbackPromptForm from "./FeedbackPromptForm";
@@ -141,6 +142,7 @@ function TrackDisplay({ track, onFeedbackSubmitted }) {
           </>
         )}
       </Grid>
+      <Wave />
     </div>
   );
 }
