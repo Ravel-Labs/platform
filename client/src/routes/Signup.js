@@ -24,7 +24,7 @@ const signupFields = [
     helperText: "Don't have an invite? Reach out to info@ravelmusic.io.",
   },
   {
-    label: "Dislay Name",
+    label: "Display Name",
     name: "displayName",
     type: "text",
     required: true,
