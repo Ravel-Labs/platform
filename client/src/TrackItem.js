@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
@@ -57,11 +58,21 @@ const useStyles = makeStyles((theme) => ({
     color: "#303f9f",
   },
   title: {
+    display: "inline-block",
     fontWeight: 700,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    maxWidth: "100%",
     "&:hover": {
       cursor: "pointer",
       textDecoration: "underline",
     },
+  },
+  titleRow: {
+    whiteSpace: "nowrap",
+    maxWidth: "100%",
+    justifyContent: "space-between",
+    textAlign: "left",
   },
   artist: {
     "&:hover": {
@@ -71,6 +82,7 @@ const useStyles = makeStyles((theme) => ({
   },
   delete: {
     cursor: "pointer",
+    textAlign: "right",
   },
 }));
 
@@ -90,7 +102,7 @@ function TrackItem({ track, shouldShowDelete, onClickDelete }) {
   };
 
   return (
-    <Grid item className={classes.item}>
+    <Grid item className={classes.trackItem}>
       <Box
         className={classes.trackImageWrapper}
         onClick={() => onClickTrack(track.slug)}
@@ -109,39 +121,41 @@ function TrackItem({ track, shouldShowDelete, onClickDelete }) {
           </div>
         </Box>
       </Box>
-      <div>
-        <Grid container justify="space-between">
-          <Grid item>
-            <Grid container onClick={() => onClickTrack(track.slug)}>
-              <Grid item>
-                {track.isPrivate && <Lock alt="Private" fontSize="small" />}
-              </Grid>
-              <Grid item>
-                <Typography
-                  variant="body1"
-                  align="left"
-                  className={classes.title}
-                >
-                  {track.title}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Typography
-              variant="body2"
-              align="left"
-              className={classes.artist}
-              onClick={() => onClickArtist(track.username)}
-            >
-              {track.artist}
+      <Grid container justify="space-between">
+        <Grid item container className={classes.titleRow}>
+          <Grid
+            item
+            xs={10}
+            className={classes.titleRowItem}
+            onClick={() => onClickTrack(track.slug)}
+          >
+            {track.isPrivate && <Lock alt="Private" fontSize="small" />}
+            <Typography variant="body1" align="left" className={classes.title}>
+              {track.title}
             </Typography>
           </Grid>
           {shouldShowDelete && user && user.username === track.username && (
-            <Grid item className={classes.delete} onClick={onClickDelete}>
+            <Grid
+              item
+              xs={2}
+              className={classNames(classes.delete, classes.titleRowItem)}
+              onClick={onClickDelete}
+            >
               <Delete alt="Delete" fontSize="small" />
             </Grid>
           )}
         </Grid>
-      </div>
+        <Grid item container className={classes.artistRow}>
+          <Typography
+            variant="body2"
+            align="left"
+            className={classes.artist}
+            onClick={() => onClickArtist(track.username)}
+          >
+            {track.artist}
+          </Typography>
+        </Grid>
+      </Grid>
     </Grid>
   );
 }
