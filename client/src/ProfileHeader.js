@@ -62,11 +62,18 @@ function ProfileHeader({
   const classes = useStyles();
   const hasStats =
     profileStats.feedbackCount > 0 || !isNaN(profileStats.avgRating);
+
   let locationDisplay = profileUser?.city || "";
   if (locationDisplay.length && profileUser?.country) {
     locationDisplay += `, ${profileUser.country}`;
   } else if (profileUser?.country) {
     locationDisplay = profileUser?.country;
+  }
+
+  // Ensure we use a link format that won't be interpreted by the browser as a relative link.
+  let formattedLink = profileUser.link?.url || "";
+  if (formattedLink.indexOf("//") === -1) {
+    formattedLink = "http://" + formattedLink;
   }
 
   return (
@@ -125,7 +132,12 @@ function ProfileHeader({
           )}
           {profileUser.link && (
             <Grid container direction="row" alignItems="center">
-              <Link href={profileUser.link.url} className={classes.link}>
+              <Link
+                href={formattedLink}
+                className={classes.link}
+                rel="noopener"
+                target="_blank"
+              >
                 <LinkIcon />
                 <span className={classes.linkText}>{profileUser.link.url}</span>
               </Link>
